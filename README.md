@@ -3,10 +3,13 @@
 
 ---
 Developed by:  
-Masuya Masafumi, Toshitsugu Yoneyama, Takeshi Terada, Tomoyuki Kudo, Isao Takaesu
+Masuya Masafumi, Toshitsugu Yoneyama, Takeshi Terada, Tomoyuki Kudo, Isao Takaesu  
 
 Working for:  
-**[Mitsui Bussan Secure Directions, Inc](https://www.mbsd.jp/en/)**. Japan.
+**[Mitsui Bussan Secure Directions, Inc](https://www.mbsd.jp/en/)**. Japan.  
+
+Gyoithon at Black Hat ASIA 2018 Arsenal:  
+[https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)
 
 ## Overview
  GyoiThon is a **growing penetration test tool using Machine Learning**. Machine Learning improves classification accuracy in proportion to the amount of learning data. Therefore, GyoiThon will be taking in new learning data during every scan. Since GyoiThon uses various features of software included in HTTP response as learning data, the more you scan, the more the accuracy of software detection improves. For this reason, GyoiThon is a growing penetration test tool.  
@@ -68,7 +71,7 @@ Working for:
 #### Step 2. Identify product name.
  GyoiThon identify product name installed on web server using **two methods**.
 
- 1. Machine Learning base.  
+##### 1. Machine Learning base.  
   By using Machine Learning (**Naive Bayes**), software analysis engine identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes is learned using the training data which example below. Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
 
    * Example.1  
@@ -104,7 +107,7 @@ Working for:
    ...snip...
    ```
 
- 2. Signature base.  
+##### 2. Signature base.  
  Of course, GyoiThon can identify software by signature base (**string matching**) also used in traditional penetration test tools. Examples are shown below.
 
    * Example.3  
@@ -249,9 +252,6 @@ local@client:~$ python gyoithon.py -t 192.168.184.132
       -v --verbose                   Show verbose message
       -h --help                      Show this screen and exit.
  ```
-
- * Demonstration movie  
- [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/BHJB-gWucp4/0.jpg)](http://www.youtube.com/watch?v=BHJB-gWucp4)
 
 ## Operation check environment
  * Kali Linux 2017.3 (Guest OS on VMWare)
