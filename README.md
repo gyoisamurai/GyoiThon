@@ -19,7 +19,7 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
  It is very easy!  
  You can identify vulnerabilities of the web servers without taking time and effort.
 
-## Procesing flow
+## Processing flow
 #### Step 1. Gather HTTP responses.
  GyoiThon gathers several HTTP responses of target website while **crawling**.  
  The following are example of HTTP responses gathered by GyoiThon.  
