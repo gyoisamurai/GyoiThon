@@ -2,13 +2,7 @@
 **Next generation penetration test tool**
 
 ---
-Developed by:  
-Masuya Masafumi, Toshitsugu Yoneyama, Takeshi Terada, Tomoyuki Kudo, Isao Takaesu  
-
-Working for:  
-**[Mitsui Bussan Secure Directions, Inc](https://www.mbsd.jp/en/)**. Japan.  
-
-Gyoithon at Black Hat ASIA 2018 Arsenal:  
+Gyoithon at **Black Hat ASIA 2018 Arsenal**:  
 [https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)
 
 ## Overview
@@ -22,12 +16,12 @@ Gyoithon at Black Hat ASIA 2018 Arsenal:
  GyoiThon executes the above "Step1" - "Step4" fully automatically.  
  **User's operation only inputs the top URL** of the target web server in GyoiThon.
 
- Using GyoiThon is easy!  
+ It is very easy!  
  You can identify vulnerabilities of the web servers without taking time and effort.
 
 ## Procesing flow
 #### Step 1. Gather HTTP responses.
- GyoiThon gathers several responses of target website while **crawling**.  
+ GyoiThon gathers several HTTP responses of target website while **crawling**.  
  The following are example of HTTP responses gathered by GyoiThon.  
 
  * Example.1  
@@ -72,14 +66,14 @@ Gyoithon at Black Hat ASIA 2018 Arsenal:
  GyoiThon identify product name installed on web server using **two methods**.
 
 ##### 1. Machine Learning base.  
-  By using Machine Learning (**Naive Bayes**), software analysis engine identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes is learned using the training data which example below. Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
+  By using Machine Learning (**Naive Bayes**), GyoiThon identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes is learned using the training data which example below (Training data). Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
 
    * Example.1  
    ```
    Etag: "409ed-183-53c5f732641c0"
    ```
    GyoiThon can identify the web server software **Apache**.  
-   This is because GyoiThon learns features of Apache such as "**Etag header value** (409ed-183-53c5f732641c0). In our survey, Apache use **combination of numeral and lower case letters as the Etag value**. And, Etag value is **separated 4-5 digits and 3 digits and 12 digits, final digit is 0** in many cases..
+   This is because GyoiThon learns features of Apache such as "**Etag header value** (409ed-183-53c5f732641c0). In our survey, Apache use **combination of numeral and lower case letters as the Etag value**. And, Etag value is **separated 4-5 digits and 3-4 digits and 12 digits, final digit is 0** in many cases.  
 
    * Example.2  
    ```
@@ -88,24 +82,25 @@ Gyoithon at Black Hat ASIA 2018 Arsenal:
    GyoiThon can identify the CMS **Joomla!**.  
    This is because GyoiThon learns features of Joomla! such as "**Cookie name** (f00e6 ... 9831e) " and "**Cookie value** (0eba9 ... 7f587). In our survey, Joomla! uses **32 lower case letters as the Cookie name and Cookie value** in many cases.
 
-   * Training data (One example)  
-   **Joomla!** (CMS)
-   ```
-   Set-Cookie: ([a-z|0-9]{32})=[a-z|0-9]{26,32};
-   Set-Cookie: [a-z|0-9]{32}=([a-z|0-9]{26,32});
-   ...snip...
-   ```
-   **HeartCore** (Japanese famous CMS)  
-   ```
-   Set-Cookie:.*=([A-Z|0-9]{32});.*
-   <meta name=["|'](author)["|'] content=["|']{2}.*
-   ...snip...
-   ```
-   **Apache** (Web server software)  
-   ```
-   Etag:.*".*-[0-9|a-z]{3,4}-[0-9|a-z]{13}")[\r\n]
-   ...snip...
-   ```
+###### Training data (One example)  
+ * Joomla! (CMS)
+ ```
+ Set-Cookie: ([a-z|0-9]{32})=[a-z|0-9]{26,32};
+ Set-Cookie: [a-z|0-9]{32}=([a-z|0-9]{26,32});
+ ...snip...
+ ```
+ * HeartCore (Japanese famous CMS)  
+ ```
+ Set-Cookie:.*=([A-Z|0-9]{32});.*
+ <meta name=["|'](author)["|'] content=["|']{2}.*
+ ...snip...
+ ```
+
+ * Apache (Web server software)  
+ ```
+ Etag:.*".*-[0-9|a-z]{3,4}-[0-9|a-z]{13}")[\r\n]
+ ...snip...
+ ```
 
 ##### 2. Signature base.  
  Of course, GyoiThon can identify software by signature base (**string matching**) also used in traditional penetration test tools. Examples are shown below.
@@ -115,10 +110,11 @@ Gyoithon at Black Hat ASIA 2018 Arsenal:
    <script src="/core/misc/drupal.js?v=8.3.1"></script>
    ```
    GyoiThon can identify the CMS **Drupal**.  
-   It is very easy.
+   It is very easy.  
 
 #### Step 3. Exploit using Metasploit.
-It collects vulnerability information corresponding to identify software. And, the engine executes an exploit corresponding to the vulnerability of the software and checks whether the software is affected by the vulnerability.
+GyoiThon executes exploit corresponding to the identified software using Metasploit.  
+And it checks whether the software is affected by the vulnerability.  
 
  ![Link with Metasploit](./img/link_with_metasploit.png)  
 
