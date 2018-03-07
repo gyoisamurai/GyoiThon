@@ -1,5 +1,5 @@
 # **GyoiThon**
-**Next generation penetration tool**
+**Next generation penetration test tool**
 
 ---
 Developed by:  
