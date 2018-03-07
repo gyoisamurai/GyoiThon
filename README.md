@@ -2,7 +2,7 @@
 **Next generation penetration test tool**
 
 ---
-Gyoithon at **Black Hat ASIA 2018 Arsenal**:  
+GyoiThon at **Black Hat ASIA 2018 Arsenal**:  
 [https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)
 
 ## Overview
