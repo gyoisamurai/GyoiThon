@@ -65,7 +65,7 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
 #### Step 2. Identify product name.
  GyoiThon identify product name installed on web server using **two methods**.
 
-##### 1. Machine Learning base.  
+##### 1. based on Machine Learning.  
   By using Machine Learning (**Naive Bayes**), GyoiThon identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes is learned using the training data which example below (Training data). Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
 
    * Example.1  
@@ -102,8 +102,8 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
  ...snip...
  ```
 
-##### 2. Signature base.  
- Of course, GyoiThon can identify software by signature base (**string matching**) also used in traditional penetration test tools. Examples are shown below.
+##### 2. based on String matching.  
+ Of course, GyoiThon can identify software by **string matching** also used in traditional penetration test tools. Examples are shown below.
 
    * Example.3  
    ```
