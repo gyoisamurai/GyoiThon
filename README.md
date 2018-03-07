@@ -12,9 +12,9 @@ Gyoithon at Black Hat ASIA 2018 Arsenal:
 [https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)
 
 ## Overview
- GyoiThon is a **growing penetration test tool using Machine Learning**. Machine Learning improves classification accuracy in proportion to the amount of learning data. Therefore, GyoiThon will be taking in new learning data during every scan. Since GyoiThon uses various features of software included in HTTP response as learning data, the more you scan, the more the accuracy of software detection improves. For this reason, GyoiThon is a growing penetration test tool.  
+ GyoiThon is a **growing penetration test tool using Machine Learning**.  
 
- GyoiThon **identifies the software installed on web server** (OS, Middleware, Framework, CMS, etc...) based on the learning data. After that, it **executes valid exploits** for the identified software using Metasploit. Finally, it **generates reports** of scan results. GyoiThon executes the above processing **automatically**.  
+ GyoiThon **identifies the software installed on web server** (OS, Middleware, Framework, CMS, etc...) based on the learning data. After that, it **executes valid exploits** for the identified software using Metasploit. Finally, it **generates reports** of scan results. GyoiThon executes the above processing **automatically**. 
 
  * Processing steps  
  ![Processing flow](./img/processing_flow.png)
