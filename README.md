@@ -75,15 +75,15 @@ Working for:
    ```
    Etag: "409ed-183-53c5f732641c0"
    ```
-    GyoiThon can identify the web server software **Apache**.  
-    This is because GyoiThon learns features of Apache such as "**Etag header value** (409ed-183-53c5f732641c0). In our survey, Apache use **combination of numeral and lower case letters as the Etag value**. And, Etag value is **separated 4-5 digits and 3 digits and 12 digits, final digit is 0** in many cases..
+   GyoiThon can identify the web server software **Apache**.  
+   This is because GyoiThon learns features of Apache such as "**Etag header value** (409ed-183-53c5f732641c0). In our survey, Apache use **combination of numeral and lower case letters as the Etag value**. And, Etag value is **separated 4-5 digits and 3 digits and 12 digits, final digit is 0** in many cases..
 
    * Example.2  
    ```
    Set-Cookie: f00e68432b68050dee9abe33c389831e=0eba9cd0f75ca0912b4849777677f587;
    ```
-    GyoiThon can identify the CMS **Joomla!**.  
-    This is because GyoiThon learns features of Joomla! such as "**Cookie name** (f00e6 ... 9831e) " and "**Cookie value** (0eba9 ... 7f587). In our survey, Joomla! uses **32 lower case letters as the Cookie name and Cookie value** in many cases.
+   GyoiThon can identify the CMS **Joomla!**.  
+   This is because GyoiThon learns features of Joomla! such as "**Cookie name** (f00e6 ... 9831e) " and "**Cookie value** (0eba9 ... 7f587). In our survey, Joomla! uses **32 lower case letters as the Cookie name and Cookie value** in many cases.
 
    * Training data (One example)  
    **Joomla!** (CMS)
@@ -111,11 +111,11 @@ Working for:
    ```
    <script src="/core/misc/drupal.js?v=8.3.1"></script>
    ```
-    GyoiThon can identify the CMS **Drupal**.  
-    It is very easy.
+   GyoiThon can identify the CMS **Drupal**.  
+   It is very easy.
 
 #### Step 3. Exploit using Metasploit.
- It collects vulnerability information corresponding to identify software. And, the engine executes an exploit corresponding to the vulnerability of the software and checks whether the software is affected by the vulnerability.
+It collects vulnerability information corresponding to identify software. And, the engine executes an exploit corresponding to the vulnerability of the software and checks whether the software is affected by the vulnerability.
 
  ![Link with Metasploit](./img/link_with_metasploit.png)  
 
@@ -137,13 +137,13 @@ Working for:
  ```
 
 #### Step 4. Generate scan report.
- GyoiThon generates a report that summarizes vulnerabilities.  
+GyoiThon generates a report that summarizes vulnerabilities.  
 
  ![Report sample](../report.png)
 
 ## Usage
 #### Step.1 Launch Metasploit Framework
- You launch Metasploit on the remote server that installed Metasploit Framework such as Kali Linux.
+You launch Metasploit on the remote server that installed Metasploit Framework such as Kali Linux.
 
 ```
 root@kali:~# msfconsole
@@ -187,7 +187,7 @@ msf >
 ```
 
 #### Step.2 Launch RPC Server
- You launch RPC Server of Metasploit following.
+You launch RPC Server of Metasploit following.
 
 ```
 msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test1234
@@ -207,7 +207,7 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
  Any password using authentication (default => random string)
 
 #### Step.3 Run GyoiThon
- You execute GyoiThon following command.
+You execute GyoiThon following command.
 
 ```
 local@client:~$ python gyoithon.py -t 192.168.184.132
@@ -215,8 +215,6 @@ local@client:~$ python gyoithon.py -t 192.168.184.132
 
  * command options
  ```
- ./pyph_mod/mod_pyphOpt.py
-
   Usage:
       ./pyph_mod/mod_pyphOpt.py [-v | --verbose] [-t | --target <ip>] [-p | --port <port>]
              [-s | --ssl] [-S | --sni] [-l | --list <target_list>]
@@ -272,6 +270,7 @@ local@client:~$ python gyoithon.py -t 192.168.184.132
 
 ## Contact us
  [gyoiler3@gmail.com](gyoiler3@gmail.com)  
+
  * Masafumi Masuya (@GyoiZamurai)  
  [https://twitter.com/gyoizamurai](https://twitter.com/gyoizamurai)
  * Isao Takaesu (@bbr_bbq)  
