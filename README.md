@@ -138,7 +138,6 @@ And it checks whether the software is affected by the vulnerability.
 #### Step 4. Generate scan report.
 GyoiThon generates a report that summarizes vulnerabilities.  
 
- ![Report sample](../report.png)
 
 ## Usage
 #### Step.1 Launch Metasploit Framework
