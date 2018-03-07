@@ -252,7 +252,7 @@ local@client:~$ python gyoithon.py -t 192.168.184.132
       -h --help                      Show this screen and exit.
  ```
 
- * Demonstration movie
+ * Demonstration movie  
  [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/BHJB-gWucp4/0.jpg)](http://www.youtube.com/watch?v=BHJB-gWucp4)
 
 ## Operation check environment
