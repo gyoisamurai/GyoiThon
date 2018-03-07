@@ -266,7 +266,7 @@ local@client:~$ python gyoithon.py -t 192.168.184.132
    * docopt 0.6.2
 
 ## Licence
-[Apache License 2.0](../license.txt)
+[Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
 
 ## Contact us
  [gyoiler3@gmail.com](gyoiler3@gmail.com)  
