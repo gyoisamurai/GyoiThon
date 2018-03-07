@@ -267,7 +267,7 @@ local@client:~$ python gyoithon.py -t 192.168.184.132
 ## Contact us
  [gyoiler3@gmail.com](gyoiler3@gmail.com)  
 
- * [Masafumi Masuya](https://www.blackhat.com/asia-18/arsenal/schedule/presenters.html#masafumi-masuya-36855)  
+ * [Masafumi Masuya](https://www.blackhat.com/asia-18/arsenal/schedule/presenters.html#masafumi-masuya-36855)  
  [https://twitter.com/gyoizamurai](https://twitter.com/gyoizamurai)
  * [Isao Takaesu](https://www.blackhat.com/asia-18/arsenal/schedule/presenters.html#isao-takaesu-33544)  
  [https://twitter.com/bbr_bbq](https://twitter.com/bbr_bbq)
