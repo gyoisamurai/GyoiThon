@@ -1,8 +1,7 @@
-# **GyoiThon**
+# **GyoiThon** ![gyoithon's logo](./img/gyoi_logo.png)  
 **Next generation penetration test tool**
 
 ---
- ![gyoithon's logo](./img/gyoi_logo.png)  
 
 GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)**.  
 
