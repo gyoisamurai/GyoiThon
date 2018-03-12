@@ -6,7 +6,8 @@ import time
 import codecs
 import configparser
 import pickle
-import argparse
+import docopt
+import ipaddress
 import pandas as pd
 from urllib.parse import urlparse
 from urllib.request import urlopen
@@ -23,7 +24,7 @@ class DeepClassifier:
         # Read config.ini.
         config = configparser.ConfigParser()
         try:
-            config.read('./classifier4gyoithon/config.ini')
+            config.read('./config.ini')
         except FileExistsError as err:
             print('File exists error: {0}', err)
             sys.exit(1)
@@ -71,7 +72,7 @@ class DeepClassifier:
     def analyzer(self, target_ip='', target_port=0, target_vhost='', silent=False, target_url='', target_response=''):
         # Display banner.
         self.show_start_banner()
-        time.sleep(5)
+        time.sleep(0.1)
         time.sleep(float(self.wait_for_banner))
 
         target_info = ''
@@ -85,7 +86,7 @@ class DeepClassifier:
                                             (df_origin['vhost'] == target_vhost)]
 
             # Get log file (webconf.csv)
-            logfile_path = df_selected_summary.iloc[0, 12]
+            logfile_path = '../' + df_selected_summary.iloc[0, 12]
             fin = codecs.open(logfile_path, 'r', encoding='utf-8')
             analyzing_text = fin.read()
             fin.close()
@@ -187,38 +188,94 @@ class DeepClassifier:
         return nb
 
 
-if __name__ == '__main__':
-    cmd_parser = argparse.ArgumentParser()
-    cmd_parser.add_argument('-t',
-                            '--target',
-                            action='store',
-                            nargs=None,
-                            const=None,
-                            default=None,
-                            type=str,
-                            metavar=None)
-    args = cmd_parser.parse_args()
+# Define command option.
+__doc__ = """{f}
+Usage:
+    {f} (-t <ip_addr> | --target <ip_addr>) (-p <port> | --port <port>) (-v <vhost> | --vhost <vhost>) [(-u <url> | --url <url>)]
+    {f} -h | --help
+Options:
+    -t --target   Require  : IP address of target server.
+    -p --port     Require  : Port number of target server.
+    -v --vhost    Require  : Virtual Host of target server.
+    -u --url      Optional : Full URL for direct access.
+    -h --help     Optional : Show this screen and exit.
+""".format(f=__file__)
 
-    target = urlparse(args.target)
-    if 'http' not in target.scheme:
-        print('Invalid scheme : {0}.'.format(target.scheme))
-        sys.exit(0)
-    if target.netloc == '':
-        print('Invalid fqdn : {0}.'.format(target.netloc))
-        sys.exit(0)
-    target_url = target.geturl()
-    target_response = ''
+
+# Parse command arguments.
+def command_parse():
+    args = docopt.docopt(__doc__)
+    ip_addr = args['<ip_addr>']
+    port = args['<port>']
+    vhost = args['<vhost>']
+    url = args['<url>']
+    return ip_addr, port, vhost, url
+
+
+# Check IP address format.
+def is_valid_ip(arg):
     try:
-        with urlopen(target_url) as furl:
-            target_response = str(furl.info()).rstrip()
-            target_response += furl.read().decode('utf-8')
-    except Exception as err:
-        print('Connection error: {0}'.format(err))
+        ipaddress.ip_address(arg)
+        return True
+    except ValueError:
+        return False
+
+
+# Check argument values.
+def check_arg_value(ip_addr, port, vhost, url=None):
+    # Check IP address.
+    if is_valid_ip(ip_addr) is False:
+        print('[*] Invalid IP address: {0}'.format(ip_addr))
+        return False
+
+    # Check port number.
+    if port.isdigit() is False:
+        print('[*] Invalid port number: {0}'.format(port))
+        return False
+    elif (int(port) < 1) or (int(port) > 65535):
+        print('[*] Invalid port number: {0}'.format(port))
+        return False
+
+    # Check virtual host.
+    if isinstance(vhost, str) is False and isinstance(vhost, int) is False:
+        print('[*] Invalid vhost: {0}'.format(vhost))
+        return False
+
+    # Check url.
+    if url is not None:
+        target = urlparse(url)
+        if 'http' not in target.scheme:
+            print('[*] Invalid scheme : {0}.'.format(target.scheme))
+            return False
+        if target.netloc == '':
+            print('[*] Invalid fqdn : {0}.'.format(target.netloc))
+            return False
+
+    return True
+
+
+if __name__ == '__main__':
+    # Get command arguments.
+    ip_addr, port, vhost, url = command_parse()
+
+    # Check argument values.
+    if check_arg_value(ip_addr, port, vhost, url) is False:
+        print('[*] Invalid argument.')
         sys.exit(1)
 
+    # Get target's response.
+    response = ''
+    if url is not None:
+        target = urlparse(url)
+        target_url = target.geturl()
+        try:
+            with urlopen(target_url) as furl:
+                response = str(furl.info()).rstrip()
+                response += furl.read().decode('utf-8')
+        except Exception as err:
+            print('[*] Connection error: {0}'.format(err))
+            sys.exit(1)
+
+    # Execute classifier.
     classifier = DeepClassifier()
-    # Debug
-    target_ip = '40.115.251.148'
-    target_port = 443
-    target_vhost = 'www.mbsd.jp'
-    classifier.analyzer(target_ip, target_port, target_vhost, target_url, target_response)
+    classifier.analyzer(ip_addr, int(port), vhost, False, url, response)
