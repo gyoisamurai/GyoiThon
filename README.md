@@ -140,7 +140,7 @@ And it checks whether the software is affected by the vulnerability.
 GyoiThon generates a report that summarizes vulnerabilities.  
 
  * sample
- [![gyoithon_report](./img/gyoi_report.png)](./report/gyoi_report.html)
+ [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/report/gyoithon_report.html)
 
 ## Usage
 #### Step.1 Launch Metasploit Framework
