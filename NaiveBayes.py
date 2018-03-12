@@ -11,32 +11,32 @@ class NaiveBayes:
         self.word_count = {}
         self.category_count = {}
 
-    # カテゴリ単位でカウント(Bag-of-Wordsの作成)
+    # Count up word (Create Bag-of-Words).
     def word_count_up(self, word, category):
         self.word_count.setdefault(category, {})
         self.word_count[category].setdefault(word, 0)
         self.word_count[category][word] += 1
         self.vocabularies.add(word)
 
-    # カテゴリ数のカウント
+    # Count up category number.
     def category_count_up(self, category):
         self.category_count.setdefault(category, 0)
         self.category_count[category] += 1
 
-    # キーワードとカテゴリを基に学習
+    # Learning based on keyword and category.
     def train(self, doc, category):
-        # カテゴリ単位でカウントする
+        # Count each category.
         self.word_count_up(doc, category)
-        # カテゴリ数をカウントする
+        # Count category number.
         self.category_count_up(category)
 
-    # ベイズ定理における事前確率の計算
+    # Calculate prior probability of Bayes.
     def prior_prob(self, category):
         num_of_categories = sum(self.category_count.values())
         num_of_docs_of_the_category = self.category_count[category]
         return float(num_of_docs_of_the_category) / float(num_of_categories)
 
-    # キーワードの出現数をカウント
+    # Count number of appearance.
     def num_of_appearance(self, word, category):
         word_count = 0
         keyword_list = []
@@ -49,35 +49,35 @@ class NaiveBayes:
         prob = float(word_count) / float(len(self.word_count[category]))
         return word_count, keyword_list, prob
 
-    # ベイズ定理の計算
+    # Calculate Bayes.
     def word_prob(self, word, category):
         numerator, keyword_list, temp_prob = self.num_of_appearance(word, category)
-        # ラプラス・スムージング
+        # Laplace  smoothing.
         numerator += 1
         denominator = sum(self.word_count[category].values()) + len(self.vocabularies)
         prob = float(numerator) / float(denominator)
         return prob, keyword_list, temp_prob
 
-    # 予測したいキーワードが各カテゴリに含まれる確率を計算
+    # Calculate score.
     def score(self, word, category):
         score = math.log(self.prior_prob(category))
         prob, keyword_list, temp_prob = self.word_prob(word, category)
         score += math.log(prob)
         return score, prob, keyword_list, temp_prob
 
-    # 分類の実行
+    # Execute classify.
     def classify(self, doc):
         best_guessed_category = None
         max_prob_before = -sys.maxsize
         keyword_list = []
         classified_list = []
 
-        # カテゴリ単位で類似度のスコアを算出
+        # Calculate score each category.
         for category in self.category_count.keys():
             score, total_prob, feature_list, category_prob = self.score(doc, category)
             classified_list.append([category, float(total_prob), feature_list])
 
-            # 予測したい文章を、スコアの最も大きいカテゴリに分類する
+            # Classify word to highest score's category.
             if score > max_prob_before:
                 max_prob_before = score
                 best_guessed_category = category
