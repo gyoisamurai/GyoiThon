@@ -213,49 +213,21 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
  * Pass  
  Any password using authentication (default => random string)
 
-#### Step.3 Run GyoiThon
+#### Step.3 Edit target file.
+GyoiThon accesses target server using host.txt.  
+So, you have to edit `host.txt` before executing GyoiThon.  
+
+ * sample of host.txt (target server => 192.168.220.148)  
+ ```
+ 192.168.220.148 80
+ ```
+
+#### Step.4 Run GyoiThon
 You execute GyoiThon following command.
 
 ```
-local@client:~$ python gyoithon.py -t 192.168.184.132
+local@client:~$ python gyoithon.py
 ```
-
- * command options
- ```
-  Usage:
-      ./pyph_mod/mod_pyphOpt.py [-v | --verbose] [-t | --target <ip>] [-p | --port <port>]
-             [-s | --ssl] [-S | --sni] [-l | --list <target_list>]
-             [-P | --path <path_list>] [-H | --header <request_header>] [-U | --ua <ua>]
-             [-m | --method <method>] [-V | --version <version>]
-             [-i | --ip] [-f | --fqdn] [-D | --dryrun]
-             [-b | --basic <id:pass>] [-d | --digest <id:pass>]
-             [-o | --output <output_directory>] [-n | --name <name>]
-             [-W | --Wait <wait_sec>] [-T | --timeout <timeout_sec>]
-      ./pyph_mod/mod_pyphOpt.py -h | --help
-
-  Options:
-      -t --target <ip>               Target IP
-      -p --port <port>               Target port
-      -l --list <target_list>        Use target list
-      -P --path <path_list>          Use path list
-      -H --header <request_header>   Use custom request header(delimiter='@')
-      -U --ua <ua>                   Use custom UserAgent
-      -V --version <version>         HTTP protocol version
-      -s --ssl                       Use ssl
-      -S --sni                       Use SNI
-      -b --basic <id:pass>           Use Basic Auth
-      -d --digest <id:pass>          Use Digest Auth
-      -m --method <method>           Use method
-      -i --ip                        IP mode
-      -f --fqdn                      FQDN mode
-      -D --dryrun                    Dry run mode. Print curl command!!
-      -n --name <name>               Suffix of log file name
-      -o --output <output_directory> writting mode. Directory of output log file
-      -W --wait <wait_sec>           Waitting time per request.
-      -T --timeout <timeout_sec>     Timeout sec.
-      -v --verbose                   Show verbose message
-      -h --help                      Show this screen and exit.
- ```
 
 ## Operation check environment
  * Kali Linux 2017.3 (Guest OS on VMWare)
