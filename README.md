@@ -217,7 +217,9 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
 GyoiThon accesses target server using host.txt.  
 So, you have to edit `host.txt` before executing GyoiThon.  
 
- * sample of host.txt (target server => 192.168.220.148)  
+ * sample of host.txt  
+ target server => 192.168.220.148  
+ target port => 80  
  ```
  192.168.220.148 80
  ```
