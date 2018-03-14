@@ -142,6 +142,13 @@ GyoiThon generates a report that summarizes vulnerabilities.
  [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/report/gyoithon_report.html)
 
 ## Usage
+#### Step.0 Initialize Metasploit DB
+Firstly, you initialize metasploit db (postgreSQL) using msfdb command.
+
+```
+root@kali:~# msfdb init
+```
+
 #### Step.1 Launch Metasploit Framework
 You launch Metasploit on the remote server that installed Metasploit Framework such as Kali Linux.
 
