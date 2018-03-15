@@ -232,17 +232,20 @@ local@client:~$ python gyoithon.py
 ```
 
 ## Operation check environment
- * Kali Linux 2017.3 (Guest OS on VMWare)
+ * Kali Linux 2017.3 (for Metasploit)
    * Memory: 8.0GB
    * Metasploit Framework 4.16.15-dev
- * Windows 7 Professional 64-bit (Host OS)
+ * ubuntu 16.04 LTS (Host OS)
    * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz
-   * Memory: 16.0GB
+   * Memory: 8.0GB
    * Python 3.6.1（Anaconda3）
-   * pandas 0.20.3
-   * msgpack 0.4.8
+   * beautifulsoup4 4.6.0
    * docopt 0.6.2
+   * fake-useragent 0.1.10
    * jinja2 2.10
+   * msgpack-python 0.4.8
+   * pandas 0.20.3
+   * tqdm 4.19.7
 
 ## Licence
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
