@@ -140,7 +140,7 @@ GyoiThon generates a report that summarizes vulnerabilities.
 Report's style is html.  
 
  * sample
- ![gyoithon_report](./img/gyoi_report.png)
+ [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/report/gyoithon_report.html)
 
 ## Usage
 #### Step.0 Initialize Metasploit DB
