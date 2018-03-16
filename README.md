@@ -136,9 +136,10 @@ GyoiThon executes exploit corresponding to the identified software using Metaspl
 
 #### Step 4. Generate scan report.
 GyoiThon generates a report that summarizes vulnerabilities.  
+Report's style is html.  
 
  * sample
- [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/report/gyoithon_report.html)
+ ![gyoithon_report](./img/gyoi_report.png)
 
 ## Usage
 #### Step.0 Initialize Metasploit DB
@@ -203,17 +204,12 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
 [*] Successfully loaded plugin: msgrpc
 ```
 
- * msgrpc options
-   * ServerHost  
-   IP address of your server that launched Metasploit.  
-   Above example is `192.168.220.144`.
-   * ServerPort  
-   Any port number of your server that launched Metasploit.  
-   Above example is `55553`.
-   * User  
-   Any user name using authentication (default => msf)
-   * Pass  
-   Any password using authentication (default => random string)
+|msgrpc options|description|
+|:---|:---|
+|ServerHost|IP address of your server that launched Metasploit. Above example is `192.168.220.144`.|
+|ServerPort|Any port number of your server that launched Metasploit. Above example is `55553`.|
+|User|Any user name using authentication (default => msf). Above example is `test`.|
+|Pass|Any password using authentication (default => random string). Above example is `test1234`.|
 
 #### Step.3 Edit config file.
 You have to change following value in ![`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
@@ -229,36 +225,21 @@ msgrpc_pass      : test1234
 timeout          : 10
 LHOST            : 192.168.220.144
 LPORT            : 4444
-data_path        : data
-wait_for_banner  : 1
 
 ...snip...
 ```
 
- * server_host  
- IP address of your server that launched Metasploit.  
- Your setting value `ServerHost` in Step2.  
- Above example is `192.168.220.144`.  
- * server_port  
- Any port number of your server that launched Metasploit.  
- Your setting value `ServerPort` in Step2.  
- Above example is `55553`.  
- * msgrpc_user  
- Metasploit's user name using authentication.  
- Your setting value `User` in Step2.  
- Above example is `test`.  
- * msgrpc_pass  
- Metasploit's password using authentication.  
- Your setting value `Pass` in Step2.  
- Above example is `test1234`.  
- * LHOST  
- IP address of your server that launched Metasploit.  
- Your setting value `ServerHost` in Step2.  
- Above example is `192.168.220.144`.  
+ |config|description|
+ |:---|:---|
+ |server_host|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
+ |server_port|Any port number of your server that launched Metasploit. Your setting value `ServerPort` in Step2.|
+ |msgrpc_user|Metasploit's user name using authentication. Your setting value `User` in Step2.|
+ |msgrpc_pass|Metasploit's password using authentication. Your setting value `Pass` in Step2.|
+ |LHOST|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
 
 #### Step.4 Edit target file.
 GyoiThon accesses target server using host.txt.  
-So, you have to edit `host.txt` before executing GyoiThon.  
+So, you have to edit [`host.txt`](https://github.com/gyoisamurai/GyoiThon/blob/master/host.txt) before executing GyoiThon.  
 
  * sample of host.txt  
  target server => 192.168.220.148  
@@ -266,6 +247,8 @@ So, you have to edit `host.txt` before executing GyoiThon.
  ```
  192.168.220.148 80
  ```
+
+You have to separate IP address and port number using single space.  
 
 #### Step.5 Run GyoiThon
 You execute GyoiThon following command.
@@ -275,7 +258,11 @@ local@client:~$ python gyoithon.py
 ```
 
 #### Step.6 Check scan report
+Please check scan report using any web browser.  
 
+```
+local@client:~$ firefox "gyoithon root path"/classifier4gyoithon/report/gyoithon_report.html
+```
 
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)

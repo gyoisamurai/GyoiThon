@@ -1,2 +1,0 @@
-PHP@(Set-Cookie: [a-z|0-9|A-Z]{32}=[a-z|0-9]{26,32});
-Java@(Set-Cookie: [a-z|0-9|A-Z]{32}=[A-Z|0-9]{26,32});
