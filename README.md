@@ -291,7 +291,7 @@ If you want to change option values, please edit [`exploit_tree.json`](https://r
             "user_specify": "/my_original_dir/"
         },
 ```
-Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "/my_original_dir/" from "/joomla".  
+Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "`/my_original_dir/`" from "`/joomla`".  
 
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)
