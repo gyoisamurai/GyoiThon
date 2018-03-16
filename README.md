@@ -267,11 +267,10 @@ local@client:~$ firefox "gyoithon root path"/classifier4gyoithon/report/gyoithon
 
 ## Tips
 #### Changing Exploit module's option.
-When GyoiThon exploits, it uses **default value** of Exploit module options. 
+When GyoiThon exploits, it uses **default value** of Exploit module options.  
 If you want to change option values, please edit [`exploit_tree.json`](https://raw.githubusercontent.com/gyoisamurai/GyoiThon/master/classifier4gyoithon/data/exploit_tree.json) as following.
 
 ```
-...snip...
 
 "unix/webapp/joomla_media_upload_exec": {
     "targets": {
@@ -279,16 +278,6 @@ If you want to change option values, please edit [`exploit_tree.json`](https://r
             "generic/custom",
             "generic/shell_bind_tcp",
             "generic/shell_reverse_tcp",
-            "php/bind_perl",
-            "php/bind_perl_ipv6",
-
-...snip...
-
-    "options": {
-        "WORKSPACE": {
-            "type": "string",
-            "required": false,
-            "advanced": true,
 
 ...snip...
 
@@ -299,13 +288,10 @@ If you want to change option values, please edit [`exploit_tree.json`](https://r
             "evasion": false,
             "desc": "The base path to Joomla",
             "default": "/joomla",
-            "user_specify": "/joomla/"
+            "user_specify": "/my_original_dir/"
         },
-
-...snip...
 ```
-Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`".  
-
+Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "/my_original_dir/" from "/joomla".  
 
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)
