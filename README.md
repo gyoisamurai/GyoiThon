@@ -209,8 +209,8 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
  |:---|:---|
  |ServerHost|IP address of your server that launched Metasploit. Above example is `192.168.220.144`.|
  |ServerPort|Any port number of your server that launched Metasploit. Above example is `55553`.|
- |User|Any user name using authentication (default => msf)|
- |Pass|Any password using authentication (default => random string)|
+ |User|Any user name using authentication (default => msf). Above example is `test`.|
+ |Pass|Any password using authentication (default => random string). Above example is `test1234`.|
 
 #### Step.3 Edit config file.
 You have to change following value in [`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
