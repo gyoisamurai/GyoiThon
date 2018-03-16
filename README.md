@@ -137,6 +137,7 @@ And it checks whether the software is affected by the vulnerability.
 
 #### Step 4. Generate scan report.
 GyoiThon generates a report that summarizes vulnerabilities.  
+Report's style is html.  
 
  * sample
  [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/report/gyoithon_report.html)
@@ -233,11 +234,11 @@ wait_for_banner  : 1
 
  |config|description|
  |:---|:---|
- |server_host|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2. Above example is `192.168.220.144`.|
- |server_port|Any port number of your server that launched Metasploit. Your setting value `ServerPort` in Step2. Above example is `55553`.|
- |msgrpc_user|Metasploit's user name using authentication. Your setting value `User` in Step2. Above example is `test`.|
- |msgrpc_pass|Metasploit's password using authentication. Your setting value `Pass` in Step2. Above example is `test1234`.|
- |LHOST|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2. Above example is `192.168.220.144`.|
+ |server_host|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
+ |server_port|Any port number of your server that launched Metasploit. Your setting value `ServerPort` in Step2.|
+ |msgrpc_user|Metasploit's user name using authentication. Your setting value `User` in Step2.|
+ |msgrpc_pass|Metasploit's password using authentication. Your setting value `Pass` in Step2.|
+ |LHOST|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
 
 #### Step.4 Edit target file.
 GyoiThon accesses target server using host.txt.  
@@ -250,6 +251,8 @@ So, you have to edit `host.txt` before executing GyoiThon.
  192.168.220.148 80
  ```
 
+You have to separate IP address and port number using single space.  
+
 #### Step.5 Run GyoiThon
 You execute GyoiThon following command.
 
@@ -258,7 +261,11 @@ local@client:~$ python gyoithon.py
 ```
 
 #### Step.6 Check scan report
+Please check scan report using any web browser.  
 
+```
+local@client:~$ firefox "gyoithon root path"/classifier4gyoithon/report/gyoithon_report.html
+```
 
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)
