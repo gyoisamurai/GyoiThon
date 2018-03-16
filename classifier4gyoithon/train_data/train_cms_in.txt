@@ -1,38 +1,40 @@
 Joomla!@(Set-Cookie: [a-z|0-9]{32}=[a-z|0-9]{26,32});
 Joomla!@(<script.*/joomla/.*</script>)
-Joomla!@([j|J][o|O][o|O][m|M][l|L][a|A]!)
+Joomla!@(joomla!)
 HeartCore@(Set-Cookie:.*=[A-Z|0-9]{32});.*
 HeartCore@(<meta name=["|']author["|'] content=["|']{2}).*
 TYPO3@(Set-Cookie: .*typo.*=[a-z|0-9]{32});
 TYPO3@.*(TYPO[0-9]).*
+TikiWiki@(Powered by TikiWiki)
 osCommerce@(Set-Cookie: osCsid=.*);
 osCommerce@(Set-Cookie: .*=[a-z|0-9]{32});
-Word Press@([w|W][o|O][r|R][d|D] [p|P][r|R][e|E][s|S][s|S])
-Word Press@([w|W][o|O][r|R][d|D][p|P][r|R][e|E][s|S][s|S])
+Word Press@(word press)
+Word Press@(wordpress)
 Word Press@<.*=(.*/wp-).*/.*>
 Word Press@(X-Pingback):.*xmlrpc.php[\r\n]
 Word Press@(<body class=["|']home ).*
-Movable Type@([m|M][o|O][v|V][a|A][b|B][l|L][e|E][t|T][y|Y][p|P][e|E])
+Movable Type@(movable type)
+Movable Type@(movabletype)
 Movable Type@<.*/(mt-.*)/.*>
 Movable Type@(<.*/mt/.*>)
-EC CUBE@([e|E][c|C] [c|C][u|U][b|B][e|E])
-EC CUBE@([e|E][c|C][c|C][u|U][b|B][e|E])
-EC CUBE@(Set-Cookie: [p|P][h|H][p|P][s|S][e|E][s|S][s|S][i|I][d|D]=.*);
-EC CUBE@([e|E][c|C][c|C][u|U][b|B][e|E]\.js)
-EC CUBE@([e|E][c|C][c|C][u|U][b|B][e|E]\.[l|L][e|E][g|G][a|A][c|C][y|Y]\.js)
-EC CUBE 2@([e|E][c|C] [c|C][u|U][b|B][e|E])
-EC CUBE 2@([e|E][c|C][c|C][u|U][b|B][e|E])
-EC CUBE 2@(Set-Cookie: [e|E][c|C][c|C][u|U][b|B][e|E]=.*);
-EC CUBE 2@([e|E][c|C][c|C][u|U][b|B][e|E]\.js)
-EC CUBE 2@([e|E][c|C][c|C][u|U][b|B][e|E]\.[l|L][e|E][g|G][a|A][c|C][y|Y]\.js)
-EC CUBE 3@([e|E][c|C] [c|C][u|U][b|B][e|E])
-EC CUBE 3@([e|E][c|C][c|C][u|U][b|B][e|E])
-EC CUBE 3@(Set-Cookie: [e|E][c|C][s|S][e|E][s|S][s|S][i|I][d|D]=.*);
-EC CUBE 3@([e|E][c|C][c|C][u|U][b|B][e|E]\.js)
-EC CUBE 3@([e|E][c|C][c|C][u|U][b|B][e|E]\.[l|L][e|E][g|G][a|A][c|C][y|Y]\.js)
-XOOPS@([x|X][o|O][o|O][p|P][s|S])
-XOOPS@([x|X][o|O][o|O][p|P][s|S] [c|C][u|U][b|B][e|E])
-XOOPS@([x|X][o|O][o|O][p|P][s|S][c|C][u|U][b|B][e|E])
-XOOPS@([x|X][o|O][o|O][p|P][s|S][c|C][u|U][b|B][e|E]\.js)
-XOOPS@([x|X][o|O][o|O][p|P][s|S]\.js)
-XOOPS@([x|X][o|O][o|O][p|P][s|S]\.css)
+EC CUBE@(ec cube)
+EC CUBE@(eccube)
+EC CUBE@(Set-Cookie: phpsessid=.*);
+EC CUBE@(eccube\.js)
+EC CUBE@(eccube\.legacy\.js)
+EC CUBE 2@(ec cube)
+EC CUBE 2@(eccube])
+EC CUBE 2@(Set-Cookie: eccube=.*);
+EC CUBE 2@(eccube\.js)
+EC CUBE 2@(eccube\.legacy\.js)
+EC CUBE 3@(ec cube)
+EC CUBE 3@(eccube])
+EC CUBE 3@(Set-Cookie: ecsessid=.*);
+EC CUBE 3@(eccube\.js)
+EC CUBE 3@(eccube\.legacy\.js)
+XOOPS@(xoops)
+XOOPS@(xoops cube)
+XOOPS@(xoopscube)
+XOOPS@(xoopscube\.js)
+XOOPS@(xoops\.js)
+XOOPS@(xoops\.css)
