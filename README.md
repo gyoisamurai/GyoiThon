@@ -204,16 +204,60 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
 [*] Successfully loaded plugin: msgrpc
 ```
 
- * ServerHost  
- Your Server IP address.
- * ServerPort  
- Any port number.
- * User  
- Any user name using authentication (default => msf)
- * Pass  
- Any password using authentication (default => random string)
+ * msgrpc options
+   * ServerHost  
+   IP address of your server that launched Metasploit.  
+   Above example is `192.168.220.144`.
+   * ServerPort  
+   Any port number of your server that launched Metasploit.  
+   Above example is `55553`.
+   * User  
+   Any user name using authentication (default => msf)
+   * Pass  
+   Any password using authentication (default => random string)
 
-#### Step.3 Edit target file.
+#### Step.3 Edit config file.
+You have to change following value in ![`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
+
+```
+...snip...
+
+[GyoiExploit]
+server_host      : 192.168.220.144
+server_port      : 55553
+msgrpc_user      : test
+msgrpc_pass      : test1234
+timeout          : 10
+LHOST            : 192.168.220.144
+LPORT            : 4444
+data_path        : data
+wait_for_banner  : 1
+
+...snip...
+```
+
+ * server_host  
+ IP address of your server that launched Metasploit.  
+ Your setting value `ServerHost` in Step2.  
+ Above example is `192.168.220.144`.  
+ * server_port  
+ Any port number of your server that launched Metasploit.  
+ Your setting value `ServerPort` in Step2.  
+ Above example is `55553`.  
+ * msgrpc_user  
+ Metasploit's user name using authentication.  
+ Your setting value `User` in Step2.  
+ Above example is `test`.  
+ * msgrpc_pass  
+ Metasploit's password using authentication.  
+ Your setting value `Pass` in Step2.  
+ Above example is `test1234`.  
+ * LHOST  
+ IP address of your server that launched Metasploit.  
+ Your setting value `ServerHost` in Step2.  
+ Above example is `192.168.220.144`.  
+
+#### Step.4 Edit target file.
 GyoiThon accesses target server using host.txt.  
 So, you have to edit `host.txt` before executing GyoiThon.  
 
@@ -224,12 +268,15 @@ So, you have to edit `host.txt` before executing GyoiThon.
  192.168.220.148 80
  ```
 
-#### Step.4 Run GyoiThon
+#### Step.5 Run GyoiThon
 You execute GyoiThon following command.
 
 ```
 local@client:~$ python gyoithon.py
 ```
+
+#### Step.6 Check scan report
+
 
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)
