@@ -140,7 +140,7 @@ GyoiThon generates a report that summarizes vulnerabilities.
 Report's style is html.  
 
  * sample
- [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/report/gyoithon_report.html)
+ ![gyoithon_report](./img/gyoi_report.png)
 
 ## Usage
 #### Step.0 Initialize Metasploit DB
@@ -226,8 +226,6 @@ msgrpc_pass      : test1234
 timeout          : 10
 LHOST            : 192.168.220.144
 LPORT            : 4444
-data_path        : data
-wait_for_banner  : 1
 
 ...snip...
 ```
@@ -242,7 +240,7 @@ wait_for_banner  : 1
 
 #### Step.4 Edit target file.
 GyoiThon accesses target server using host.txt.  
-So, you have to edit `host.txt` before executing GyoiThon.  
+So, you have to edit [`host.txt`](https://github.com/gyoisamurai/GyoiThon/blob/master/host.txt) before executing GyoiThon.  
 
  * sample of host.txt  
  target server => 192.168.220.148  
