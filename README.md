@@ -85,20 +85,20 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
 ###### Training data (One example)  
  * Joomla! (CMS)
  ```
- Set-Cookie: ([a-z|0-9]{32})=[a-z|0-9]{26,32};
- Set-Cookie: [a-z|0-9]{32}=([a-z|0-9]{26,32});
+ Set-Cookie: ([a-z0-9]{32})=[a-z0-9]{26,32};
+ Set-Cookie: [a-z0-9]{32}=([a-z0-9]{26,32});
  ...snip...
  ```
  * HeartCore (Japanese famous CMS)  
  ```
- Set-Cookie:.*=([A-Z|0-9]{32});.*
+ Set-Cookie:.*=([A-Z0-9]{32});.*
  <meta name=["|'](author)["|'] content=["|']{2}.*
  ...snip...
  ```
 
  * Apache (Web server software)  
  ```
- Etag:.*".*-[0-9|a-z]{3,4}-[0-9|a-z]{13}")[\r\n]
+ Etag:.*".*-[0-9a-z]{3,4}-[0-9a-z]{13}")[\r\n]
  ...snip...
  ```
 
