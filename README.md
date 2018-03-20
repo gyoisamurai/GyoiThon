@@ -92,7 +92,7 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
  * HeartCore (Japanese famous CMS)  
  ```
  Set-Cookie:.*=([A-Z0-9]{32});.*
- <meta name=["|'](author)["|'] content=["|']{2}.*
+ <meta name=["'](author)["'] content=["']{2}.*
  ...snip...
  ```
 
