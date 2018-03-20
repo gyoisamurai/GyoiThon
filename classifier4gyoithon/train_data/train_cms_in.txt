@@ -1,5 +1,5 @@
-Joomla!@(Set-Cookie: [a-z0-9]{32}=[a-z0-9]{26,32});
-Joomla!@(<script.*/joomla/.*</script>)
+Joomla!@(Set-Cookie: [a-z0-9]{32}=.*{26,32});
+Joomla!@(Set-Cookie: .*=[a-z0-9]{26,32});
 Joomla!@(joomla!)
 HeartCore@(Set-Cookie:.*=[A-Z0-9]{32});.*
 HeartCore@(<meta name=["']author["'] content=["']{2}).*
@@ -20,18 +20,6 @@ Movable Type@(<.*/mt/.*>)
 EC CUBE@(ec cube)
 EC CUBE@(eccube)
 EC CUBE@(Set-Cookie: phpsessid=.*);
-EC CUBE@(eccube\.js)
-EC CUBE@(eccube\.legacy\.js)
-EC CUBE 2@(ec cube)
-EC CUBE 2@(eccube])
-EC CUBE 2@(Set-Cookie: eccube=.*);
-EC CUBE 2@(eccube\.js)
-EC CUBE 2@(eccube\.legacy\.js)
-EC CUBE 3@(ec cube)
-EC CUBE 3@(eccube])
-EC CUBE 3@(Set-Cookie: ecsessid=.*);
-EC CUBE 3@(eccube\.js)
-EC CUBE 3@(eccube\.legacy\.js)
 XOOPS@(xoops)
 XOOPS@(xoops cube)
 XOOPS@(xoopscube)
