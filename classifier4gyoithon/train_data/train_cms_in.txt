@@ -1,4 +1,4 @@
-Joomla!@(Set-Cookie: [a-z0-9]{32}=.*{26,32});
+Joomla!@(Set-Cookie: [a-z0-9]{32}=.*);
 Joomla!@(Set-Cookie: .*=[a-z0-9]{26,32});
 Joomla!@(joomla!)
 HeartCore@(Set-Cookie:.*=[A-Z0-9]{32});.*
