@@ -66,7 +66,7 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
  GyoiThon identify product name installed on web server using **two methods**.
 
 ##### 1. based on Machine Learning.  
-  By using Machine Learning (**Naive Bayes**), GyoiThon identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes is learned using the training data which example below (Training data). Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
+  By using Machine Learning (**Naive Bayes**), GyoiThon identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes learns using the training data which example below (Training data). Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
 
    * Example.1  
    ```
@@ -274,7 +274,7 @@ local@client:~$ firefox "gyoithon root path"/classifier4gyoithon/report/gyoithon
 ## Tips
 #### Changing Exploit module's option.
 When GyoiThon exploits, it uses **default value** of Exploit module options.  
-If you want to change option values, please edit [`exploit_tree.json`](https://raw.githubusercontent.com/gyoisamurai/GyoiThon/master/classifier4gyoithon/data/exploit_tree.json) as following.
+If you want to change option values, please input any value to `"user_specify"` in [`exploit_tree.json`](https://raw.githubusercontent.com/gyoisamurai/GyoiThon/master/classifier4gyoithon/data/exploit_tree.json) as following.
 
 ```
 
