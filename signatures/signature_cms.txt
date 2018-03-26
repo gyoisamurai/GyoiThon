@@ -1,0 +1,7 @@
+tikiwiki@(Powered by TikiWiki)
+wordpress@<.*=(.*/wp-).*/.*>
+movabletype@<.*/(mt-.*)/.*>
+movabletype@(<.*/mt/.*>)
+xoops@(xoopscube\.js)
+xoops@(xoops\.js)
+xoops@(xoops\.css)

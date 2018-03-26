@@ -85,20 +85,20 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
 ###### Training data (One example)  
  * Joomla! (CMS)
  ```
- Set-Cookie: ([a-z|0-9]{32})=[a-z|0-9]{26,32};
- Set-Cookie: [a-z|0-9]{32}=([a-z|0-9]{26,32});
+ Set-Cookie: ([a-z0-9]{32})=[a-z0-9]{26,32};
+ Set-Cookie: [a-z0-9]{32}=([a-z0-9]{26,32});
  ...snip...
  ```
  * HeartCore (Japanese famous CMS)  
  ```
- Set-Cookie:.*=([A-Z|0-9]{32});.*
- <meta name=["|'](author)["|'] content=["|']{2}.*
+ Set-Cookie:.*=([A-Z0-9]{32});.*
+ <meta name=["'](author)["'] content=["']{2}.*
  ...snip...
  ```
 
  * Apache (Web server software)  
  ```
- Etag:.*".*-[0-9|a-z]{3,4}-[0-9|a-z]{13}")[\r\n]
+ Etag:.*".*-[0-9a-z]{3,4}-[0-9a-z]{13}")[\r\n]
  ...snip...
  ```
 
@@ -139,7 +139,13 @@ GyoiThon generates a report that summarizes vulnerabilities.
 Report's style is html.  
 
  * sample
- ![gyoithon_report](./img/gyoi_report.png)
+ [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/report/gyoithon_report.html)
+
+## Demonstration movie.
+
+ [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/jmi43eZOE9w/0.jpg)](http://www.youtube.com/watch?v=jmi43eZOE9w)  
+
+ https://www.youtube.com/watch?v=jmi43eZOE9w
 
 ## Usage
 #### Step.0 Initialize Metasploit DB
@@ -263,6 +269,34 @@ Please check scan report using any web browser.
 ```
 local@client:~$ firefox "gyoithon root path"/classifier4gyoithon/report/gyoithon_report.html
 ```
+
+## Tips
+#### Changing Exploit module's option.
+When GyoiThon exploits, it uses **default value** of Exploit module options.  
+If you want to change option values, please input any value to `"user_specify"` in [`exploit_tree.json`](https://raw.githubusercontent.com/gyoisamurai/GyoiThon/master/classifier4gyoithon/data/exploit_tree.json) as following.
+
+```
+
+"unix/webapp/joomla_media_upload_exec": {
+    "targets": {
+        "0": [
+            "generic/custom",
+            "generic/shell_bind_tcp",
+            "generic/shell_reverse_tcp",
+
+...snip...
+
+        "TARGETURI": {
+            "type": "string",
+            "required": true,
+            "advanced": false,
+            "evasion": false,
+            "desc": "The base path to Joomla",
+            "default": "/joomla",
+            "user_specify": "/my_original_dir/"
+        },
+```
+Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "`/my_original_dir/`" from "`/joomla`".  
 
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)
