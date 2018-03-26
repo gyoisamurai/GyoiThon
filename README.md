@@ -260,7 +260,7 @@ You have to separate IP address, port number and target path using single space.
 
  |Note|
  |:---|
- |Current `gyoithon.py` is provisional version that without crawling function. We'll upgrade `gyoithon.py` until April 9th. Then, target path will be unnecessary.|
+ |Current `gyoithon.py` is provisional version that without crawling function. We'll upgrade `gyoithon.py` by April 9. Then, target path will be unnecessary.|
 
 #### Step.5 Run GyoiThon
 You execute GyoiThon following command.
