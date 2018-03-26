@@ -80,6 +80,7 @@ class DeepClassifier:
         time.sleep(0.1)
         time.sleep(float(self.wait_for_banner))
 
+        identified_list = []
         target_info = ''
         target_log = ''
         analyzing_text = ''
@@ -91,7 +92,7 @@ class DeepClassifier:
                                             (df_origin['vhost'] == target_vhost)]
 
             # Get log file (webconf.csv)
-            logfile_path = os.path.join(self.root_path, df_selected_summary.iloc[0, 12])
+            logfile_path = os.path.join(self.root_path, df_selected_summary.at[0, 'log'])
             fin = codecs.open(logfile_path, 'r', encoding='utf-8')
             analyzing_text = fin.read()
             fin.close()
@@ -144,6 +145,7 @@ class DeepClassifier:
                 sorted_classified_list = sorted(classified_list, key=lambda x: x[1], reverse=True)
                 print(OKBLUE + '[-] category : {0}'.format(category) + ENDC)
                 for idx, item in enumerate(sorted_classified_list):
+                    add_flag = True
                     if idx >= self.maximum_display_num:
                         break
                     # Delete duplicated result.
@@ -153,17 +155,22 @@ class DeepClassifier:
                     # # If no feature, reason is "too few features".
                     if len(item[2]) == 0:
                         reason_list = 'too few features..'
+                        add_flag = False
                     print('    ' + '-' * 5)
                     print(OKBLUE + '    ranking {0}\n'
                                    '    product     : {1}\n'
                                    '    probability : {2} %\n'
                                    '    reason      : {3}'.format(idx + 1, item[0], round(item[1] * 100.0, 4),
                                                                   reason_list) + ENDC)
+                    # Add product for Exploit.
+                    identified_list.append(item[0])
 
         # Output result of prediction (footer).
         print('-' * 42)
         print()
         print('[+] done {0}'.format(os.path.basename(__file__)))
+
+        return list(set(identified_list))
 
     # Execute learning / Get learned data.
     def train(self, in_file, out_file):
