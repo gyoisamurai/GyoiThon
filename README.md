@@ -14,7 +14,7 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
  ![Processing flow](./img/processing_flow.png)
 
  GyoiThon executes the above "Step1" - "Step4" fully automatically.  
- **User's operation only inputs the top URL** of the target web server in GyoiThon.
+ **User's only operation is to input the top URL** of the target web server in GyoiThon.
 
  It is very easy!  
  You can identify vulnerabilities of the web servers without taking time and effort.
@@ -63,10 +63,10 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
  ```
 
 #### Step 2. Identify product name.
- GyoiThon identify product name installed on web server using **two methods**.
+ GyoiThon identifies product name installed on web server using following **two methods**.
 
-##### 1. based on Machine Learning.  
-  By using Machine Learning (**Naive Bayes**), GyoiThon identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes learns using the training data which example below (Training data). Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
+##### 1. Based on Machine Learning.  
+  By using Machine Learning (**Naive Bayes**), GyoiThon identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes is learned using the training data which example below (Training data). Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
 
    * Example.1  
    ```
@@ -102,7 +102,7 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
  ...snip...
  ```
 
-##### 2. based on String matching.  
+##### 2. Based on String matching.  
  Of course, GyoiThon can identify software by **string matching** also used in traditional penetration test tools. Examples are shown below.
 
    * Example.3  
@@ -113,8 +113,7 @@ GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/ars
    It is very easy.  
 
 #### Step 3. Exploit using Metasploit.
-GyoiThon executes exploit corresponding to the identified software using Metasploit.  
-And it checks whether the software is affected by the vulnerability.  
+GyoiThon executes exploit corresponding to the identified software using Metasploit and it checks whether the software is affected by the vulnerability.  
 
  ![Link with Metasploit](./img/link_with_metasploit.png)  
 
@@ -211,15 +210,15 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
 [*] Successfully loaded plugin: msgrpc
 ```
 
- |msgrpc options|description|
- |:---|:---|
- |ServerHost|IP address of your server that launched Metasploit. Above example is `192.168.220.144`.|
- |ServerPort|Any port number of your server that launched Metasploit. Above example is `55553`.|
- |User|Any user name using authentication (default => msf). Above example is `test`.|
- |Pass|Any password using authentication (default => random string). Above example is `test1234`.|
+|msgrpc options|description|
+|:---|:---|
+|ServerHost|IP address of your server that launched Metasploit. Above example is `192.168.220.144`.|
+|ServerPort|Any port number of your server that launched Metasploit. Above example is `55553`.|
+|User|Any user name using authentication (default => msf). Above example is `test`.|
+|Pass|Any password using authentication (default => random string). Above example is `test1234`.|
 
 #### Step.3 Edit config file.
-You have to change following value in [`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
+You have to change following value in ![`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
 
 ```
 ...snip...
