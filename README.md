@@ -3,6 +3,7 @@
 
 ---
 
+[![Black Hat Arsenal](https://www.toolswatch.org/badges/arsenal/2018.svg)](https://www.toolswatch.org/2018/01/black-hat-arsenal-asia-2018-great-lineup/)  
 GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)**.  
 
 ## Overview
