@@ -41,7 +41,7 @@ class NaiveBayes:
         word_count = 0
         keyword_list = []
         for key_item in self.word_count[category]:
-            list_match = re.findall(key_item, word)
+            list_match = re.findall(key_item, word, flags=re.IGNORECASE)
             if len(list_match) != 0:
                 word_count += 1
                 # keyword_list.append(key_item)
