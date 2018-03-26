@@ -250,11 +250,16 @@ So, you have to edit [`host.txt`](https://github.com/gyoisamurai/GyoiThon/blob/m
  * sample of host.txt  
  target server => 192.168.220.148  
  target port => 80  
+ target path => /oscommerce/catalog/
  ```
- 192.168.220.148 80
+ 192.168.220.148 80 /oscommerce/catalog/
  ```
 
-You have to separate IP address and port number using single space.  
+You have to separate IP address, port number and target path using single space.  
+
+ |Note|
+ |:---|
+ |Current `gyoithon.py` is provisional version that without crawling function. We'll upgrade `gyoithon.py` until April 9th. Then, target path will be unnecessary.|
 
 #### Step.5 Run GyoiThon
 You execute GyoiThon following command.
@@ -306,13 +311,10 @@ Above example is to change value of `TARGETURI` option in exploit module "`explo
    * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz
    * Memory: 8.0GB
    * Python 3.6.1（Anaconda3）
-   * beautifulsoup4 4.6.0
    * docopt 0.6.2
-   * fake-useragent 0.1.10
    * jinja2 2.10
    * msgpack-python 0.4.8
    * pandas 0.20.3
-   * tqdm 4.19.7
 
 ## Licence
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
