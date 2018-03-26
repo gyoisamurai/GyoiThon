@@ -1,28 +1,27 @@
-Joomla!@(Set-Cookie: [a-z0-9]{32}=.*);
-Joomla!@(Set-Cookie: .*=[a-z0-9]{26,32});
-Joomla!@(joomla!)
-HeartCore@(Set-Cookie:.*=[A-Z0-9]{32});.*
-HeartCore@(<meta name=["']author["'] content=["']{2}).*
-TYPO3@(Set-Cookie: .*typo.*=[a-z0-9]{32});
-TYPO3@.*(TYPO[0-9]).*
-TikiWiki@(Powered by TikiWiki)
-osCommerce@(Set-Cookie: osCsid=.*);
-osCommerce@(Set-Cookie: .*=[a-z0-9]{32});
-Word Press@(word press)
-Word Press@(wordpress)
-Word Press@<.*=(.*/wp-).*/.*>
-Word Press@(X-Pingback):.*xmlrpc.php[\r\n]
-Word Press@(<body class=["']home ).*
-Movable Type@(movable type)
-Movable Type@(movabletype)
-Movable Type@<.*/(mt-.*)/.*>
-Movable Type@(<.*/mt/.*>)
-EC CUBE@(ec cube)
-EC CUBE@(eccube)
-EC CUBE@(Set-Cookie: phpsessid=.*);
-XOOPS@(xoops)
-XOOPS@(xoops cube)
-XOOPS@(xoopscube)
-XOOPS@(xoopscube\.js)
-XOOPS@(xoops\.js)
-XOOPS@(xoops\.css)
+joomla@(Set-Cookie: [a-z0-9]{32}=.*);
+joomla@(Set-Cookie: .*=[a-z0-9]{26,32});
+joomla@(joomla!)
+heartcore@(Set-Cookie:.*=[A-Z0-9]{32});.*
+heartcore@(<meta name=["']author["'] content=["']{2}).*
+typo@(Set-Cookie: .*typo.*=[a-z0-9]{32});
+typo@.*(TYPO[0-9]).*
+oscommerce@(Set-Cookie: osCsid=.*);
+oscommerce@(Set-Cookie: .*=[a-z0-9]{32});
+wordpress@(word press)
+wordpress@(wordpress)
+wordpress@<.*=(.*/wp-).*/.*>
+wordpress@(X-Pingback):.*xmlrpc.php[\r\n]
+wordpress@(<body class=["']home ).*
+movabletype@(movable type)
+movabletype@(movabletype)
+movabletype@<.*/(mt-.*)/.*>
+movabletype@(<.*/mt/.*>)
+eccube@(ec cube)
+eccube@(eccube)
+eccube@(Set-Cookie: phpsessid=.*);
+xoops@(xoops)
+xoops@(xoops cube)
+xoops@(xoopscube)
+xoops@(xoopscube\.js)
+xoops@(xoops\.js)
+xoops@(xoops\.css)
