@@ -218,7 +218,7 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
 |Pass|Any password using authentication (default => random string). Above example is `test1234`.|
 
 #### Step.3 Edit config file.
-You have to change following value in ![`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
+You have to change following value in [`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
 
 ```
 ...snip...
