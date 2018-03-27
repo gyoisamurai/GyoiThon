@@ -277,7 +277,97 @@ local@client:~$ firefox "gyoithon root path"/classifier4gyoithon/report/gyoithon
 ```
 
 ## Tips
-#### Changing Exploit module's option.
+#### 1. How to add string matching patterns.  
+`signatures` path includes four files corresponding to each product categories.  
+
+```
+local@client:~$ ls "gyoithon root path"/signatures/
+signature_cms.txt
+signature_framework.txt
+signature_os.txt
+signature_web.txt
+```
+
+ * `signature_cms.txt`  
+ It includes string matching patterns of CMS.  
+ * `signature_framework.txt`  
+ It includes string matching patterns of FrameWork.  
+ * `signature_os.txt`  
+ It includes string matching patterns of Operating System.  
+ * `signature_web.txt`  
+ It includes string matching patterns of Web server software.  
+
+If you want to add new string matching patterns, you add new string matching patterns at last line in each file.  
+
+ex) How to add new string matching pattern of CMS at `signature_cms.txt`.  
+```
+tikiwiki@(Powered by TikiWiki)
+wordpress@<.*=(.*/wp-).*/.*>
+wordpress@(<meta name="generator" content="WordPress).*>
+
+...snip...
+
+typo@.*(href="fileadmin/templates/).*>
+typo@(<meta name="generator" content="TYPO3 CMS).*>
+"new product name"@"regex pattern"
+[EOF]
+```
+
+ |Note|
+ |:---|
+ |Above new product name must be a name that Metasploit can identify. And you have to separate new product name and regex pattern using `@`.|
+
+
+#### 2. How to add learning data.  
+`signatures` path includes four files corresponding to each product categories.  
+
+```
+local@client:~$ ls "gyoithon root path"/classifier4gyoithon/train_data/
+train_cms_in.txt
+train_framework_in.txt
+train_os_in.txt
+train_web_in.txt
+```
+
+ * `train_cms_in.txt`  
+ It includes learning data of CMS.  
+ * `train_framework_in.txt`  
+ It includes learning data of FrameWork.  
+ * `train_os_in.txt`  
+ It includes learning data of Operating System.  
+ * `train_web_in.txt`  
+ It includes learning data of Web server software.  
+
+If you want to add new learning data, you add learning data at last line in each file.  
+
+ex) How to add new learning data of CMS at `train_cms_in.txt`.  
+```
+joomla@(Set-Cookie: [a-z0-9]{32}=.*);
+joomla@(Set-Cookie: .*=[a-z0-9]{26,32});
+
+...snip...
+
+xoops@(xoops\.js)
+xoops@(xoops\.css)
+"new product name"@"regex pattern"
+[EOF]
+```
+
+ |Note|
+ |:---|
+ |Above new product name must be a name that Metasploit can identify. And you have to separate new product name and regex pattern using `@`.|
+
+And you have to delete trained data (`*.pkl`).  
+
+```
+local@client:~$ ls "gyoithon root path"/classifier4gyoithon/trained_data/
+train_cms_out.pkl
+train_framework_out.pkl
+train_web_out.pkl
+local@client:~$ rm "gyoithon root path"/classifier4gyoithon/trained_data/*.pkl
+```
+
+#### 3. How to change "Exploit module's option".
 When GyoiThon exploits, it uses **default value** of Exploit module options.  
 If you want to change option values, please input any value to `"user_specify"` in [`exploit_tree.json`](https://raw.githubusercontent.com/gyoisamurai/GyoiThon/master/classifier4gyoithon/data/exploit_tree.json) as following.
 
