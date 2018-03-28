@@ -1,9 +1,10 @@
+[![Black Hat Arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/2018.svg)](https://www.toolswatch.org/2018/01/black-hat-arsenal-asia-2018-great-lineup/)  
+
 # **GyoiThon** ![gyoithon's logo](./img/gyoi_logo.png)  
 **Next generation penetration test tool**
 
 ---
 
-[![Black Hat Arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/2018.svg)](https://www.toolswatch.org/2018/01/black-hat-arsenal-asia-2018-great-lineup/)  
 GyoiThon at **[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)**.  
 
 ## Overview
