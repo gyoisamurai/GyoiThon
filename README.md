@@ -1,4 +1,4 @@
-[![Black Hat Arsenal](https://raw.githubusercontent.com/toolswatch/badges/master/arsenal/asia/2018.svg?sanitize=true)
+![Black Hat Arsenal](https://raw.githubusercontent.com/toolswatch/badges/master/arsenal/asia/2018.svg?sanitize=true)
 
 # **GyoiThon** ![gyoithon's logo](./img/gyoi_logo.png)  
 **Next generation penetration test tool**
