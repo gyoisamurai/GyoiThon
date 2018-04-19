@@ -412,7 +412,7 @@ Above example is to change value of `TARGETURI` option in exploit module "`explo
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
 
 ## Contact us
- [gyoiler3@gmail.com](gyoiler3@gmail.com)  
+ gyoiler3@gmail.com  
 
  * [Masafumi Masuya](https://www.blackhat.com/asia-18/arsenal/schedule/presenters.html#masafumi-masuya-36855)  
  [https://twitter.com/gyoizamurai](https://twitter.com/gyoizamurai)
