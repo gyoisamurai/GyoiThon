@@ -149,6 +149,18 @@ Report's style is html.
 
  https://www.youtube.com/watch?v=jmi43eZOE9w
 
+## Installation
+#### Step.0 git clone GyoiThon's repository.
+```
+local@client:~$ git clone https://github.com/gyoisamurai/GyoiThon.git
+```
+
+#### Step.1 install required packages.
+```
+local@client:~$ cd GyoiThon
+local@client:~$ pip install -r requirements.txt
+```
+
 ## Usage
 #### Step.0 Initialize Metasploit DB
 Firstly, you initialize metasploit db (postgreSQL) using msfdb command.
