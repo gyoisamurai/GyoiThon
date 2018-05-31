@@ -397,6 +397,146 @@ Above example is to change value of `TARGETURI` option in exploit module "`explo
 
 #### 4. How to use each instance.
 ##### `GyoiClassifier.py`  
+You can use the log "webconf.csv" gathered by GyoiThon or the log gathered by GyoiClassifier to identify products operated on the target server.
+
+ * Usage (using `webconf.csv`)  
+ GyoiClassifier identifies product name using `webconf.csv`.  
+
+ ```
+ local@client:~$ python GyoiClassifier.py -h
+ GyoiClassifier.py
+ Usage:
+     GyoiClassifier.py (-t <ip_addr> | --target <ip_addr>) (-p <port> | --port <port>) (-v <vhost> | --vhost <vhost>) [(-u <url> | --url <url>)]
+     GyoiClassifier.py -h | --help
+ Options:
+     -t --target   Require  : IP address of target server.
+     -p --port     Require  : Port number of target server.
+     -v --vhost    Require  : Virtual Host of target server.
+     -u --url      Optional : Full URL for direct access.
+     -h --help     Optional : Show this screen and exit.
+
+ local@client:~$ python GyoiClassifier.py -t 192.168.220.148 -p 80 -v 192.168.220.148
+ 
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 　　███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗███████╗
+ 　　████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
+ 　　██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║█████╗
+ 　　██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══╝
+ 　　██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║███████╗
+ 　　╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝
+ 
+ 　██╗     ███████╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗
+ 　██║     ██╔════╝██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝
+ 　██║     █████╗  ███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
+ 　██║     ██╔══╝  ██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
+ 　███████╗███████╗██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
+ 　╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝
+　 　   __      _   _      _   _                 _        _
+　 　  / /  ___| |_( )__  | |_| |__   ___  _ __ | |_ __ _| | __
+　 　 / /  / _ \ __|/ __| | __| '_ \ / _ \| '_ \| __/ _` | |/ /
+　 　/ /__|  __/ |_ \__ \ | |_| | | | (_) | | | | || (_| |   <
+　 　\____/\___|\__||___/  \__|_| |_|\___/|_| |_|\__\__,_|_|\_
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ by GyoiClassifier.py
+ 
+ ------------------------------------------
+ target     : 192.168.220.148(192.168.220.148):80
+ target log : "gyoithon root path"../gyoithon\get_192.168.220.148_80_ip.log
+ 
+ [+] judge :
+ [-] category : web server
+     product  : unknown
+     too low maximum probability.
+ [-] category : framework
+     product  : unknown
+     too low maximum probability.
+ [-] category : cms
+     -----
+     ranking 1
+     product     : heartcore
+     probability : 6.8966 %
+     reason      : [['Set-Cookie: PHPSESSID=44ec9b66c633a7abc374e5f9a4ad4be3', 'Set-Cookie:  PHPSESSID=b1f9a2c2be74f3b3507d5cbb8ea78c75']]
+     -----
+     ranking 2
+     product     : oscommerce
+     probability : 6.8966 %
+     reason      : [['Set-Cookie: PHPSESSID=44ec9b66c633a7abc374e5f9a4ad4be3', 'Set-Cookie: PHPSESSID=b1f9a2c2be74f3b3507d5cbb8ea78c75']]
+     -----
+     ranking 3
+     product     : joomla
+     probability : 6.6667 %
+     reason      : [['Set-Cookie: PHPSESSID=44ec9b66c633a7abc374e5f9a4ad4be3', 'Set-Cookie: PHPSESSID=b1f9a2c2be74f3b3507d5cbb8ea78c75']]
+ ------------------------------------------
+ 
+ [+] done GyoiClassifier.py
+ GyoiClassifier.py finish!!
+ ```
+
+ * Usage (using self-gathered log)  
+ GyoiClassifier identifies product name using self-gathered log.  
+ 
+ ```
+ local@client:~$ python GyoiClassifier.py -t 192.168.220.129 -p 80 -v www.example.com -u http://www.example.com/
+ 
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 　　███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗███████╗
+ 　　████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
+ 　　██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║█████╗
+ 　　██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══╝
+ 　　██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║███████╗
+ 　　╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝ 
+ 
+ 　██╗     ███████╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
+ 　██║     ██╔════╝██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
+ 　██║     █████╗  ███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
+ 　██║     ██╔══╝  ██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
+ 　███████╗███████╗██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
+ 　╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+ 　　   __      _   _      _   _                 _        _    
+ 　　  / /  ___| |_( )__  | |_| |__   ___  _ __ | |_ __ _| | __
+ 　　 / /  / _ \ __|/ __| | __| '_ \ / _ \| '_ \| __/ _` | |/ /
+ 　　/ /__|  __/ |_ \__ \ | |_| | | | (_) | | | | || (_| |   < 
+ 　　\____/\___|\__||___/  \__|_| |_|\___/|_| |_|\__\__,_|_|\_
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ by GyoiClassifier.py
+ 
+ ------------------------------------------
+ target     : http://www.example.com/
+ target log : not use
+ 
+ [+] judge :
+ [-] category : web server
+     product  : unknown
+     too low maximum probability.
+ [-] category : framework
+     -----
+     ranking 1
+     product     : php
+     probability : 66.6667 %
+     reason      : [['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe']]
+ [-] category : cms
+     -----
+     ranking 1
+     product     : joomla
+     probability : 13.3333 %
+     reason      : [['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe; path=/'], ['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe'], ['Joomla!']]
+     -----
+     ranking 2
+     product     : heartcore
+     probability : 6.8966 %
+     reason      : [['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe']]
+ ------------------------------------------
+ 
+ [+] done GyoiClassifier.py
+ GyoiClassifier.py finish!!
+ ```
+
+|option|required|description|
+|:---|:---|:---|
+|-t, --target|yes|IP address of target server.|
+|-p, --port|yes|Target port number.|
+|-v, --vhost|yes|Virtual host of target server. If target server hasn't virtual host, you indicate IP address.|
+|-u, --url|no|URL of target server. If you want to gather newly logs of any server, indicate url of target server.|
 
 ##### `GyoiExploit.py`
 You can execute exploits thoroughly using all combinations of "Exploit module", "Target" and "Payload" of Metasploit corresponding to user's indicated product name and port number.
@@ -453,11 +593,11 @@ You can execute exploits thoroughly using all combinations of "Exploit module", 
  ...snip...
 ```
 
-|option|description|
-|:---|:---|
-|-t, --target|IP address of target server.|
-|-p, --port|Target port number.|
-|-s, --service|Target service name identifiable by Metasploit.|
+|option|required|description|
+|:---|:---|:---|
+|-t, --target|yes|IP address of target server.|
+|-p, --port|yes|Target port number.|
+|-s, --service|yes|Target service name identifiable by Metasploit.|
 
 If you want to change "exploit module" options, please refer this section \[3. How to change "Exploit module's option"].  
 
