@@ -397,7 +397,7 @@ Above example is to change value of `TARGETURI` option in exploit module "`explo
 
 #### 4. How to use each instance.
 ##### `GyoiClassifier.py`  
-You can use the log "webconf.csv" gathered by GyoiThon or the log gathered by GyoiClassifier to identify products operated on the target server.
+You can use the log "webconf.csv" gathered by GyoiThon or the log gathered by GyoiClassifier to identify products operated on the target server. Then, the product is identified using machine learning.  
 
  * Usage (using `webconf.csv`)  
  GyoiClassifier identifies product name using `webconf.csv`.  
