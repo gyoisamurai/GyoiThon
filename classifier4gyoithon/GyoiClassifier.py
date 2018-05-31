@@ -85,7 +85,7 @@ class DeepClassifier:
         target_log = ''
         analyzing_text = ''
         if target_response == '':
-            # GyoiThonのsummary取得
+            # Get GyoiThon's summary.
             df_origin = pd.read_csv(self.summary_file, encoding='utf-8').fillna('')
             df_selected_summary = df_origin[(df_origin['ip'] == target_ip) &
                                             (df_origin['port'] == target_port) &
