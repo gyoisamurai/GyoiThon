@@ -459,6 +459,8 @@ You can execute exploits thoroughly using all combinations of "Exploit module", 
 |-p, --port|Target port number.|
 |-s, --service|Target service name identifiable by Metasploit.|
 
+If you want to change "exploit module" options, please refer this section \[3. How to change "Exploit module's option"].  
+
 ## Operation check environment
  * Kali Linux 2017.3 (for Metasploit)
    * Memory: 8.0GB
