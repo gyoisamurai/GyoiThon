@@ -1,0 +1,2 @@
+testaspnet.vulnweb.com 80 /
+crackme.cenzic.com 80 /
