@@ -9,8 +9,8 @@ import pickle
 import docopt
 import ipaddress
 import pandas as pd
+import urllib3
 from urllib.parse import urlparse
-from urllib.request import urlopen
 from NaiveBayes import NaiveBayes
 
 OKBLUE = '\033[96m'
@@ -280,10 +280,14 @@ if __name__ == '__main__':
     if url is not None:
         target = urlparse(url)
         target_url = target.geturl()
+        con = urllib3.PoolManager()
         try:
-            with urlopen(target_url) as furl:
-                response = str(furl.info()).rstrip()
-                response += furl.read().decode('utf-8')
+            # Get HTTP headers and body.
+            res = con.request('GET', target_url)
+            headers = dict(res.headers)
+            for header in headers.keys():
+                response += header + ': ' + headers[header].replace('"', '') + '\n'
+            response += '\n' + res.data.decode('utf-8') + '\n'
         except Exception as err:
             print('[*] Connection error: {0}'.format(err))
             sys.exit(1)
