@@ -7,12 +7,11 @@ import ipaddress
 import codecs
 import time
 import pandas as pd
-from urllib.request import urlopen
+import urllib3
 sys.path.append('./classifier4gyoithon')
 from GyoiClassifier import DeepClassifier
 from GyoiExploit import Metasploit
 from GyoiReport import CreateReport
-
 
 OKBLUE = '\033[96m'
 OKGREEN = '\033[92m'
@@ -53,20 +52,20 @@ def identify_product(categoy, target_url, response):
 
 # Classifier product name using signatures.
 def classifier_signature(ip_addr, port, target_url, response, log_file):
-    ip_list = []
-    port_list = []
-    vhost_list = []
-    judge_list = []
-    version_list = []
-    reason_list = []
-    scan_type_list = []
-    ua_list = []
-    http_ver_list = []
-    ssl_list = []
-    sni_list = []
-    url_list = []
-    log_list = []
-    product_list = []
+    ip_list = [ip_addr]
+    port_list = [port]
+    vhost_list = [ip_addr]
+    judge_list = ['-']
+    version_list = ['-']
+    reason_list = ['-']
+    scan_type_list = ['-']
+    ua_list = ['-']
+    http_ver_list = ['-']
+    ssl_list = ['-']
+    sni_list = ['-']
+    url_list = ['-']
+    log_list = [os.path.join('gyoithon', log_file)]
+    product_list = ['-']
     for category in ['os', 'web', 'framework', 'cms']:
         products, keywords = identify_product(category, target_url, response)
         for product, keyword in zip(products, keywords):
@@ -205,15 +204,20 @@ if __name__ == '__main__':
 
         # Get HTTP responses.
         log_file = 'get_' + ip_list[idx] + '_' + str(port_list[idx]) + '_ip.log'
+        con = urllib3.PoolManager()
         for scheme in ['http://', 'https://']:
             target_url = scheme + ip_list[idx] + ':' + port_list[idx] + path_list[idx]
             response = ''
             try:
-                with urlopen(target_url) as furl:
-                    response = str(furl.info()).rstrip()
-                    response += '\n\n' + furl.read().decode('utf-8')
-                    with codecs.open(os.path.join(full_path + '/gyoithon/', log_file), 'a', 'utf-8') as fout:
-                        fout.write(response)
+                # Get HTTP headers and body.
+                res = con.request('GET', target_url)
+                headers = dict(res.headers)
+                for header in headers.keys():
+                    response += header + ': ' + headers[header].replace('"', '') + '\n'
+                response += '\n' + res.data.decode('utf-8') + '\n'
+
+                with codecs.open(os.path.join(full_path + '/gyoithon/', log_file), 'a', 'utf-8') as fout:
+                    fout.write(response)
             except Exception as err:
                 print('[*] Exception: {0}'.format(err))
                 continue
