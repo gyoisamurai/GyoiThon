@@ -158,7 +158,11 @@ local@client:~$ git clone https://github.com/gyoisamurai/GyoiThon.git
 #### Step.1 install required packages.
 ```
 local@client:~$ cd GyoiThon
+#For python 2.7
 local@client:~$ pip install -r requirements.txt
+#For python3
+local@client:~$ apt-get install python3-pip
+local@client:~$ pip3 install -r requirements.txt
 ```
 
 ## Usage
@@ -279,7 +283,10 @@ You have to separate IP address, port number and target path using single space.
 You execute GyoiThon following command.
 
 ```
+#For python 2.7
 local@client:~$ python gyoithon.py
+#For python 3
+local@client:~$ python3 gyoithon.py
 ```
 
 #### Step.6 Check scan report
