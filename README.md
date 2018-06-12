@@ -629,6 +629,9 @@ If you want to change "exploit module" options, please refer this section \[3. H
 ## Licence
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
 
+## SNS
+ * [Slack](https://gyoithon.slack.com)
+
 ## Contact us
  gyoiler3@gmail.com  
 
