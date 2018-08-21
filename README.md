@@ -152,25 +152,57 @@ Report's style is html.
 ## Installation
 #### Step.0 git clone GyoiThon's repository.
 ```
-local@client:~$ git clone https://github.com/gyoisamurai/GyoiThon.git
+root@kali:~# git clone https://github.com/gyoisamurai/GyoiThon.git
 ```
 
-#### Step.1 install required packages.
+#### Step.1 Get python3-pip
 ```
-local@client:~$ cd GyoiThon
-local@client:~$ pip install -r requirements.txt
+root@kali:~# apt-get install python3-pip
 ```
 
-## Usage
-#### Step.0 Initialize Metasploit DB
-Firstly, you initialize metasploit db (postgreSQL) using msfdb command.
+#### Step.2 install required packages.
+```
+root@kali:~# cd GyoiThon
+root@kali:~/GyoiThon# pip3 install -r requirements.txt
+```
+
+#### Step.3 Edit config.ini of GyoiThon.
+You have to be match server_host value with IP address of your Kali Linux.  
+
+```
+root@kali:~/GyoiThon# cd classifier4gyoithon
+root@kali:~/GyoiThon/classifier4gyoithon# vim config.ini
+...snip...
+
+[GyoiExploit]
+server_host      : 192.168.220.144
+server_port      : 55553
+msgrpc_user      : test
+msgrpc_pass      : test1234
+timeout          : 10
+LHOST            : 192.168.220.144
+LPORT            : 4444
+
+...snip...
+```
+
+ |config|description|
+ |:---|:---|
+ |server_host|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
+ |server_port|Any port number of your server that launched Metasploit. Your setting value `ServerPort` in Step2.|
+ |msgrpc_user|Metasploit's user name using authentication. Your setting value `User` in Step2.|
+ |msgrpc_pass|Metasploit's password using authentication. Your setting value `Pass` in Step2.|
+ |LHOST|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
+
+#### Step.4 Initialize Metasploit DB
+Firstly, you initialize metasploit db (postgreSQL) using msfdb command.  
 
 ```
 root@kali:~# msfdb init
 ```
 
-#### Step.1 Launch Metasploit Framework
-You launch Metasploit on the remote server that installed Metasploit Framework such as Kali Linux.
+#### Step.5 Launch Metasploit Framework
+You launch Metasploit.  
 
 ```
 root@kali:~# msfconsole
@@ -213,8 +245,8 @@ ______________________________________________________________________________
 msf >
 ```
 
-#### Step.2 Launch RPC Server
-You launch RPC Server of Metasploit following.
+#### Step.6 Launch RPC Server
+You launch RPC Server of Metasploit following.  
 
 ```
 msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test1234
@@ -231,62 +263,37 @@ msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test
 |User|Any user name using authentication (default => msf). Above example is `test`.|
 |Pass|Any password using authentication (default => random string). Above example is `test1234`.|
 
-#### Step.3 Edit config file.
-You have to change following value in [`config.ini`](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/config.ini)
-
-```
-...snip...
-
-[GyoiExploit]
-server_host      : 192.168.220.144
-server_port      : 55553
-msgrpc_user      : test
-msgrpc_pass      : test1234
-timeout          : 10
-LHOST            : 192.168.220.144
-LPORT            : 4444
-
-...snip...
-```
-
- |config|description|
- |:---|:---|
- |server_host|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
- |server_port|Any port number of your server that launched Metasploit. Your setting value `ServerPort` in Step2.|
- |msgrpc_user|Metasploit's user name using authentication. Your setting value `User` in Step2.|
- |msgrpc_pass|Metasploit's password using authentication. Your setting value `Pass` in Step2.|
- |LHOST|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
-
-#### Step.4 Edit target file.
+## Usage
+#### Step.0 Edit target file.
 GyoiThon accesses target server using host.txt.  
 So, you have to edit [`host.txt`](https://github.com/gyoisamurai/GyoiThon/blob/master/host.txt) before executing GyoiThon.  
 
- * sample of host.txt  
+ * Example of `host.txt`  
  target server => 192.168.220.148  
  target port => 80  
  target path => /oscommerce/catalog/
+
  ```
+ root@kali:~# cd GyoiThon
+ root@kali:~/GyoiThon# vim host.txt
  192.168.220.148 80 /oscommerce/catalog/
  ```
 
 You have to separate IP address, port number and target path using single space.  
 
- |Note|
- |:---|
- |Current `gyoithon.py` is provisional version that without crawling function. We'll add crawling functionality to GyoiThon coming soon.  Then, target path will be unnecessary.|
-
-#### Step.5 Run GyoiThon
-You execute GyoiThon following command.
+#### Step.1 Run GyoiThon
+You execute GyoiThon following command.  
 
 ```
-local@client:~$ python gyoithon.py
+root@kali:~/GyoiThon# python3 gyoithon.py
 ```
 
-#### Step.6 Check scan report
+#### Step.2 Check scan report
 Please check scan report using any web browser.  
 
 ```
-local@client:~$ firefox "gyoithon root path"/classifier4gyoithon/report/gyoithon_report.html
+root@kali:~/GyoiThon# cd classifier4gyoithon/report/
+root@kali:~/GyoiThon/classifier4gyoithon/report# firefox gyoithon_report.html
 ```
 
 ## Tips
