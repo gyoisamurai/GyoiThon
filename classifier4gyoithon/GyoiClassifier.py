@@ -10,25 +10,30 @@ import docopt
 import ipaddress
 import pandas as pd
 import urllib3
-from urllib.parse import urlparse
-from NaiveBayes import NaiveBayes
+from urllib3 import util
+from .NaiveBayes import NaiveBayes
+sys.path.append('../')
+from util import Utilty
 
-OKBLUE = '\033[96m'
-OKGREEN = '\033[92m'
-YELLOW = '\033[93m'
-ENDC = '\033[0m'
+# Type of printing.
+OK = 'ok'         # [*]
+NOTE = 'note'     # [+]
+FAIL = 'fail'     # [-]
+WARNING = 'warn'  # [!]
+NONE = 'none'     # No label.
 
 
 class DeepClassifier:
     def __init__(self):
         # Read config.ini.
+        self.utility = Utilty()
         config = configparser.ConfigParser()
         self.full_path = os.path.dirname(os.path.abspath(__file__))
         self.root_path = os.path.join(self.full_path, '../')
         try:
             config.read(os.path.join(self.full_path, 'config.ini'))
         except FileExistsError as err:
-            print('File exists error: {0}'.format(err))
+            self.utility.print_exception(err, 'File exists error: {0}'.format(err))
             sys.exit(1)
         self.category_type = config['Common']['category']
         self.train_path = os.path.join(self.full_path, config['GyoiClassifier']['train_path'])
@@ -47,39 +52,9 @@ class DeepClassifier:
         self.summary_file = os.path.join(self.summary_path, config['GyoiThon']['summary_file'])
         return
 
-    def show_start_banner(self):
-        banner = """
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-　　███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗███████╗
-　　████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
-　　██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║█████╗
-　　██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══╝
-　　██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║███████╗
-　　╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝ 
-
-　██╗     ███████╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
-　██║     ██╔════╝██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
-　██║     █████╗  ███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
-　██║     ██╔══╝  ██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
-　███████╗███████╗██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
-　╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
-　　   __      _   _      _   _                 _        _    
-　　  / /  ___| |_( )__  | |_| |__   ___  _ __ | |_ __ _| | __
-　　 / /  / _ \ __|/ __| | __| '_ \ / _ \| '_ \| __/ _` | |/ /
-　　/ /__|  __/ |_ \__ \ | |_| | | | (_) | | | | || (_| |   < 
-　　\____/\___|\__||___/  \__|_| |_|\___/|_| |_|\__\__,_|_|\_\
-\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-""" + 'by ' + os.path.basename(__file__)
-        print(OKGREEN + banner + ENDC)
-        print()
-
     # Analysis using ML.
     def analyzer(self, target_ip='', target_port=0, target_vhost='', silent=False, target_url='', target_response=''):
-        # Display banner.
-        self.show_start_banner()
-        time.sleep(0.1)
-        time.sleep(float(self.wait_for_banner))
-
+        self.utility.print_message(NOTE, 'Analyzing gathered HTTP response using Machine Learning.')
         identified_list = []
         target_info = ''
         target_log = ''
@@ -104,20 +79,20 @@ class DeepClassifier:
             analyzing_text = target_response
 
         # Output result (header)
-        print('-' * 42)
-
         # If silent mode is True, hidden target information.
         if silent is True:
-            print('target     : *** hidden for silent mode. ***')
-            print('target log : *** hidden for silent mode. ***')
+            self.utility.print_message(WARNING, 'target host : *** hidden for silent mode. ***')
+            self.utility.print_message(WARNING, 'target url  : *** hidden for silent mode. ***')
+            self.utility.print_message(WARNING, 'target log  : *** hidden for silent mode. ***')
         else:
-            print('target     : {0}'.format(target_info))
-            print('target log : {0}'.format(target_log))
-        print()
-        print('[+] judge :')
+            self.utility.print_message(WARNING, 'target host : {}'.format(target_info))
+            self.utility.print_message(WARNING, 'target url  : {}'.format(target_url))
+            self.utility.print_message(WARNING, 'target log  : {}'.format(target_log))
+        self.utility.print_message(OK, 'judge :')
 
         # Predict product name each category (OS, Middleware, CMS..).
         list_category = self.category_type.split('@')
+        print('-' * 42)
         for category in list_category:
             # Learning.
             if category == 'os':
@@ -129,7 +104,7 @@ class DeepClassifier:
             elif category == 'cms':
                 nb = self.train(self.train_cms_in, self.train_cms_out)
             else:
-                print('Choose category is not found.')
+                self.utility.print_message(FAIL, 'Choose category is not found.')
                 exit(1)
 
             # Predict product name.
@@ -138,12 +113,12 @@ class DeepClassifier:
             # Output result of prediction (body).
             # If no feature, result is unknown.
             if len(keyword_list) == 0:
-                print(YELLOW + '[-] category : {0}\n'
-                               '    product  : unknown\n'
-                               '    too low maximum probability.'.format(category) + ENDC)
+                self.utility.print_message(NOTE, 'category : {}'.format(category))
+                self.utility.print_message(WARNING, 'product  : unknown')
+                self.utility.print_message(WARNING, 'too low maximum probability.')
             else:
                 sorted_classified_list = sorted(classified_list, key=lambda x: x[1], reverse=True)
-                print(OKBLUE + '[-] category : {0}'.format(category) + ENDC)
+                self.utility.print_message(NOTE, 'category : {}'.format(category))
                 for idx, item in enumerate(sorted_classified_list):
                     add_flag = True
                     if idx >= self.maximum_display_num:
@@ -156,19 +131,16 @@ class DeepClassifier:
                     if len(item[2]) == 0:
                         reason_list = 'too few features..'
                         add_flag = False
-                    print('    ' + '-' * 5)
-                    print(OKBLUE + '    ranking {0}\n'
-                                   '    product     : {1}\n'
-                                   '    probability : {2} %\n'
-                                   '    reason      : {3}'.format(idx + 1, item[0], round(item[1] * 100.0, 4),
-                                                                  reason_list) + ENDC)
+                    self.utility.print_message(NOTE, 'ranking {}'.format(idx + 1))
+                    self.utility.print_message(OK, 'product     : {}'.format(item[0]))
+                    self.utility.print_message(OK, 'probability : {}'.format(round(item[1] * 100.0, 4)))
+                    self.utility.print_message(OK, 'reason      : {}'.format(reason_list))
                     # Add product for Exploit.
                     identified_list.append(item[0])
+            self.utility.print_message(NONE, '-' * 42)
 
         # Output result of prediction (footer).
-        print('-' * 42)
-        print()
-        print('[+] done {0}'.format(os.path.basename(__file__)))
+        self.utility.print_message(NOTE, 'done {}'.format(os.path.basename(__file__)))
 
         return list(set(identified_list))
 
@@ -237,30 +209,30 @@ def is_valid_ip(arg):
 def check_arg_value(ip_addr, port, vhost, url=None):
     # Check IP address.
     if is_valid_ip(ip_addr) is False:
-        print('[*] Invalid IP address: {0}'.format(ip_addr))
+        Utilty().print_message(FAIL, 'Invalid IP address: {}'.format(ip_addr))
         return False
 
     # Check port number.
     if port.isdigit() is False:
-        print('[*] Invalid port number: {0}'.format(port))
+        Utilty().print_message(FAIL, 'Invalid port number: {}'.format(port))
         return False
     elif (int(port) < 1) or (int(port) > 65535):
-        print('[*] Invalid port number: {0}'.format(port))
+        Utilty().print_message(FAIL, 'Invalid port number: {}'.format(port))
         return False
 
     # Check virtual host.
     if isinstance(vhost, str) is False and isinstance(vhost, int) is False:
-        print('[*] Invalid vhost: {0}'.format(vhost))
+        Utilty().print_message(FAIL, 'Invalid vhost: {}'.format(vhost))
         return False
 
     # Check url.
     if url is not None:
-        target = urlparse(url)
+        target = util.parse_url(url)
         if 'http' not in target.scheme:
-            print('[*] Invalid scheme : {0}.'.format(target.scheme))
+            Utilty().print_message(FAIL, 'Invalid scheme : {}.'.format(target.scheme))
             return False
         if target.netloc == '':
-            print('[*] Invalid fqdn : {0}.'.format(target.netloc))
+            Utilty().print_message(FAIL, 'Invalid fqdn : {}.'.format(target.netloc))
             return False
 
     return True
@@ -272,13 +244,13 @@ if __name__ == '__main__':
 
     # Check argument values.
     if check_arg_value(ip_addr, port, vhost, url) is False:
-        print('[*] Invalid argument.')
+        Utilty().print_message(FAIL, 'Invalid argument.')
         sys.exit(1)
 
     # Get target's response.
     response = ''
     if url is not None:
-        target = urlparse(url)
+        target = util.parse_url(url)
         target_url = target.geturl()
         con = urllib3.PoolManager()
         try:
@@ -289,10 +261,10 @@ if __name__ == '__main__':
                 response += header + ': ' + headers[header].replace('"', '') + '\n'
             response += '\n' + res.data.decode('utf-8') + '\n'
         except Exception as err:
-            print('[*] Connection error: {0}'.format(err))
+            Utilty().print_message(FAIL, 'Connection error: {}'.format(err))
             sys.exit(1)
 
     # Execute classifier.
     classifier = DeepClassifier()
     classifier.analyzer(ip_addr, int(port), vhost, False, url, response)
-    print(os.path.basename(__file__) + ' finish!!')
+    Utilty().print_message(NOTE, os.path.basename(__file__) + ' finish!!')
