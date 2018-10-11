@@ -116,7 +116,9 @@ def classifier_signature(ip_addr, port, target_url, response, log_file, utility)
                        'ssl': series_ssl,
                        'sni': series_sni,
                        'url': series_url,
-                       'log': series_log})
+                       'log': series_log},
+                      columns=['ip', 'port', 'vhost', 'judge', 'judge_version', 'reason',
+                               'scantype', 'ua', 'version', 'ssl', 'sni', 'url', 'log'])
     saved_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gyoithon')
     df.sort_values(by='port', ascending=False).to_csv(os.path.join(saved_path, 'webconf.csv'),
                                                       mode='a',
@@ -158,6 +160,7 @@ def create_webconf(ip_addr, port, log_file):
                                'scantype', 'ua', 'version', 'ssl', 'sni', 'url', 'log'])
     saved_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gyoithon')
     df.sort_values(by='port', ascending=False).to_csv(os.path.join(saved_path, 'webconf.csv'), index=False)
+
 
 # Check IP address format.
 def is_valid_ip(arg):
