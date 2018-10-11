@@ -621,17 +621,19 @@ You can execute exploits thoroughly using all combinations of "Exploit module", 
 If you want to change "exploit module" options, please refer this section \[3. How to change "Exploit module's option"].  
 
 ## Operation check environment
- * Kali Linux 2017.3 (for Metasploit)
+ * Kali Linux 2018.2 (for Metasploit)
    * Memory: 8.0GB
-   * Metasploit Framework 4.16.15-dev
+   * Metasploit Framework 4.16.48-dev
  * ubuntu 16.04 LTS (Host OS)
    * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz
    * Memory: 8.0GB
    * Python 3.6.1（Anaconda3）
-   * docopt 0.6.2
-   * jinja2 2.10
-   * msgpack-python 0.4.8
-   * pandas 0.20.3
+   * docopt==0.6.2
+   * jinja2==2.10
+   * msgpack-python==0.4.8
+   * pandas==0.23.4
+   * urllib3==1.23
+   * Scrapy==1.5.1
 
 ## Licence
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
