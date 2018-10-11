@@ -115,7 +115,7 @@ class DeepClassifier:
             if len(keyword_list) == 0:
                 self.utility.print_message(NOTE, 'category : {}'.format(category))
                 self.utility.print_message(WARNING, 'product  : unknown')
-                self.utility.print_message(WARNING, 'too low maximum probability.')
+                self.utility.print_message(WARNING, 'too low probability.')
             else:
                 sorted_classified_list = sorted(classified_list, key=lambda x: x[1], reverse=True)
                 self.utility.print_message(NOTE, 'category : {}'.format(category))
