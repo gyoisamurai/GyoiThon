@@ -91,9 +91,10 @@ def show_credit(utility):
 # Define command option.
 __doc__ = """{f}
 usage:
-    {f} [-m] [-g] [-e] [-c] [-p] [-l <log_path>]
+    {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l <log_path>]
     {f} -h | --help
 options:
+    -s   Optional : Examine cloud service.
     -m   Optional : Analyze HTTP response for identify product/version using Machine Learning.
     -g   Optional : Google Custom Search for identify product/version.
     -e   Optional : Explore default path of product.
@@ -109,6 +110,7 @@ def command_parse(utility):
     utility.write_log(20, '[In] Parse command options [{}].'.format(os.path.basename(__file__)))
 
     args = docopt(__doc__)
+    opt_cloud = args['-s']
     opt_ml = args['-m']
     opt_gcs = args['-g']
     opt_explore = args['-e']
@@ -118,7 +120,7 @@ def command_parse(utility):
     opt_log_path = args['<log_path>']
 
     utility.write_log(20, '[Out] Parse command options [{}].'.format(os.path.basename(__file__)))
-    return opt_ml, opt_gcs, opt_explore, opt_censys, opt_exploit, opt_log, opt_log_path
+    return opt_cloud, opt_ml, opt_gcs, opt_explore, opt_censys, opt_exploit, opt_log, opt_log_path
 
 
 # main.
@@ -130,7 +132,7 @@ if __name__ == '__main__':
     utility.write_log(20, '[In] GyoiThon [{}].'.format(file_name))
 
     # Get command arguments.
-    opt_ml, opt_gcs, opt_explore, opt_censys, opt_exploit, opt_log, opt_log_path = command_parse(utility)
+    opt_cloud, opt_ml, opt_gcs, opt_explore, opt_censys, opt_exploit, opt_log, opt_log_path = command_parse(utility)
 
     # Read config.ini.
     config = configparser.ConfigParser()
@@ -188,7 +190,9 @@ if __name__ == '__main__':
         report.create_report_header(fqdn_list[idx], path_list[idx].replace('/', ''))
 
         # Check cloud service.
-        cloud_type = cloud_checker.get_cloud_service(fqdn_list[idx])
+        cloud_type = 'Unknown'
+        if opt_cloud:
+            cloud_type = cloud_checker.get_cloud_service(fqdn_list[idx])
 
         # Search Censys.
         if opt_censys:
