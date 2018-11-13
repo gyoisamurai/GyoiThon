@@ -9,6 +9,10 @@
  * [JANOG41](https://www.janog.gr.jp/meeting/janog41/program/sp5sts)  
  * [Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)  
  * [DEFCON26 DemoLabs](https://www.defcon.org/html/defcon-26/dc-26-demolabs.html#GyoiThon)  
+ * [AV TOKYO 2018 HIVE](http://ja.avtokyo.org/avtokyo2018/event)
+
+### Documentation (Installation, Usage)
+See the project's [wiki](https://github.com/gyoisamurai/GyoiThon/wiki) for installation, usage.  
 
 ## Overview
  GyoiThon is a **growing penetration test tool using Machine Learning**.  
