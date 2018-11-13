@@ -1,2 +1,4 @@
-192.168.220.148 80 /tikiwiki/
-192.168.220.148 80 /oscommerce/catalog/
+http 192.168.220.129 80 /cyclone/
+http 192.168.220.129 80 /WackoPicko/
+http 192.168.220.129 80 /bodgeit/
+http 192.168.220.129 80 /vicnum/

@@ -4,12 +4,12 @@ import os
 import sys
 import string
 import random
-import codecs
-import json
+import urllib3
+import socket
+import ipaddress
 import configparser
-from urllib3 import util
 from datetime import datetime
-from subprocess import Popen
+from logging import getLogger, FileHandler, StreamHandler, Formatter
 
 # Printing colors.
 OK_BLUE = '\033[94m'      # [*]
@@ -36,22 +36,27 @@ class Utilty:
         # Read config.ini.
         full_path = os.path.dirname(os.path.abspath(__file__))
         config = configparser.ConfigParser()
+        config.read(os.path.join(full_path, 'config.ini'))
+
         try:
-            config.read(os.path.join(full_path, './classifier4gyoithon/config.ini'))
-        except FileExistsError as err:
-            self.print_message(FAIL, 'File exists error: {}'.format(err))
+            self.banner_delay = float(config['Common']['banner_delay'])
+            self.report_date_format = config['Common']['date_format']
+            self.con_timeout = float(config['Common']['con_timeout'])
+            self.log_dir = config['Common']['log_path']
+            self.log_file = config['Common']['log_file']
+            self.log_path = os.path.join(os.path.join(full_path, self.log_dir), self.log_file)
+            self.modules_dir = config['Common']['module_path']
+        except Exception as e:
+            self.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             sys.exit(1)
 
-        # Utility setting value.
-        self.http_timeout = float(config['Utility']['http_timeout'])
-
-        # Spider setting value.
-        self.output_base_path = config['Spider']['output_base_path']
-        self.store_path = os.path.join(full_path, self.output_base_path)
-        if os.path.exists(self.store_path) is False:
-            os.mkdir(self.store_path)
-        self.output_filename = config['Spider']['output_filename']
-        self.spider_delay_time = config['Spider']['delay_time']
+        # Setting logger.
+        self.logger = getLogger('GyoiThon')
+        self.logger.setLevel(20)
+        file_handler = FileHandler(self.log_path)
+        self.logger.addHandler(file_handler)
+        formatter = Formatter('%(levelname)s,%(message)s')
+        file_handler.setFormatter(formatter)
 
     # Print metasploit's symbol.
     def print_message(self, type, message):
@@ -85,6 +90,10 @@ class Utilty:
         self.print_message(WARNING, '{}'.format(e))
         self.print_message(WARNING, message)
 
+    # Write logs.
+    def write_log(self, loglevel, message):
+        self.logger.log(loglevel, self.get_current_date() + ' ' + message)
+
     # Create random string.
     def get_random_token(self, length):
         chars = string.digits + string.ascii_letters
@@ -99,8 +108,11 @@ class Utilty:
         return datetime.now().strftime(date_format)
 
     # Transform date from string to object.
-    def transform_date_object(self, target_date):
-        return datetime.strptime(target_date, self.report_date_format)
+    def transform_date_object(self, target_date, format=None):
+        if format is None:
+            return datetime.strptime(target_date, self.report_date_format)
+        else:
+            return datetime.strptime(target_date, format)
 
     # Transform date from object to string.
     def transform_date_string(self, target_date):
@@ -116,42 +128,74 @@ class Utilty:
                 clean_text += chr(ord_num)
         return clean_text
 
-    # Running spider.
-    def run_spider(self, scheme_list, target_ip, target_port, target_path):
-        # Execute crawling using Scrapy.
-        all_targets_log = []
-        for scheme in scheme_list:
-            target_url = scheme + '://' + target_ip + ':' + target_port + target_path
-            target_log = [target_url]
-            response_log = target_ip + '_' + target_port + '.log'
-            now_time = self.get_current_date('%Y%m%d%H%M%S')
-            result_file = os.path.join(self.output_base_path, now_time + self.output_filename)
-            option = ' -a target_url=' + target_url + ' -a allow_domain=' + target_ip + \
-                     ' -a delay=' + self.spider_delay_time + ' -a store_path=' + self.store_path + \
-                     ' -a response_log=' + response_log + ' -o ' + result_file
-            command = 'scrapy runspider Spider.py' + option
-            proc = Popen(command, shell=True)
-            proc.wait()
+    # Check IP address format.
+    def is_valid_ip(self, arg):
+        try:
+            ipaddress.ip_address(arg)
+            return True
+        except ValueError:
+            return False
 
-            # Get crawling result.
-            dict_json = {}
-            if os.path.exists(result_file):
-                with codecs.open(result_file, 'r', encoding='utf-8') as fin:
-                    target_text = self.delete_ctrl_char(fin.read())
-                    if target_text != '':
-                        dict_json = json.loads(target_text)
-                    else:
-                        self.print_message(WARNING, '[{}] is empty.'.format(result_file))
-                        continue
+    # Check argument values.
+    def check_arg_value(self, protocol, fqdn, port, path):
+        # Check protocol.
+        if protocol not in ['http', 'https']:
+            self.print_message(FAIL, 'Invalid protocol : {}'.format(protocol))
 
-            # Exclude except allowed domains.
-            for idx in range(len(dict_json)):
-                items = dict_json[idx]['urls']
-                for item in items:
-                    try:
-                        if target_ip == util.parse_url(item).host:
-                            target_log.append(item)
-                    except Exception as err:
-                        self.print_exception(err, 'Parsed error: {}'.format(item))
-            all_targets_log.append([target_url, os.path.join(self.store_path, response_log), list(set(target_log))])
-        return all_targets_log
+        # Check IP address.
+        if isinstance(fqdn, str) is False and isinstance(fqdn, int) is False:
+            self.print_message(FAIL, 'Invalid IP address : {}'.format(fqdn))
+            return False
+
+        # Check port number.
+        if port.isdigit() is False:
+            self.print_message(FAIL, 'Invalid port number : {}'.format(port))
+            return False
+        elif (int(port) < 1) or (int(port) > 65535):
+            self.print_message(FAIL, 'Invalid port number : {}'.format(port))
+            return False
+
+        # Check path.
+        if isinstance(path, str) is False and isinstance(path, int) is False:
+            self.print_message(FAIL, 'Invalid path : {}'.format(path))
+            return False
+        elif path.startswith('/') is False or path.endswith('/') is False:
+            self.print_message(FAIL, 'Invalid path : {}'.format(path))
+            return False
+
+        return True
+
+    # Send http request.
+    def send_request(self, method, target_url):
+        res_header = ''
+        res_body = ''
+        server_header = '-'
+        res = None
+        http = urllib3.PoolManager(timeout=self.con_timeout)
+        try:
+            res = http.request(method, target_url)
+            for header in res.headers.items():
+                res_header += header[0] + ': ' + header[1] + '\r\n'
+                if header[0].lower() == 'server':
+                    server_header = header[0] + ': ' + header[1]
+            res_body = '\r\n\r\n' + res.data.decode('utf-8')
+        except Exception as e:
+            self.print_exception(e, 'Access is failure : {}'.format(target_url))
+            self.write_log(30, 'Accessing is failure : {}'.format(target_url))
+        return res, server_header, res_header, res_body
+
+    # Forward lookup.
+    def forward_lookup(self, fqdn):
+        try:
+            return socket.gethostbyname(fqdn)
+        except Exception as e:
+            self.print_exception(e, 'Forward lookup error: {}'.format(fqdn))
+            return 'unknown'
+
+    # Reverse lookup.
+    def reverse_lookup(self, ip_addr):
+        try:
+            return socket.gethostbyaddr(ip_addr)
+        except Exception as e:
+            self.print_exception(e, 'Reverse lookup error: {}'.format(ip_addr))
+            return 'unknown'

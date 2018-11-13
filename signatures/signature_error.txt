@@ -1,0 +1,21 @@
+Language@Java@*@([^0-9a-zA-z\.]java\.[0-9a-zA-Z\.])*
+Language@Java@*@([^0-9a-zA-z\.]javax\.[0-9a-zA-Z\.])*
+Language@Java@*@([^0-9a-zA-z\.]com\.[0-9a-zA-Z\.])*
+Language@Java@*@([^0-9a-zA-z\.]jp\.[0-9a-zA-Z\.])*
+Language@Java@*@([^0-9a-zA-z\.]org\.[0-9a-zA-Z\.])*
+Language@PHP@*@(<b>Fatal[^\n]*php)
+Language@PHP@*@(<b>Warning[^\n]*php)
+DataBase@Oracle@*@(ORA-[0-9a-zA-Z\.])*
+Other@*@*@(Exception[^\r\n<>])*
+Other@*@*@(Error[^\r\n<>])*
+Other@*@*@(Illegal[^\r\n<>])*
+Other@*@*@(Incompatible[^\r\n<>])*
+Other@*@*@(Incorrect[^\r\n<>])*
+Other@*@*@(Invalid[^\r\n<>])*
+Other@*@*@(Missing[^\r\n<>])*
+Other@*@*@(Unknown[^\r\n<>])*
+Other@*@*@(Expected '\)' in [^\r\n&lt;&gt;])*
+Other@*@*@(System\.Web\.)
+Other@*@*@(Error Number:\s+[0-9]+)\s*$
+Other@*@*@(fail|Fail|ERROR|error|Notice|Parse|Warning|Fatal)[^\n]*line[^\n]*[0-9]+
+Other@*@*@(fail|Fail|ERROR|error|Notice|Parse|Warning|Fatal|ERRSTR).{0,500}line[^\n]*[0-9]+
