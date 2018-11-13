@@ -1,2 +1,0 @@
-coldfusion@(Set-Cookie.*CFID)
-coldfusion@(Set-Cookie.*CFTOKEN)
