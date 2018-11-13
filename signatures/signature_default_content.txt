@@ -1,0 +1,95 @@
+Web@apache@http_server@*@/server-status@*@Version:.*(Apache/([0-9]+[\.0-9]*[\.0-9]*))@0
+Web@apache@http_server@*@/error/README@*@*@0
+Web@apache@http_server@*@/icons/@*@*@0
+Web@apache@http_server@*@/icons/README@*@*@0
+Web@apache@http_server@*@/icons/small/README.txt@(These icons are provided as)@*@0
+Web@apache@http_server@*@/manual/@(<title>Apache)@*@0
+Web@apache@http_server@*@/manual/images/@(<title>Apache)@*@0
+Web@apache@http_server@*@/manual/style/@(<title>Apache)@*@0
+CMS@wordpress@wordpress@*@/wp-login.php@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@wordpress@wordpress@*@/wp/wp-login.php@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@wordpress@wordpress@*@/wp-admin/@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@wordpress@wordpress@*@/wp/wp-admin@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@wordpress@wordpress@*@/wp-content/@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@/wp-includes/@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@/wp-json/@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@/wp-json/wp/v2/users@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@/xmlrpc.php@(XML-RPC server accepts POST requests only)*@*@0
+CMS@wordpress@wordpress@*@/?author=1@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@drupal@drupal@*@/user/login@(/drupal)@*@1
+CMS@drupal@drupal@*@/core/misc/drupalSettingsLoader.js@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@drupal@drupal@*@/core/misc/drupal.js@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@drupal@drupal@*@/core/misc/drupal.init.js@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@drupal@drupal@*@/themes/bootstrap/js/drupal.bootstrap.js@*@*@0
+CMS@drupal@drupal@*@/drupal/@*@*@0
+CMS@joomla@joomla\!@*@/administrator/@*@*@1
+CMS@joomla@joomla\!@*@/joomla/@*@*@0
+CMS@joomla@joomla\!@*@/templates/joomla/@*@*@0
+CMS@sixapart@movabletype@*@/mt.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sixapart@movabletype@*@/mt.cgi?__lang=ja@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sixapart@movabletype@*@/mt/mt.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sixapart@movabletype@*@/mt/mt.cgi?__lang=ja@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sixapart@movabletype@*@/cgi-bin/mt/mt.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sixapart@movabletype@*@/cgi-bin/mt/mt.cgi?__lang=ja@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sixapart@movabletype@*@/mt-sp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sixapart@movabletype@*@/mt/mt-sp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@tiki@tikiwiki_cms\/groupware@*@/tikiwiki/@*@*@0
+CMS@n-i-agroinformatics@soy_cms@*@/cms/admin/index.php@*@*@1
+CMS@n-i-agroinformatics@soy_cms@*@/soy/admin/index.php@*@*@1
+CMS@mediawiki@mediawiki@*@/index.php?Special:UserLogin@*@*@1
+CMS@mediawiki@mediawiki@*@/mediawiki/@*@*@0
+CMS@cmsimple@cmsimple@*@/?login@*@*@1
+CMS@cmsimple@cmsimple_classic@*@/?login@*@*@1
+CMS@cmsmadesimple@cms_made_simple@*@/?login@*@*@1
+CMS@modx@modx_revolution@*@/manager/@*@*@1
+CMS@nucleuscms@nucleus@*@/nucleus/@*@*@1
+CMS@nucleuscms@nucleus_cms@*@/nucleus/@*@*@1
+CMS@xoops@xoops@*@/user.php@*@*@1
+CMS@rcms@rcms@*@/management/login/login/@.*(\-rcms).*@*@1
+Framework@apache@tomcat@*@/tomcat-docs/@*@*@0
+Framework@apache@tomcat@*@/examples/servlets/@*@*@0
+Framework@apache@tomcat@*@/examples/jsp@*@*@0
+Framework@apache@tomcat@*@/examples/jsp/snp/snoop.jsp@*@*@0
+Framework@apache@tomcat@*@/examples/jsp/servlets/@*@*@0
+Framework@apache@tomcat@*@/webdav/@*@*@0
+Framework@apache@tomcat@*@/admin/@.*(Licensed to the Apache Software Foundation).*@*@0
+Framework@apache@tomcat@*@/config.aspx@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
+Framework@apache@tomcat@*@/config.jsp@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
+Framework@apache@tomcat@*@/config.php@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
+Framework@apache@coyote_http_connector@*@/tomcat-docs/@*@*@0
+Framework@apache@coyote_http_connector@*@/examples/jsp@*@*@0
+Framework@apache@coyote_http_connector@*@/examples/servlets/@*@*@0
+Framework@apache@coyote_http_connector@*@/webdav/@*@*@0
+Framework@apache@coyote_http_connector@*@/admin/@*@*@0
+Framework@adobe@coldfusion@*@/CFIDE/@*@*@0
+Framework@adobe@coldfusion@*@/cfdocs/@*@*@0
+Language@php@php@*@/?=PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000@*@*@0
+Language@php@php@*@/info.php@*@*@0
+Language@php@php@*@/phpinfo.php@*@*@0
+Language@php@php@*@/test.php@*@*@0
+Tool@squirrelmail@squirrelmail@*@/webmail/src/login.php@*@*@1
+Tool@squirrelmail@squirrelmail@*@/sqwebmail/@*@*@0
+Tool@squirrelmail@squirrelmail@*@/webmail/@*@*@0
+Tool@apache@subversion@*@/svn/@*@*@0
+Tool@apache@subversion@*@/.svn/entries@*@*@0
+Tool@apache@subversion@*@/repos/@*@*@0
+Tool@hping@visitors@*@/visitors/@*@*@0
+Tool@hping@visitors@*@/log/@*@*@0
+Tool@webdruid@webdruid@*@/webdruid/@*@*@0
+Tool@webdruid@webdruid@*@/usage/@*@*@0
+Tool@htdig@htdig@*@/htdig/@*@*@0
+Tool@htdig@htdig@*@/htsearch/@*@*@0
+Tool@gnu@mailman@*@/mailman/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
+Tool@gnu@mailman@*@/mailman/admin/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
+Tool@gnu@mailman@*@/mailman/admin/mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
+Tool@gnu@mailman@*@/mailman/create@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
+Tool@phpmyadmin@phpmyadmin@*@/phpmyadmin/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@/phpmyadmin/index.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@/phpMyAdmin/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@/phpMyAdmin/index.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
+Tool@awstats@awstats@*@/webstat/@*@*@0
+Tool@mrtg@mrtgconfig@*@/mrtg/@*@*@0
+Tool@mrtg@multi_router_traffic_grapher_cgi@*@/mrtg/@*@*@0
+Tool@webmin@webmin@*@/webmin/@*@*@0
+Tool@phpbb@phpbb@*@/phpbb/@*@*@0
+Tool@dwr@dwr@*@/dwr/index.html@*@*@0
