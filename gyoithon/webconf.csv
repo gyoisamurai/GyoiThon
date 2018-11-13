@@ -1,4 +1,0 @@
-,ip,port,vhost,judge,judge_version,reason,scantype,ua,version,ssl,sni,url,log
-0,192.168.220.148,80,192.168.220.148,os:ubuntu,-,[['Server: Apache/2.0.54 (Ubuntu)']],[ip],-,HTTP/1.1,-,-,http://192.168.220.148:80/tikiwiki/,gyoithon\get_192.168.220.148_80_ip.log
-1,192.168.220.148,80,192.168.220.148,web:apache,-,[['Server: Apache']],[ip],-,HTTP/1.1,-,-,http://192.168.220.148:80/tikiwiki/,gyoithon\get_192.168.220.148_80_ip.log
-2,192.168.220.148,80,192.168.220.148,cms:tikiwiki,-,[['Powered by TikiWiki']],[ip],-,HTTP/1.1,-,-,http://192.168.220.148:80/tikiwiki/,gyoithon\get_192.168.220.148_80_ip.log
