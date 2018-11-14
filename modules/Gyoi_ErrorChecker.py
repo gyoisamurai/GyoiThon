@@ -44,14 +44,21 @@ class ErrorChecker:
             # Open signature file.
             with codecs.open(self.signature_path, 'r', 'utf-8') as fin:
                 matching_patterns = fin.readlines()
-                for pattern in matching_patterns:
-                    list_match = re.findall(pattern, response, flags=re.IGNORECASE)
+                for signature in matching_patterns:
+                    try:
+                        # Find bad message.
+                        pattern = signature.replace('\r', '').replace('\n', '')
+                        obj_match = re.search(pattern, response, flags=re.IGNORECASE)
 
-                    if len(list_match) != 0:
-                        error_list.extend(list_match)
-                        msg = 'Find unnecessary error message : {}'.format(list_match)
-                        self.utility.print_message(OK, msg)
-                        self.utility.write_log(20, msg)
+                        if obj_match is not None:
+                            trigger = obj_match.group(1)
+                            error_list.append(trigger)
+                            msg = 'Detect unnecessary message: {}'.format(trigger)
+                            self.utility.print_message(OK, msg)
+                            self.utility.write_log(20, msg)
+                    except Exception as e:
+                        self.utility.print_exception(e, 'Invalid signature: {}, {}'.format(signature, e))
+                        self.utility.write_log(30, '{}'.format(e))
         except Exception as e:
             msg = 'Getting error message is failure : {}.'.format(e)
             self.utility.print_exception(e, msg)

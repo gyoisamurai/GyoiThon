@@ -72,17 +72,21 @@ class CommentChecker:
                 matching_patterns = fin.readlines()
                 for comment in comment_list:
                     for signature in matching_patterns:
-                        # Find bad comments.
-                        pattern = signature.replace('\r', '').replace('\n', '')
-                        obj_match = re.search(pattern, comment, flags=re.IGNORECASE)
+                        try:
+                            # Find bad comments.
+                            pattern = signature.replace('\r', '').replace('\n', '')
+                            obj_match = re.search(pattern, comment, flags=re.IGNORECASE)
 
-                        if obj_match is not None:
-                            trigger = obj_match.group(1)
-                            bad_comment_list.append(trigger)
-                            msg = 'Detect unnecessary comment: {}'.format(trigger)
-                            self.utility.print_message(OK, msg)
-                            self.utility.write_log(20, msg)
-                            break
+                            if obj_match is not None:
+                                trigger = obj_match.group(1)
+                                bad_comment_list.append(trigger)
+                                msg = 'Detect unnecessary comment: {}'.format(trigger)
+                                self.utility.print_message(OK, msg)
+                                self.utility.write_log(20, msg)
+                                break
+                        except Exception as e:
+                            self.utility.print_exception(e, 'Invalid signature: {}, {}'.format(signature, e))
+                            self.utility.write_log(30, '{}'.format(e))
         except Exception as e:
             self.utility.print_exception(e, 'Getting comment is failure :{}.'.format(e))
             self.utility.write_log(30, 'Getting comment is failure :{}.'.format(e))
