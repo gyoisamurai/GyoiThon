@@ -48,7 +48,7 @@ class CommentChecker:
         script_tags = soup.find_all('script')
         for script_tag in script_tags:
             target_text = script_tag.get_text()
-            js_comment_list.extend(re.findall(r'(/\*.*\*/)', target_text))
+            js_comment_list.extend(re.findall(r'(/\*[\s\S]*?\*/)', target_text))
             js_comment_list.extend(re.findall(r'(//.*[\r\n])', target_text))
         self.utility.write_log(20, '[Out] Get Javascript comments [{}].'.format(self.file_name))
         return list(set(js_comment_list))
@@ -69,17 +69,20 @@ class CommentChecker:
         try:
             # Open signature file.
             with codecs.open(self.signature_path, 'r', 'utf-8') as fin:
+                matching_patterns = fin.readlines()
                 for comment in comment_list:
-                    matching_patterns = fin.readlines()
-                    for pattern in matching_patterns:
+                    for signature in matching_patterns:
                         # Find bad comments.
-                        list_match = re.findall(pattern, comment, flags=re.IGNORECASE)
+                        pattern = signature.replace('\r', '').replace('\n', '')
+                        obj_match = re.search(pattern, comment, flags=re.IGNORECASE)
 
-                        if len(list_match) != 0:
-                            bad_comment_list.extend(list_match)
-                            msg = 'Find unnecessary comment : {}'.format(list_match)
+                        if obj_match is not None:
+                            trigger = obj_match.group(1)
+                            bad_comment_list.append(trigger)
+                            msg = 'Detect unnecessary comment: {}'.format(trigger)
                             self.utility.print_message(OK, msg)
                             self.utility.write_log(20, msg)
+                            break
         except Exception as e:
             self.utility.print_exception(e, 'Getting comment is failure :{}.'.format(e))
             self.utility.write_log(30, 'Getting comment is failure :{}.'.format(e))
