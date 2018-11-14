@@ -653,5 +653,7 @@ If you want to change "exploit module" options, please refer this section \[3. H
 
  * [Masafumi Masuya](https://www.blackhat.com/asia-18/arsenal/schedule/presenters.html#masafumi-masuya-36855)  
  [https://twitter.com/gyoizamurai](https://twitter.com/gyoizamurai)
+ * [Toshitsugu Yoneyama](https://www.blackhat.com/asia-18/arsenal/schedule/presenters.html#toshitsugu-yoneyama-36864)  
+ [https://twitter.com/yoneyoneyo](https://twitter.com/yoneyoneyo)
  * [Isao Takaesu](https://www.blackhat.com/asia-18/arsenal/schedule/presenters.html#isao-takaesu-33544)  
  [https://twitter.com/bbr_bbq](https://twitter.com/bbr_bbq)
