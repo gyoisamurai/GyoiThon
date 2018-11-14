@@ -44,7 +44,7 @@ class Censys:
         # Check cloud service name.
         if protocol == 'https':
             api = censys.certificates.CensysCertificates(api_id=self.api_id, api_secret=self.secret)
-            fields = ["parsed.subject_dn", "parsed.fingerprint_sha256"]
+            fields = ['parsed.subject_dn', 'parsed.fingerprint_sha256', 'parsed.validity']
             for cert in api.search('tags: trusted and parsed.names: {}'.format(fqdn), fields=fields):
                 self.utility.print_message(OK, 'Certification info: {}'.format(cert))
 
