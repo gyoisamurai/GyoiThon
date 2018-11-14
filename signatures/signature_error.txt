@@ -6,6 +6,10 @@ Language@Java@*@([^0-9a-zA-z\.]org\.[0-9a-zA-Z\.])*
 Language@PHP@*@(<b>Fatal[^\n]*php)
 Language@PHP@*@(<b>Warning[^\n]*php)
 DataBase@Oracle@*@(ORA-[0-9a-zA-Z\.])*
+Other@*@*@(select\s+[\s\r\n\w\d,\"']*\s+from)
+Other@*@*@(update\s+[\s\r\n\w\d,\"\']*\s+set)
+Other@*@*@(insert\s+into)
+Other@*@*@(delete\s+from)
 Other@*@*@(Exception[^\r\n<>])*
 Other@*@*@(Error[^\r\n<>])*
 Other@*@*@(Illegal[^\r\n<>])*
