@@ -14,9 +14,9 @@ Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
  * November 3rd,2018:[AV TOKYO 2018 HIVE](http://ja.avtokyo.org/avtokyo2018/event)
 
 ## Documents
- * [Installation](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#Installation)  
- * [Usage](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#Usage)  
- * [Tips](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#Tips)  
+ * [Installation](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Installation)  
+ * [Usage](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Usage)  
+ * [Tips](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Tips)  
 
 ## Overview
 GyoiThon is **Intelligence Gathering tool** for Web Server.  
@@ -68,7 +68,7 @@ You have to edit your `config.ini`.
 More information is Usage.  
 
 ## <a name='Usage'>Usage</a>
-By using [default mode](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#default_mode) without option and [combination of several options](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#complex_mode), GyoiThon can gather various information of target web server.  
+By using [default mode](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#default_mode) without option and [combination of several options](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#complex_mode), GyoiThon can gather various information of target web server.  
 
 ```
 usage:
