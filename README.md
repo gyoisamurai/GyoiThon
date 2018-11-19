@@ -57,7 +57,7 @@ root@kali:~# cd GyoiThon
 root@kali:~/GyoiThon# pip3 install -r requirements.txt
 ```
 
-4. Edit config.ini of GyoiThon.
+4. Edit config.ini of GyoiThon.  
 You have to edit your `config.ini`.  
 More information is Usage.  
 
@@ -107,7 +107,7 @@ If you want to change parameters, edit `config.ini`.
 Detail of `config.ini` is [here](https://github.com/gyoisamurai/GyoiThon/wiki/Configure).  
 
 ### Execution of GyoiThon.  
-#### <a name='default_mode'>1. Execute default mode.</a>  
+#### <a name='default_mode'>1. Default mode.</a>  
 ```
 root@kali:~/GyoiThon# python3 gyoithon.py
 ```
@@ -129,7 +129,7 @@ By change the parameters in `config.ini`, you can change setting of Scrapy.
 |Spider|depth_limit|Maximum depth of crawling. Default value is `2` layer. |
 ||delay_time|Delay time of crawling. Default value is `3` (sec). |
 
-#### 2. Execute examination of cloud services.  
+#### 2. Examination of cloud services mode.  
 ```
 root@kali:~/GyoiThon# python3 gyoithon.py -s
 ```
@@ -143,14 +143,14 @@ Before execution, you must change the below parameter of `config.ini` before exe
 
 This parameter is source URL of Azure Datacenter IP range. This URL is changed a few per day. So, you must get the latest URL from link "click here to download manually" of page "[Microsoft Azure Datacenter IP Ranges](https://www.microsoft.com/en-us/download/confirmation.aspx?id=41653)" and set it to above parameter before execute GyoiThon.  
 
-#### 3. Execute Machine Learning analysis for identification of products.  
+#### 3. Machine Learning analysis mode.  
 ```
 root@kali:~/GyoiThon# python3 gyoithon.py -m
 ```
 
 By add `-m` option, GyoiThon identifies products/version using Machine Learning (Naive Bayes) in addition to default mode.  
 
-#### 4. Execute Google Hacking for identification of products.  
+#### 4. Google Hacking mode.  
 ```
 root@kali:~/GyoiThon# python3 gyoithon.py -g
 ```
@@ -166,7 +166,7 @@ By add `-g` option, GyoiThon identifies products/version using Google Custom Sea
 |:-----|
 | You can use free Google Custom Search API of 100 queries per day. But, if you want to use more than 100 queries, you must pay fee the Google Custom Search API service. |
 
-#### 5. Execute exploration of default contents.  
+#### 5. Exploration of default contents mode.  
 ```
 root@kali:~/GyoiThon# python3 gyoithon.py -e
 ```
@@ -180,22 +180,113 @@ By change the parameters in `config.ini`, you can change setting of exploration.
 
 | Note |
 |:-----|
-| 本モードは数百ものアクセスを伴うため、Webサーバ側に負荷が掛かる可能性がある。また、アクセスログに大量の404エラーログが記録されることで、監視によるアラートが上がる可能性がある。よって、**必ず事前に監視やサーバ管理者等の関係者に周知し、自身の管理下にあるサーバに対して実行すること**。 |
+| When you use this option, may be affected to heavy load of server because of GyoiThon execute numerous accesses (hundreds accesses) against the target web server. In addition, by numerous 404 error logs are wrote to access log, it may be to caught by SOC.
+So, if you use this option, **please notify person concerned such as SOC (Security Operation Center), administrator and use them in an environment under your control and at your own risk and**. |
 
-#### Step.1 Run GyoiThon
-You execute GyoiThon following command.  
+#### 6. Censys cooperation mode.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -c
+```
+
+By add `-c` option, GyoiThon examines open port number and server certification using [Censys](https://censys.io/).  Before execution, you must set API key and Secret key to the below parameters.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|Censys|api_id|API key of Censys. |
+||secret|Secret key of Censys. |
+
+#### 7. Metasploit cooperation mode.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -p
+```
+
+By add `-p` option, GyoiThon examines real vulnerabilities such as DoS and backdoor using Metasploit in addition to default mode.  
+Before execution, you must launch RPC server of Metasploit and set below parameters in `config.ini`.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|Exploit|server_host|Allocated IP address to the RPC Server (`msgrpc`). |
+||server_port|Allocated port number to the RPC Server (`msgrpc`). |
+||msgrpc_user|User ID for authorization of `msgrpc`. |
+||msgrpc_pass|Password for authorization of `msgrpc`. |
+||LHOST|Allocated IP address to the RPC Server (`msgrpc`).|
+
+| Note |
+|:-----|
+| When you use this option, may be heavily affected to server operation because of GyoiThon execute the exploit against the target web server. In addition, this option may be caught by SOC (Security Operation Center) because of exploits are like a real attacks.
+So, if you use this option, **please notify person concerned such as SOC, administrator and use them in an environment under your control and at your own risk and**. |
+
+#### 8. Stored logs based analysis mode.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -l "Full path of stored logs"
+```
+
+By add `-l` option, GyoiThon executes various examination using stored HTTP responses without web crawling.  
+
+This mode assumes the web application that GyoiThon cannot execute web crawling.  
+GyoiThon can execute various examination similar web crawling of default mode using stored HTTP responses gathered by local proxy tool.  
+
+| Note |
+|:-----|
+| Log file's extension is `.log`. |
+
+#### <a name='complex_mode'>9. Combination of multiple options</a>.  
+##### Combination of "Examination of cloud services mode" and "Machine Learning analysis mode".
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -s -m
+```
+
+##### Combination of "Examination of cloud services mode" and "Google Hacking mode".
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -s -g
+```
+
+##### Combination of "Examination of cloud services mode", "Machine Learning analysis mode" and "Google Hacking mode".
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g
+```
+
+#### All option.
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g -e -c -p -l "Full path of stored logs"
+```
+
+### Check report.  
+After finished execution of GyoiThon, reports of each target are generated to the following path.    
 
 ```
-root@kali:~/GyoiThon# python3 gyoithon.py
+root@kali:~/GyoiThon/report# ls
+gyoithon_report_192.168.220.129_1082018338.csv
+gyoithon_report_192.168.220.129_bodgeit.csv
+gyoithon_report_192.168.220.129_cyclone.csv
+gyoithon_report_192.168.220.129_vicnum.csv
+gyoithon_report_192.168.220.129_WackoPicko.csv
 ```
 
-#### Step.2 Check scan report
-Please check scan report using any web browser.  
+Report format is `gyoithon_report_target FQDN(or IP address)_Root Path.csv`.  
+Each column's detail is following.  
 
-```
-root@kali:~/GyoiThon# cd classifier4gyoithon/report/
-root@kali:~/GyoiThon/classifier4gyoithon/report# firefox gyoithon_report.html
-```
+|Column|Description|Example|
+|:----|:----|:----|
+|fqdn|FQDN of target web server.|`www.gyoithon.example.com`|
+|ip_addr|IP address of target web server.|`192.168.220.129`|
+|port|Port number of target web server.|80|
+|cloud_type|Target web server is using cloud service name (Azure or AWS or GCP). |`AWS`|
+|method|Examination way of GyoiThon.|`Crawling`|
+|url|Accessed URL.|`http://192.168.220.129:80/WackoPicko/admin/index.php?page=login`|
+|vendor_name|Vendor name of identified products.|`apache`|
+|prod_name|Identified products|`http_server`|
+|prod_version|Version of identified products.|`2.2.14`|
+|prod_trigger|Trigger of identified products.|`Apache/2.2.14`|
+|prod_type|Product category (Web or CMS or Framework etc..)|`Web`|
+|prod_vuln|CVE number according to identified products (descending order of CVSS score).|`CVE-2017-3167, CVE-2017-3169, CVE-2017-7668` ...|
+|origin_login|Webアプリ独自のログイン画面有無（機械学習による推定とURL文字列判定の2パターン）|`Log : 37.5 %\nUrl : 100.0 %`|
+|origin_login_trigger|ログイン画面判定時のトリガ（証跡）|`Log : name",<input type="password"\nUrl : login`|
+|wrong_comment|特定した不要なコメント|`パスワードは「password1234」です。`|
+|error_msg|特定した不要なメッセージ|`Warning: mysql_connect() ..snip.. in auth.php on line 38`|
+|server_header|HTTPレスポンスのServerヘッダ値|`Server: Apache/2.2.14 (Ubuntu) mod_mono/2.4.3 PHP/5.3.2`|
+|log|生ログのPath|`/usr/home/~snip~/http_192.168.220.129_80_20181112170525765.log`|
+|date|調査日時|`2018/11/12  17:05:25`|
 
 ## Tips
 #### 1. How to add string matching patterns.  
@@ -314,212 +405,6 @@ If you want to change option values, please input any value to `"user_specify"` 
         },
 ```
 Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "`/my_original_dir/`" from "`/joomla`".  
-
-#### 4. How to use each instance.
-##### `GyoiClassifier.py`  
-You can use the log "webconf.csv" gathered by GyoiThon or the log gathered by GyoiClassifier to identify products operated on the target server. Then, the product is identified using machine learning.  
-
- * Usage (using `webconf.csv`)  
- GyoiClassifier identifies product name using `webconf.csv`.  
-
- ```
- local@client:~$ python GyoiClassifier.py -h
- GyoiClassifier.py
- Usage:
-     GyoiClassifier.py (-t <ip_addr> | --target <ip_addr>) (-p <port> | --port <port>) (-v <vhost> | --vhost <vhost>) [(-u <url> | --url <url>)]
-     GyoiClassifier.py -h | --help
- Options:
-     -t --target   Require  : IP address of target server.
-     -p --port     Require  : Port number of target server.
-     -v --vhost    Require  : Virtual Host of target server.
-     -u --url      Optional : Full URL for direct access.
-     -h --help     Optional : Show this screen and exit.
-
- local@client:~$ python GyoiClassifier.py -t 192.168.220.148 -p 80 -v 192.168.220.148
- 
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 　　███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗███████╗
- 　　████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
- 　　██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║█████╗
- 　　██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══╝
- 　　██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║███████╗
- 　　╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝
- 
- 　██╗     ███████╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗
- 　██║     ██╔════╝██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝
- 　██║     █████╗  ███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
- 　██║     ██╔══╝  ██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
- 　███████╗███████╗██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
- 　╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝
-　 　   __      _   _      _   _                 _        _
-　 　  / /  ___| |_( )__  | |_| |__   ___  _ __ | |_ __ _| | __
-　 　 / /  / _ \ __|/ __| | __| '_ \ / _ \| '_ \| __/ _` | |/ /
-　 　/ /__|  __/ |_ \__ \ | |_| | | | (_) | | | | || (_| |   <
-　 　\____/\___|\__||___/  \__|_| |_|\___/|_| |_|\__\__,_|_|\_
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- by GyoiClassifier.py
- 
- ------------------------------------------
- target     : 192.168.220.148(192.168.220.148):80
- target log : "gyoithon root path"../gyoithon\get_192.168.220.148_80_ip.log
- 
- [+] judge :
- [-] category : web server
-     product  : unknown
-     too low maximum probability.
- [-] category : framework
-     product  : unknown
-     too low maximum probability.
- [-] category : cms
-     -----
-     ranking 1
-     product     : heartcore
-     probability : 6.8966 %
-     reason      : [['Set-Cookie: PHPSESSID=44ec9b66c633a7abc374e5f9a4ad4be3', 'Set-Cookie:  PHPSESSID=b1f9a2c2be74f3b3507d5cbb8ea78c75']]
-     -----
-     ranking 2
-     product     : oscommerce
-     probability : 6.8966 %
-     reason      : [['Set-Cookie: PHPSESSID=44ec9b66c633a7abc374e5f9a4ad4be3', 'Set-Cookie: PHPSESSID=b1f9a2c2be74f3b3507d5cbb8ea78c75']]
-     -----
-     ranking 3
-     product     : joomla
-     probability : 6.6667 %
-     reason      : [['Set-Cookie: PHPSESSID=44ec9b66c633a7abc374e5f9a4ad4be3', 'Set-Cookie: PHPSESSID=b1f9a2c2be74f3b3507d5cbb8ea78c75']]
- ------------------------------------------
- 
- [+] done GyoiClassifier.py
- GyoiClassifier.py finish!!
- ```
-
- * Usage (using self-gathered log)  
- GyoiClassifier identifies product name using self-gathered log.  
- 
- ```
- local@client:~$ python GyoiClassifier.py -t 192.168.220.129 -p 80 -v www.example.com -u http://www.example.com/
- 
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 　　███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗███████╗
- 　　████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔════╝
- 　　██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║█████╗
- 　　██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══╝
- 　　██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║███████╗
- 　　╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝ 
- 
- 　██╗     ███████╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
- 　██║     ██╔════╝██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
- 　██║     █████╗  ███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
- 　██║     ██╔══╝  ██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
- 　███████╗███████╗██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
- 　╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
- 　　   __      _   _      _   _                 _        _    
- 　　  / /  ___| |_( )__  | |_| |__   ___  _ __ | |_ __ _| | __
- 　　 / /  / _ \ __|/ __| | __| '_ \ / _ \| '_ \| __/ _` | |/ /
- 　　/ /__|  __/ |_ \__ \ | |_| | | | (_) | | | | || (_| |   < 
- 　　\____/\___|\__||___/  \__|_| |_|\___/|_| |_|\__\__,_|_|\_
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- by GyoiClassifier.py
- 
- ------------------------------------------
- target     : http://www.example.com/
- target log : not use
- 
- [+] judge :
- [-] category : web server
-     product  : unknown
-     too low maximum probability.
- [-] category : framework
-     -----
-     ranking 1
-     product     : php
-     probability : 66.6667 %
-     reason      : [['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe']]
- [-] category : cms
-     -----
-     ranking 1
-     product     : joomla
-     probability : 13.3333 %
-     reason      : [['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe; path=/'], ['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe'], ['Joomla!']]
-     -----
-     ranking 2
-     product     : heartcore
-     probability : 6.8966 %
-     reason      : [['Set-Cookie: f00e68432b68050dee9abe33c389831e=a3daf0eba60a5f11c95e4563c4eccebe']]
- ------------------------------------------
- 
- [+] done GyoiClassifier.py
- GyoiClassifier.py finish!!
- ```
-
-|option|required|description|
-|:---|:---|:---|
-|-t, --target|yes|IP address of target server.|
-|-p, --port|yes|Target port number.|
-|-v, --vhost|yes|Virtual host of target server. If target server hasn't virtual host, you indicate IP address.|
-|-u, --url|no|URL of target server. If you want to gather newly logs of any server, indicate url of target server.|
-
-##### `GyoiExploit.py`
-You can execute exploits thoroughly using all combinations of "Exploit module", "Target" and "Payload" of Metasploit corresponding to user's indicated product name and port number.
-
- * Usage 
- ```
- local@client:~$ python GyoiExploit.py -h
- GyoiExploit.py
- Usage:
-     GyoiExploit.py (-t <ip_addr> | --target <ip_addr>) (-p <port> | --port <port>) (-s <service> | --service <service>)
-     GyoiExploit.py -h | --help
- 
- Options:
-     -t --target   Require  : IP address of target server.
-     -p --port     Require  : Port number of target server.
-     -s --service  Require  : Service name (product name).
-     -h --help     Optional : Show this screen and exit.
-
- local@client:~$ python GyoiExploit.py -t 192.168.220.145 -p 3306 -s mysql
-
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   ███████╗██╗  ██╗██████╗ ██╗      ██████╗ ██╗████████╗██╗██╗
-   ██╔════╝╚██╗██╔╝██╔══██╗██║     ██╔═══██╗██║╚══██╔══╝██║██║
-   █████╗   ╚███╔╝ ██████╔╝██║     ██║   ██║██║   ██║   ██║██║
-   ██╔══╝   ██╔██╗ ██╔═══╝ ██║     ██║   ██║██║   ██║   ╚═╝╚═╝
-   ███████╗██╔╝ ██╗██║     ███████╗╚██████╔╝██║   ██║   ██╗██╗
-   ╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝   ╚═╝   ╚═╝╚═╝
- 　   __      _   _      _   _                 _        _
- 　  / /  ___| |_( )__  | |_| |__   ___  _ __ | |_ __ _| | __
- 　 / /  / _ \ __|/ __| | __| '_ \ / _ \| '_ \| __/ _` | |/ /
- 　/ /__|  __/ |_ \__ \ | |_| | | | (_) | | | | || (_| |   <
- 　\____/\___|\__||___/  \__|_| |_|\___/|_| |_|\__\__,_|_|\_
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- by GyoiExploit.py
- 
- [+] Get exploit list.
- [*] Loading exploit list from local file: C:\Users\i.takaesu\Documents\GitHub\GyoiThon\classifier4gyoithon\data\exploit_list.csv
- [+] Get exploit tree.
- [*] Loading exploit tree from local file: C:\Users\i.takaesu\Documents\GitHub\GyoiThon\classifier4gyoithon\data\exploit_tree.json
- [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/custom, result: failure
- [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/debug_trap, result: failure
- [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/shell_bind_tcp, result: bingo!!
- [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/shell_reverse_tcp, result: failure
- [*] exploit/linux/mysql/mysql_yassl_getname, target: 0, payload: generic/tight_loop, result: failure 
- 
- ...snip...
- 
- [*] exploit/linux/mysql/mysql_yassl_getname, target: 1, payload: linux/x86/shell_bind_tcp_random_port, result: failure
- [*] exploit/linux/mysql/mysql_yassl_getname, target: 1, payload: linux/x86/shell_reverse_tcp, result: failure
- [*] exploit/linux/mysql/mysql_yassl_hello, target: 0, payload: generic/custom, result: failure
- [*] exploit/linux/mysql/mysql_yassl_hello, target: 0, payload: generic/debug_trap, result: bingo!!
- [*] exploit/linux/mysql/mysql_yassl_hello, target: 0, payload: generic/shell_bind_tcp, result: failure
- 
- ...snip...
-```
-
-|option|required|description|
-|:---|:---|:---|
-|-t, --target|yes|IP address of target server.|
-|-p, --port|yes|Target port number.|
-|-s, --service|yes|Target service name identifiable by Metasploit.|
-
-If you want to change "exploit module" options, please refer this section \[3. How to change "Exploit module's option"].  
 
 ## Operation check environment
  * Kali Linux 2018.2 (for Metasploit)
