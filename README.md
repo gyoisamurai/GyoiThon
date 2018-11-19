@@ -7,16 +7,22 @@
 
 Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
 
-### Presentation
+## Presentation
  * January 25th,2018:[JANOG41](https://www.janog.gr.jp/meeting/janog41/program/sp5sts)  
  * March 23th,2018:[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)  
  * August 12th,2018:[DEFCON26 DemoLabs](https://www.defcon.org/html/defcon-26/dc-26-demolabs.html#GyoiThon)  
  * November 3rd,2018:[AV TOKYO 2018 HIVE](http://ja.avtokyo.org/avtokyo2018/event)
 
+## Documents
+ * [Installation](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#Installation)  
+ * [Usage](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#Usage)  
+ * [Tips](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#Tips)  
+
 ## Overview
 GyoiThon is **Intelligence Gathering tool** for Web Server.  
 
 GyoiThon execute **remote access** to target Web server and **identifies product operated on the server** such as CMS, Web server software, Framework, Programming Language etc,. And, it can **execute exploit modules** to identified products using Metasploit. GyoiThon **fully automatically execute** above action.  
+
 GyoiThon's main features are following.  
 
  * Remote access/Fully automatic  
@@ -37,9 +43,9 @@ GyoiThon's main features are following.
 
 | Note |
 |:-----|
-| If you are interested, please use them in an environment under your control and at your own risk. |
+| If you are interested, **please use them in an environment under your control and at your own risk**. |
 
-## Installation
+## <a name='Installation'>Installation</a>
 1. git clone GyoiThon's repository.  
 ```
 root@kali:~# git clone https://github.com/gyoisamurai/GyoiThon.git
@@ -61,7 +67,7 @@ root@kali:~/GyoiThon# pip3 install -r requirements.txt
 You have to edit your `config.ini`.  
 More information is Usage.  
 
-## Usage
+## <a name='Usage'>Usage</a>
 By using [default mode](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#default_mode) without option and [combination of several options](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#complex_mode), GyoiThon can gather various information of target web server.  
 
 ```
@@ -180,8 +186,7 @@ By change the parameters in `config.ini`, you can change setting of exploration.
 
 | Note |
 |:-----|
-| When you use this option, may be affected to heavy load of server because of GyoiThon execute numerous accesses (hundreds accesses) against the target web server. In addition, by numerous 404 error logs are wrote to access log, it may be to caught by SOC.
-So, if you use this option, **please notify person concerned such as SOC (Security Operation Center), administrator and use them in an environment under your control and at your own risk and**. |
+| When you use this option, may be affected to heavy load of server because of GyoiThon execute numerous accesses (hundreds accesses) against the target web server. In addition, by numerous 404 error logs are wrote to access log, it may be to caught by SOC. So, if you use this option, **please notify person concerned such as SOC (Security Operation Center), administrator and use them in an environment under your control and at your own risk and**. |
 
 #### 6. Censys cooperation mode.  
 ```
@@ -213,8 +218,7 @@ Before execution, you must launch RPC server of Metasploit and set below paramet
 
 | Note |
 |:-----|
-| When you use this option, may be heavily affected to server operation because of GyoiThon execute the exploit against the target web server. In addition, this option may be caught by SOC (Security Operation Center) because of exploits are like a real attacks.
-So, if you use this option, **please notify person concerned such as SOC, administrator and use them in an environment under your control and at your own risk and**. |
+| When you use this option, may be heavily affected to server operation because of GyoiThon execute the exploit against the target web server. In addition, this option may be caught by SOC (Security Operation Center) because of exploits are like a real attacks. So, if you use this option, **please notify person concerned such as SOC, administrator and use them in an environment under your control and at your own risk and**. |
 
 #### 8. Stored logs based analysis mode.  
 ```
@@ -280,15 +284,15 @@ Each column's detail is following.
 |prod_trigger|Trigger of identified products.|`Apache/2.2.14`|
 |prod_type|Product category (Web or CMS or Framework etc..)|`Web`|
 |prod_vuln|CVE number according to identified products (descending order of CVSS score).|`CVE-2017-3167, CVE-2017-3169, CVE-2017-7668` ...|
-|origin_login|Webアプリ独自のログイン画面有無（機械学習による推定とURL文字列判定の2パターン）|`Log : 37.5 %\nUrl : 100.0 %`|
-|origin_login_trigger|ログイン画面判定時のトリガ（証跡）|`Log : name",<input type="password"\nUrl : login`|
-|wrong_comment|特定した不要なコメント|`パスワードは「password1234」です。`|
-|error_msg|特定した不要なメッセージ|`Warning: mysql_connect() ..snip.. in auth.php on line 38`|
-|server_header|HTTPレスポンスのServerヘッダ値|`Server: Apache/2.2.14 (Ubuntu) mod_mono/2.4.3 PHP/5.3.2`|
-|log|生ログのPath|`/usr/home/~snip~/http_192.168.220.129_80_20181112170525765.log`|
-|date|調査日時|`2018/11/12  17:05:25`|
+|origin_login|Login page is existing or not (Log: analysis of HTTP response using Machine Leaerning, Url: String pattern matching of URL.|`Log : 37.5 %\nUrl : 100.0 %`|
+|origin_login_trigger|Trigger of identifed login page.|`Log : name",<input type="password"\nUrl : login`|
+|wrong_comment|Identified unnecessary comments.|`パスワードは「password1234」です。`|
+|error_msg|Identified unnecessary debug messages.|`Warning: mysql_connect() ..snip.. in auth.php on line 38`|
+|server_header|Server header of HTTP response.|`Server: Apache/2.2.14 (Ubuntu) mod_mono/2.4.3 PHP/5.3.2`|
+|log|Path of raw data.|`/usr/home/~snip~/http_192.168.220.129_80_20181112170525765.log`|
+|date|Examination date.|`2018/11/12  17:05:25`|
 
-## Tips
+## <a name='Tips'>Tips</a>
 #### 1. How to add string matching patterns.  
 `signatures` path includes four files corresponding to each product categories.  
 
@@ -408,11 +412,9 @@ Above example is to change value of `TARGETURI` option in exploit module "`explo
 
 ## Operation check environment
  * Kali Linux 2018.2 (for Metasploit)
-   * Memory: 8.0GB
-   * Metasploit Framework 4.16.48-dev
- * ubuntu 16.04 LTS (Host OS)
    * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz
    * Memory: 8.0GB
+   * Metasploit Framework 4.16.48-dev
    * Python 3.6.1（Anaconda3）
    * docopt==0.6.2
    * jinja2==2.10
