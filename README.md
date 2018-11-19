@@ -295,7 +295,7 @@ Each column's detail is following.
 
 ## <a name='Tips'>Tips</a>
 ### 1. How to add new signature (string matching patterns).  
-`signatures` path includes four files corresponding to each product categories.  
+`signatures` path includes below files.  
 
 ```
 root@kali:~/GyoiThon/signatures/ ls
