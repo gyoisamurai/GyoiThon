@@ -5,288 +5,108 @@
 
 ---
 
-### Presentation
- * [JANOG41](https://www.janog.gr.jp/meeting/janog41/program/sp5sts)  
- * [Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)  
- * [DEFCON26 DemoLabs](https://www.defcon.org/html/defcon-26/dc-26-demolabs.html#GyoiThon)  
- * [AV TOKYO 2018 HIVE](http://ja.avtokyo.org/avtokyo2018/event)
+Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
 
-### Documentation (Installation, Usage)
-See the project's [wiki](https://github.com/gyoisamurai/GyoiThon/wiki) for installation, usage.  
+### Presentation
+ * January 25th,2018:[JANOG41](https://www.janog.gr.jp/meeting/janog41/program/sp5sts)  
+ * March 23th,2018:[Black Hat ASIA 2018 Arsenal](https://www.blackhat.com/asia-18/arsenal/schedule/index.html#gyoithon-9651)  
+ * August 12th,2018:[DEFCON26 DemoLabs](https://www.defcon.org/html/defcon-26/dc-26-demolabs.html#GyoiThon)  
+ * November 3rd,2018:[AV TOKYO 2018 HIVE](http://ja.avtokyo.org/avtokyo2018/event)
 
 ## Overview
- GyoiThon is a **growing penetration test tool using Machine Learning**.  
+GyoiThon is **Intelligence Gathering tool** for Web Server.  
 
- GyoiThon **identifies the software installed on web server** (OS, Middleware, Framework, CMS, etc...) based on the learning data. After that, it **executes valid exploits** for the identified software using Metasploit. Finally, it **generates reports** of scan results. GyoiThon executes the above processing **automatically**. 
+GyoiThon execute **remote access** to target Web server and **identifies product operated on the server** such as CMS, Web server software, Framework, Programming Language etc,. And, it can **execute exploit modules** to identified products using Metasploit. GyoiThon **fully automatically execute** above action.  
+GyoiThon's main features are following.  
 
- * Processing steps  
- ![Processing flow](./img/processing_flow.png)
+ * Remote access/Fully automatic  
+ GyoiThon can **fully automatically** gather the information of target Web server using only **remote access**. You only execute GyoiThon once for your operation.  
 
- GyoiThon executes the above "Step1" - "Step4" fully automatically.  
- **User's only operation is to input the top URL** of the target web server in GyoiThon.
+ * Non-destructive test  
+ GyoiThon can gather information of target Web server using **only normally access**.  
+ But, when you use a part of option, GyoiThon execute abnormally access such as sending exploit modules.  
 
- It is very easy!  
- You can identify vulnerabilities of the web servers without taking time and effort.
+ * Gathering various information  
+ GyoiThon has various intelligence gathering engines such as Web crawler, Google Custom Search API, Censys, explorer of default contents, examination of cloud services etc,. By analyze gathered information using **strings pattern matching** and **machine learning**, GyoiThon can identify **product/version/CVE number** operated on the target web server, **unnecceary html comments**/**debug messages**, **login page** etc,.  
 
-## Processing flow
-#### Step 1. Gather HTTP responses.
- GyoiThon gathers several HTTP responses of target website while **crawling**.  
- The following are example of HTTP responses gathered by GyoiThon.  
+ * Examination of real vulnerability  
+ GyoiThon can execute exploit modules to identified products using Metasploit.  
+ As a result, it can **examine real vulnerability of target web server**.  
 
- * Example.1  
- ```
- HTTP/1.1 200 OK
- Date: Tue, 06 Mar 2018 03:01:57 GMT
- Connection: close
- Content-Type: text/html; charset=UTF-8
- Etag: "409ed-183-53c5f732641c0"
- Content-Length: 15271
+![Overview](https://github.com/gyoisamurai/GyoiThon/raw/master/img/overview.png)
 
- ...snip...
- ```
-
- * Example.2  
- ```
- HTTP/1.1 200 OK
- Date: Tue, 06 Mar 2018 06:56:17 GMT
- Connection: close
- Content-Type: text/html; charset=UTF-8
- Set-Cookie: f00e68432b68050dee9abe33c389831e=0eba9cd0f75ca0912b4849777677f587;
- path=/;
- Content-Length: 37496
-
- ...snip...
- ```
-
- * Example.3  
- ```
- HTTP/1.1 200 OK
- Date: Tue, 06 Mar 2018 04:19:19 GMT
- Connection: close
- Content-Type: text/html; charset=UTF-8
- Content-Length: 11819
-
- ...snip...
-
-  <script src="/core/misc/drupal.js?v=8.3.1"></script>
- ```
-
-#### Step 2. Identify product name.
- GyoiThon identifies product name installed on web server using following **two methods**.
-
-##### 1. Based on Machine Learning.  
-  By using Machine Learning (**Naive Bayes**), GyoiThon identifies software based on a **combination of slightly different features** (Etag value, Cookie value, specific HTML tag etc.) for each software. Naive Bayes is learned using the training data which example below (Training data). Unlike the signature base, Naive Bayes is stochastically identified based on various features included in HTTP response when it cannot be identified software in one feature.
-
-   * Example.1  
-   ```
-   Etag: "409ed-183-53c5f732641c0"
-   ```
-   GyoiThon can identify the web server software **Apache**.  
-   This is because GyoiThon learns features of Apache such as "**Etag header value** (409ed-183-53c5f732641c0). In our survey, Apache use **combination of numeral and lower case letters as the Etag value**. And, Etag value is **separated 4-5 digits and 3-4 digits and 12 digits, final digit is 0** in many cases.  
-
-   * Example.2  
-   ```
-   Set-Cookie: f00e68432b68050dee9abe33c389831e=0eba9cd0f75ca0912b4849777677f587;
-   ```
-   GyoiThon can identify the CMS **Joomla!**.  
-   This is because GyoiThon learns features of Joomla! such as "**Cookie name** (f00e6 ... 9831e) " and "**Cookie value** (0eba9 ... 7f587). In our survey, Joomla! uses **32 lower case letters as the Cookie name and Cookie value** in many cases.
-
-###### Training data (One example)  
- * Joomla! (CMS)
- ```
- Set-Cookie: ([a-z0-9]{32})=[a-z0-9]{26,32};
- Set-Cookie: [a-z0-9]{32}=([a-z0-9]{26,32});
- ...snip...
- ```
- * HeartCore (Japanese famous CMS)  
- ```
- Set-Cookie:.*=([A-Z0-9]{32});.*
- <meta name=["'](author)["'] content=["']{2}.*
- ...snip...
- ```
-
- * Apache (Web server software)  
- ```
- Etag:.*".*-[0-9a-z]{3,4}-[0-9a-z]{13}")[\r\n]
- ...snip...
- ```
-
-##### 2. Based on String matching.  
- Of course, GyoiThon can identify software by **string matching** also used in traditional penetration test tools. Examples are shown below.
-
-   * Example.3  
-   ```
-   <script src="/core/misc/drupal.js?v=8.3.1"></script>
-   ```
-   GyoiThon can identify the CMS **Drupal**.  
-   It is very easy.  
-
-#### Step 3. Exploit using Metasploit.
-GyoiThon executes exploit corresponding to the identified software using Metasploit and it checks whether the software is affected by the vulnerability.  
-
- ![Link with Metasploit](./img/link_with_metasploit.png)  
-
- * Running example  
- ```
- [*] exploit/multi/http/struts_code_exec_exception_delegator, target: 1, payload: linux/x86/shell/reverse_nonx_tcp, result: failure
- [*] exploit/multi/http/struts_code_exec_exception_delegator, target: 1, payload: linux/x86/shell/reverse_tcp, result: failure
- [*] exploit/multi/http/struts_code_exec_exception_delegator, target: 1, payload: linux/x86/shell/reverse_tcp_uuid, result: failure
- [*] exploit/multi/http/struts_code_exec_exception_delegator, target: 1, payload: linux/x86/shell_bind_ipv6_tcp, result: failure
- [*] exploit/multi/http/struts_code_exec_exception_delegator, target: 1, payload: linux/x86/shell_bind_tcp, result: failure
-
- ...snip...
-
- [*] exploit/linux/http/apache_continuum_cmd_exec, target: 0, payload: generic/custom, result: failure
- [*] exploit/linux/http/apache_continuum_cmd_exec, target: 0, payload: generic/debug_trap, result: failure
- [*] exploit/linux/http/apache_continuum_cmd_exec, target: 0, payload: generic/shell_bind_tcp, result: failure
- [*] exploit/linux/http/apache_continuum_cmd_exec, target: 0, payload: generic/shell_reverse_tcp, result: failure
- [*] exploit/linux/http/apache_continuum_cmd_exec, target: 0, payload: generic/tight_loop, result: bingo!!
- ```
-
-#### Step 4. Generate scan report.
-GyoiThon generates a report that summarizes vulnerabilities.  
-Report's style is html.  
-
- * sample
- [![gyoithon_report](./img/gyoi_report.png)](https://github.com/gyoisamurai/GyoiThon/blob/master/classifier4gyoithon/report/gyoithon_report.html)
-
-## Demonstration movie.
-
- [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/jmi43eZOE9w/0.jpg)](http://www.youtube.com/watch?v=jmi43eZOE9w)  
-
- https://www.youtube.com/watch?v=jmi43eZOE9w
+| Note |
+|:-----|
+| If you are interested, please use them in an environment under your control and at your own risk. |
 
 ## Installation
-#### Step.0 git clone GyoiThon's repository.
+1. git clone GyoiThon's repository.  
 ```
 root@kali:~# git clone https://github.com/gyoisamurai/GyoiThon.git
 ```
 
-#### Step.1 Get python3-pip
+2. Get python3-pip.  
 ```
+root@kali:~# apt-get update
 root@kali:~# apt-get install python3-pip
 ```
 
-#### Step.2 install required packages.
+3. install required python packages.  
 ```
 root@kali:~# cd GyoiThon
 root@kali:~/GyoiThon# pip3 install -r requirements.txt
 ```
 
-#### Step.3 Edit config.ini of GyoiThon.
-You have to be match server_host value with IP address of your Kali Linux.  
-
-```
-root@kali:~/GyoiThon# cd classifier4gyoithon
-root@kali:~/GyoiThon/classifier4gyoithon# vim config.ini
-...snip...
-
-[GyoiExploit]
-server_host      : 192.168.220.144
-server_port      : 55553
-msgrpc_user      : test
-msgrpc_pass      : test1234
-timeout          : 10
-LHOST            : 192.168.220.144
-LPORT            : 4444
-
-...snip...
-```
-
- |config|description|
- |:---|:---|
- |server_host|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
- |server_port|Any port number of your server that launched Metasploit. Your setting value `ServerPort` in Step2.|
- |msgrpc_user|Metasploit's user name using authentication. Your setting value `User` in Step2.|
- |msgrpc_pass|Metasploit's password using authentication. Your setting value `Pass` in Step2.|
- |LHOST|IP address of your server that launched Metasploit. Your setting value `ServerHost` in Step2.|
-
-#### Step.4 Initialize Metasploit DB
-Firstly, you initialize metasploit db (postgreSQL) using msfdb command.  
-
-```
-root@kali:~# msfdb init
-```
-
-#### Step.5 Launch Metasploit Framework
-You launch Metasploit.  
-
-```
-root@kali:~# msfconsole
-______________________________________________________________________________
-|                                                                              |
-|                   METASPLOIT CYBER MISSILE COMMAND V4                        |
-|______________________________________________________________________________|
-     \\                                  /                      /
-      \\     .                          /                      /            x
-       \\                              /                      /
-        \\                            /          +           /
-         \\            +             /                      /
-          *                        /                      /
-                                  /      .               /
-   X                             /                      /            X
-                                /                     ###
-                               /                     # % #
-                              /                       ###
-                     .       /
-    .                       /      .            *           .
-                           /
-                          *
-                 +                       *
-
-                                      ^
-####      __     __     __          #######         __     __     __        ####
-####    /    \\ /    \\ /    \\      ###########     /    \\ /    \\ /    \\      ####
-################################################################################
-################################################################################
-# WAVE 4 ######## SCORE 31337 ################################## HIGH FFFFFFFF #
-################################################################################
-                                                          https://metasploit.com
-
-
-      =[ metasploit v4.16.15-dev                         ]
-+ -- --=[ 1699 exploits - 968 auxiliary - 299 post        ]
-+ -- --=[ 503 payloads - 40 encoders - 10 nops            ]
-+ -- --=[ Free Metasploit Pro trial: http://r-7.co/trymsp ]
-
-msf >
-```
-
-#### Step.6 Launch RPC Server
-You launch RPC Server of Metasploit following.  
-
-```
-msf> load msgrpc ServerHost=192.168.220.144 ServerPort=55553 User=test Pass=test1234
-[*] MSGRPC Service: 192.168.220.144:55553
-[*] MSGRPC Username: test
-[*] MSGRPC Password: test1234
-[*] Successfully loaded plugin: msgrpc
-```
-
-|msgrpc options|description|
-|:---|:---|
-|ServerHost|IP address of your server that launched Metasploit. Above example is `192.168.220.144`.|
-|ServerPort|Any port number of your server that launched Metasploit. Above example is `55553`.|
-|User|Any user name using authentication (default => msf). Above example is `test`.|
-|Pass|Any password using authentication (default => random string). Above example is `test1234`.|
+4. Edit config.ini of GyoiThon.
+You have to edit your `config.ini`.  
+More information is Usage.  
 
 ## Usage
-#### Step.0 Edit target file.
-GyoiThon accesses target server using host.txt.  
-So, you have to edit [`host.txt`](https://github.com/gyoisamurai/GyoiThon/blob/master/host.txt) before executing GyoiThon.  
+By using [default mode] without option and [combination of several options], GyoiThon can gather various information of target web server.  
 
- * Example of `host.txt`  
- target server => 192.168.220.148  
- target port => 80  
- target path => /oscommerce/catalog/
+```
+usage:
+    gyoithon.py [-s] [-m] [-g] [-e] [-c] [-p] [-l <log_path>]
+    gyoithon.py -h | --help
+options:
+    -s   Optional : Examine cloud service.
+    -m   Optional : Analyze HTTP response for identify product/version using Machine Learning.
+    -g   Optional : Google Custom Search for identify product/version.
+    -e   Optional : Explore default path of product.
+    -c   Optional : Discover open ports and wrong ssl server certification using Censys.
+    -p   Optional : Execute exploit module using Metasploit.
+    -l   Optional : Analyze log based HTTP response for identify product/version.
+    -h --help     Show this help message and exit.
+```
 
- ```
- root@kali:~# cd GyoiThon
- root@kali:~/GyoiThon# vim host.txt
- 192.168.220.148 80 /oscommerce/catalog/
- ```
+### Preparation.  
+1. Edit target file `host.txt`.  
+You have to write target web server to the `host.txt`.  
+Writting format is `protocol FQDN(or IP address) Port Crawling_root_path`.  
 
-You have to separate IP address, port number and target path using single space.  
+* Example.  
+```
+https gyoithon.example.com 443 /
+```
+
+If you want to indicate multiple target information, you have to write below.  
+
+```
+https gyoithon.example.com 443 /
+http 192.168.220.129 80 /vicnum/
+https www.example.com 443 /catalog/
+```
+
+| Note |
+|:-----|
+| You insert `/` at the beginning and end of Root Path. |
+
+2. Edit configuration file `config.ini`.  
+Parameters to be changed by the user are defined in the setting file `config.ini`.  
+If you want to change parameters, edit `config.ini`.  
+Detail of `config.ini` is [here](https://github.com/gyoisamurai/GyoiThon/wiki/Configure).  
+
+### Execution of GyoiThon.  
 
 #### Step.1 Run GyoiThon
 You execute GyoiThon following command.  
