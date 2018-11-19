@@ -460,49 +460,53 @@ Login@.*(login|log_in|logon|log_on|signin|sign_in).*
 `signatures` path includes four files corresponding to each product categories.  
 
 ```
-local@client:~$ ls "gyoithon root path"/classifier4gyoithon/train_data/
+root@kali:~/GyoiThon/modules/train_data/ ls
 train_cms_in.txt
-train_framework_in.txt
-train_os_in.txt
-train_web_in.txt
+train_page_type.txt
 ```
 
- * `train_cms_in.txt`  
- It includes learning data of CMS.  
- * `train_framework_in.txt`  
- It includes learning data of FrameWork.  
- * `train_os_in.txt`  
- It includes learning data of Operating System.  
- * `train_web_in.txt`  
- It includes learning data of Web server software.  
-
-If you want to add new learning data, you add learning data at last line in each file.  
-
-ex) How to add new learning data of CMS at `train_cms_in.txt`.  
-```
-joomla@(Set-Cookie: [a-z0-9]{32}=.*);
-joomla@(Set-Cookie: .*=[a-z0-9]{26,32});
-
-...snip...
-
-xoops@(xoops\.js)
-xoops@(xoops\.css)
-"new product name"@"regex pattern"
-[EOF]
-```
-
- |Note|
- |:---|
- |Above new product name must be a name that Metasploit can identify. And you have to separate new product name and regex pattern using `@`.|
-
-In addition, since GyoiThon retrains with new training data, you have to delete old training data (`*.pkl`).  
+#### `train_cms_in.txt`  
+This is train data for Machine Learning analysis that uses <a name='machine_learning_mode'>Machine Learning mode</a>.  
+If you want to add new train data, you have to write it such following format.   
 
 ```
-local@client:~$ ls "gyoithon root path"/classifier4gyoithon/trained_data/
-train_cms_out.pkl
-train_framework_out.pkl
-train_web_out.pkl
-local@client:~$ rm "gyoithon root path"/classifier4gyoithon/trained_data/*.pkl
+Format: field1@field2@field3@field4
+```
+
+|Type|Field#|Description|Example|
+|:---|:---|:---|:---|
+|Required|1|Vendor name.|`joomla`|
+|Required|2|Product name.|`joomla\!`|
+|Optional|3|Version binded with this signature.|`*` |
+|Required|4|Regex of target product's feature.|`(Set-Cookie: [a-z0-9]{32}=.*);`|
+
+If you don't need optional field, you must set `*` to this field.  
+
+* Example  
+```
+joomla@joomla\!@*@(Set-Cookie: [a-z0-9]{32}=.*);
+joomla@joomla\!@*@(Set-Cookie: .*=[a-z0-9]{26,32});
+heartcore@heartcore@*@(Set-Cookie:.*=[A-Z0-9]{32});.*
+heartcore@heartcore@*@(<meta name=["']author["'] content=["']{2}).*
+```
+
+#### `train_page_type.txt`  
+This is train data for identifying page type usin Machine Learning that uses <a name='default_mode'>default mode</a>.  
+If you want to add new train data, you have to write it such following format.   
+
+```
+Format: field1@field2@field3@field4
+```
+
+|Type|Field#|Description|Example|
+|:---|:---|:---|:---|
+|Required|1|Category.|`Login`|
+|Required|2|Regex of page's feature.|`.*(<input.*type=[\"']text[\"'].*name=[\"']user|uid|username|user_name|name[\"']).*>`|
+
+* Example  
+```
+Login@.*(<input.*type=[\"']text[\"'].*name=[\"']user|uid|username|user_name|name[\"']).*>
+Login@.*(<input.*type=[\"']password[\"']).*>
 ```
 
 ### 3. How to change "Exploit module's option".
@@ -533,17 +537,19 @@ If you want to change option values, please input any value to `"user_specify"` 
 Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "`/my_original_dir/`" from "`/joomla`".  
 
 ## Operation check environment
- * Kali Linux 2018.2 (for Metasploit)
-   * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz
-   * Memory: 8.0GB
-   * Metasploit Framework 4.16.48-dev
-   * Python 3.6.1（Anaconda3）
-   * docopt==0.6.2
-   * jinja2==2.10
-   * msgpack-python==0.4.8
-   * pandas==0.23.4
-   * urllib3==1.23
-   * Scrapy==1.5.1
+ * Kali Linux 2018.2 (for Metasploit)  
+   * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz  
+   * Memory: 8.0GB  
+   * Metasploit Framework 4.16.48-dev  
+   * Python 3.6.1 (Anaconda3)  
+   * censys==0.0.8  
+   * docopt==0.6.2  
+   * google-api-python-client==1.7.4
+   * jinja2==2.10  
+   * msgpack-python==0.5.6  
+   * pandas==0.23.4  
+   * urllib3==1.23  
+   * Scrapy==1.5.1  
 
 ## Licence
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
