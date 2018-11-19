@@ -62,7 +62,7 @@ You have to edit your `config.ini`.
 More information is Usage.  
 
 ## Usage
-By using [default mode] without option and [combination of several options], GyoiThon can gather various information of target web server.  
+By using [default mode](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#default_mode) without option and [combination of several options](https://github.com/gyoisamurai/GyoiThon/edit/master/README.md#complex_mode), GyoiThon can gather various information of target web server.  
 
 ```
 usage:
@@ -107,6 +107,80 @@ If you want to change parameters, edit `config.ini`.
 Detail of `config.ini` is [here](https://github.com/gyoisamurai/GyoiThon/wiki/Configure).  
 
 ### Execution of GyoiThon.  
+#### <a name='default_mode'>1. Execute default mode.</a>  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py
+```
+
+The default mode gathers following minimum information.  
+
+ 1. Gathering of HTTP responses by Web crawling.  
+ 2. Identification of product/version using string pattern matching.  
+ 3. Examination of CVE number (from NVD) for identified products.  
+ 4. Examination of unneccesary HTML/JavaScript comments.  
+ 5. Examination of unneccesary debug messages.  
+ 6. Examination of login pages.  
+
+GyoiThon uses `Scrapy` that Python's library.  
+By change the parameters in `config.ini`, you can change setting of Scrapy.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|Spider|depth_limit|Maximum depth of crawling. Default value is `2` layer. |
+||delay_time|Delay time of crawling. Default value is `3` (sec). |
+
+#### 2. Execute examination of cloud services.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -s
+```
+
+By add `-s` option, GyoiThon identifies target web server uses cloud service or not  in addition to default mode.  
+Before execution, you must change the below parameter of `config.ini` before execute GyoiThon.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|CloudChecker|azure_ip_range|Source URL of Azure Datacenter IP Ranges. |
+
+This parameter is source URL of Azure Datacenter IP range. This URL is changed a few per day. So, you must get the latest URL from link "click here to download manually" of page "[Microsoft Azure Datacenter IP Ranges](https://www.microsoft.com/en-us/download/confirmation.aspx?id=41653)" and set it to above parameter before execute GyoiThon.  
+
+#### 3. Execute Machine Learning analysis for identification of products.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -m
+```
+
+By add `-m` option, GyoiThon identifies products/version using Machine Learning (Naive Bayes) in addition to default mode.  
+
+#### 4. Execute Google Hacking for identification of products.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -g
+```
+
+By add `-g` option, GyoiThon identifies products/version using Google Custom Search API in addition to default mode. Before execution, you must set [API key](https://console.cloud.google.com/apis/dashboard) and [Search engine ID](https://support.google.com/customsearch/answer/2649143?hl=ja) to the below parameters.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|GoogleHack|api_key|API key of Google Custom Search API. |
+||search_engine_id|Google search engine ID. |
+
+| Note |
+|:-----|
+| You can use free Google Custom Search API of 100 queries per day. But, if you want to use more than 100 queries, you must pay fee the Google Custom Search API service. |
+
+#### 5. Execute exploration of default contents.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -e
+```
+
+By add -e option, GyoiThon explores the default contents of products such as CMS, Web server software in addition to default mode.  
+By change the parameters in `config.ini`, you can change setting of exploration.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|ContentExplorer|delay_time|Delay time of exploration. Default value is `1` (sec). |
+
+| Note |
+|:-----|
+| 本モードは数百ものアクセスを伴うため、Webサーバ側に負荷が掛かる可能性がある。また、アクセスログに大量の404エラーログが記録されることで、監視によるアラートが上がる可能性がある。よって、**必ず事前に監視やサーバ管理者等の関係者に周知し、自身の管理下にあるサーバに対して実行すること**。 |
 
 #### Step.1 Run GyoiThon
 You execute GyoiThon following command.  
