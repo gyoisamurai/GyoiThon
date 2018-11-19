@@ -17,6 +17,7 @@ Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
  * [Installation](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Installation)  
  * [Usage](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Usage)  
  * [Tips](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Tips)  
+ * [Demonstration](https://www.youtube.com/watch?v=cFgyBJuYQQ4) (Youtube)  
 
 ## Overview
 GyoiThon is **Intelligence Gathering tool** for Web Server.  
@@ -293,48 +294,169 @@ Each column's detail is following.
 |date|Examination date.|`2018/11/12  17:05:25`|
 
 ## <a name='Tips'>Tips</a>
-#### 1. How to add string matching patterns.  
+### 1. How to add new signature (string matching patterns).  
 `signatures` path includes four files corresponding to each product categories.  
 
 ```
-local@client:~$ ls "gyoithon root path"/signatures/
-signature_cms.txt
-signature_framework.txt
-signature_os.txt
-signature_web.txt
+root@kali:~/GyoiThon/signatures/ ls
+signature_product.txt
+signature_default_content.txt
+signature_search_query.txt
+signature_comment.txt
+signature_error.txt
+signature_page_type_from_url.txt
 ```
 
- * `signature_cms.txt`  
- It includes string matching patterns of CMS.  
- * `signature_framework.txt`  
- It includes string matching patterns of FrameWork.  
- * `signature_os.txt`  
- It includes string matching patterns of Operating System.  
- * `signature_web.txt`  
- It includes string matching patterns of Web server software.  
-
-If you want to add new string matching patterns, you add new string matching patterns at last line in each file.  
-
-ex) How to add new string matching pattern of CMS at `signature_cms.txt`.  
+#### `signature_product.txt`  
+This is string matching patterns for identification of product that uses <a name='default_mode'>default mode</a>.  
+If you want to add new string matching pattern, you have to write it such following format.   
+ 
 ```
-tikiwiki@(Powered by TikiWiki)
-wordpress@<.*=(.*/wp-).*/.*>
-wordpress@(<meta name="generator" content="WordPress).*>
-
-...snip...
-
-typo@.*(href="fileadmin/templates/).*>
-typo@(<meta name="generator" content="TYPO3 CMS).*>
-"new product name"@"regex pattern"
-[EOF]
+Format: field1@field2@field3@field4@field5
 ```
 
- |Note|
- |:---|
- |Above new product name must be a name that Metasploit can identify. And you have to separate new product name and regex pattern using `@`.|
+|Type|Field#|Description|Example|
+|:---|:---|:---|:---|
+|Required|1|Product Category.|`CMS`|
+|Required|2|Vendor name.|`drupal`|
+|Required|3|Product name.|`drupal`|
+|Optional|4|Version binded with this signature.|`8.0` |
+|Required|5|Regex of identifying product.|`.*(X-Generator: Drupal 8).*`|
 
+If you don't need optional field, you must set `*` to this field.  
+ 
+* Example  
+```
+CMS@wordpress@wordpress@*@.*(WordPress ([0-9]+[\.0-9]*[\.0-9]*)).*
+CMS@drupal@drupal@8.0@.*(X-Generator: Drupal 8).*
+```
 
-#### 2. How to add learning data.  
+| Note |
+|:-----|
+| If you want to extract product version, you write two regex groups (**the second regex is used for version extraction**). |
+
+#### `signature_default_content.txt`  
+This is string matching patterns for identification of product that uses <a name='explore_contents_mode'>Exploration of default contents mode</a>.  
+If you want to add new string matching pattern, you have to write it such following format.   
+
+```
+Format: field1@field2@field3@field4@field5@field6@field7@field8
+```
+
+|Type|Field#|Description|Example|
+|:---|:---|:---|:---|
+|Required|1|Product Category.|`CMS`|
+|Required|2|Vendor name.|`sixapart`|
+|Required|3|Product name.|`movabletype`|
+|Optional|4|Version binded with this signature.|`*` |
+|Required|5|Explore path|`/readme.html`|
+|Optional|6|Regex of to confirm product.|`.*(Movable Type).*`|
+|Optional|7|Regex of identifying version.|`(v=([0-9]+[\.0-9]*[\.0-9]*))`|
+|Required|8|Login page or not.|Login page is `1`, Not login page is `0`|
+
+If you don't need optional field, you must set `*` to this field.  
+
+* Example  
+```
+Web@apache@http_server@*@/server-status@*@Version:.*(Apache/([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@/readme.html@.*(Movable Type).*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+```
+
+| Note |
+|:-----|
+| If you want to extract product version, you write two regex groups (**the second regex is used for version extraction**). |
+
+#### `signature_search_query.txt`  
+This is Google Custom Search query for identification of product that uses <a name='google_hacking_mode'>Google Hacking mode</a>.  
+If you want to add new query, you have to write it such following format.   
+
+```
+Format: field1@field2@field3@field4@field5@field6@field7@field8
+```
+
+|Type|Field#|Description|Example|
+|:---|:---|:---|:---|
+|Optional|1|Product Category.|`CMS`|
+|Optional|2|Vendor name.|`sixapart`|
+|Optional|3|Product name.|`movabletype`|
+|Optional|4|Version binded with this signature.|`*` |
+|Required|5|Google Custom Search query|`inurl:/readme.html`|
+|Optional|6|Regex of to confirm product.|`.*(Movable Type).*`|
+|Optional|7|Regex of identifying version.|`(v=([0-9]+[\.0-9]*[\.0-9]*))`|
+|Optional|8|Login page or not.|Login page is `1`, Not login page is `0`|
+
+If you don't need optional field, you must set `*` to this field.  
+
+* Example  
+```
+Web@apache@http_server@*@inurl:/server-status@*@Version:.*(Apache/([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/readme.html@.*(Movable Type).*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+*@*@*@*@filetype:bak@*@*@0
+```
+
+| Note |
+|:-----|
+| If you want to extract product version, you write two regex groups (**the second regex is used for version extraction**). |
+
+#### `signature_comment.txt`  
+This is string matching patterns for identification of unnecessary comments that uses <a name='default_mode'>default mode</a>.  
+If you want to add new string matching pattern, you have to write it such following format.   
+
+```
+Format: field1
+```
+
+|Type|Field#|Description|
+|:---|:---|:---|
+|Required|1|Regex of unnecessary comment.|
+
+* Example  
+```
+(user\s*=|[\"']user[\"']\s*:|user_id\s*=|[\"']user_id[\"']\s*:|id\s*=|[\"']id[\"']\s*:)
+(select\s+[\s\r\n\w\d,\"']*\s+from)
+```
+
+#### `signature_error.txt`  
+This is string matching patterns for identification of unnecessary debug message that uses <a name='default_mode'>default mode</a>.  
+If you want to add new string matching pattern, you have to write it such following format.   
+
+```
+Format: field1
+```
+
+|Type|Field#|Description|
+|:---|:---|:---|
+|Required|1|Regex of unnecessary debug message.|
+
+* Example  
+```
+(ORA-[0-9a-zA-Z\.])
+(fail|error|notice|parse|warning|fatal)[^\n]*line[^\n]*[0-9]+
+```
+
+#### `signature_page_type_from_url.txt`  
+This is string matching patterns for identification of page type that uses <a name='default_mode'>default mode</a>.  
+If you want to add new string matching pattern, you have to write it such following format.   
+
+```
+Format: field1@field2
+```
+
+|Type|Field#|Description|Example|
+|:---|:---|:---|:---|
+|Required|1|Page type.|`Login`|
+|Required|2|Regex of identifying page type.|`.*(login|log_in|logon|log_on|signin|sign_in).*`|
+
+* Example  
+```
+Login@.*(login|log_in|logon|log_on|signin|sign_in).*
+```
+
+|Note|
+|:---|
+|Vendor name and product name must be match a name that [CPE format](https://en.wikipedia.org/wiki/Common_Platform_Enumeration).|
+
+### 2. How to add learning data.  
 `signatures` path includes four files corresponding to each product categories.  
 
 ```
@@ -383,7 +505,7 @@ train_web_out.pkl
 local@client:~$ rm "gyoithon root path"/classifier4gyoithon/trained_data/*.pkl
 ```
 
-#### 3. How to change "Exploit module's option".
+### 3. How to change "Exploit module's option".
 When GyoiThon exploits, it uses **default value** of Exploit module options.  
 If you want to change option values, please input any value to `"user_specify"` in [`exploit_tree.json`](https://raw.githubusercontent.com/gyoisamurai/GyoiThon/master/classifier4gyoithon/data/exploit_tree.json) as following.
 
