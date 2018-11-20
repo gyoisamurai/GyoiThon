@@ -75,7 +75,7 @@ class GoogleCustomSearch:
             result.append(default_ver)
         return result
 
-    def execute_google_hack(self, cve_explorer, fqdn, path, report):
+    def execute_google_hack(self, cve_explorer, fqdn, port, path, report):
         self.utility.print_message(NOTE, 'Execute Google hack.')
         self.utility.write_log(20, '[In] Execute Google hack [{}].'.format(self.file_name))
 
@@ -125,9 +125,9 @@ class GoogleCustomSearch:
                             self.utility.write_log(20, msg)
 
                             # Write log.
-                            log_name = 'google_custom_search_' + fqdn + '_' + date + '.log'
+                            log_name = 'google_custom_search_' + fqdn + '_' + str(port) + '_' + date + '.log'
                             log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'),
-                                                         fqdn + '_' + path.replace('/', ''))
+                                                         fqdn + '_' + str(port) + '_' + path.replace('/', ''))
                             if os.path.exists(log_path_fqdn) is False:
                                 os.mkdir(log_path_fqdn)
                             log_file = os.path.join(log_path_fqdn, log_name)

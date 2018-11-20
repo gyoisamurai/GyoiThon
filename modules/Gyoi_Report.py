@@ -41,11 +41,11 @@ class CreateReport:
             sys.exit(1)
 
     # Create report's header.
-    def create_report_header(self, fqdn, path):
+    def create_report_header(self, fqdn, port, path):
         self.utility.print_message(NOTE, 'Create report header : {}'.format(self.report_path))
         self.utility.write_log(20, '[In] Create report header [{}].'.format(self.file_name))
 
-        report_file_name = self.report_path.replace('*', fqdn + '_' + path)
+        report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + path)
         pd.DataFrame([], columns=self.header).to_csv(report_file_name, mode='w', index=False)
         self.utility.write_log(20, '[Out] Create report header [{}].'.format(self.file_name))
 
@@ -113,14 +113,19 @@ class CreateReport:
         msg = 'Create report : {}'.format(self.report_path)
         self.utility.print_message(OK, msg)
         self.utility.write_log(20, msg)
-        report_file_name = self.report_path.replace('*', fqdn + '_' + path)
+        report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + path)
         pd.DataFrame(report).to_csv(report_file_name, mode='a', header=False, index=False)
 
         self.utility.write_log(20, '[Out] Create report body [{}].'.format(self.file_name))
 
-    def create_exploit_report(self):
+    # Create exploit's report
+    def create_exploit_report(self, fqdn, port, path):
         # Gather reporting items.
-        csv_file_list = glob.glob(os.path.join(self.report_dir, '*.csv'))
+        log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'),
+                                     fqdn + '_' + str(port) + '_' + path.replace('/', ''))
+        if os.path.exists(log_path_fqdn) is False:
+            os.mkdir(log_path_fqdn)
+        csv_file_list = glob.glob(os.path.join(log_path_fqdn, self.report_temp))
 
         # Create DataFrame.
         content_list = []
