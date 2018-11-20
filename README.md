@@ -142,7 +142,7 @@ root@kali:~/GyoiThon# python3 gyoithon.py -s
 ```
 
 By add `-s` option, GyoiThon identifies target web server uses cloud service or not  in addition to default mode.  
-Before execution, you must change the below parameter of `config.ini` before execute GyoiThon.  
+Before execution, you must change the below parameter of `config.ini`.  
 
 |Category|Parameter|Description|
 |:----|:----|:----|
@@ -187,14 +187,15 @@ By change the parameters in `config.ini`, you can change setting of exploration.
 
 | Note |
 |:-----|
-| When you use this option, may be affected to heavy load of server because of GyoiThon execute numerous accesses (hundreds accesses) against the target web server. In addition, by numerous 404 error logs are wrote to access log, it may be to caught by SOC. So, if you use this option, **please notify person concerned such as SOC (Security Operation Center), administrator and use them in an environment under your control and at your own risk and**. |
+| When you use this option, may be affected to heavy load of server because of GyoiThon execute numerous accesses (hundreds accesses) against the target web server. In addition, by numerous 404 error logs are wrote to access log, it may be to caught by SOC (Security Operation Center). So, if you use this option, **please notify person concerned such as SOC, administrator and use them in an environment under your control and at your own risk and**. |
 
 #### 6. Censys cooperation mode.  
 ```
 root@kali:~/GyoiThon# python3 gyoithon.py -c
 ```
 
-By add `-c` option, GyoiThon examines open port number and server certification using [Censys](https://censys.io/).  Before execution, you must set API key and Secret key to the below parameters.  
+By add `-c` option, GyoiThon examines open port number and server certification using [Censys](https://censys.io/).  
+Before execution, you must set API key and Secret key to the below parameters.  
 
 |Category|Parameter|Description|
 |:----|:----|:----|
@@ -276,16 +277,16 @@ Each column's detail is following.
 |fqdn|FQDN of target web server.|`www.gyoithon.example.com`|
 |ip_addr|IP address of target web server.|`192.168.220.129`|
 |port|Port number of target web server.|80|
-|cloud_type|Target web server is using cloud service name (Azure or AWS or GCP). |`AWS`|
+|cloud_type|Cloud service name (Azure or AWS or GCP or Unknown).|`AWS`|
 |method|Examination way of GyoiThon.|`Crawling`|
 |url|Accessed URL.|`http://192.168.220.129:80/WackoPicko/admin/index.php?page=login`|
 |vendor_name|Vendor name of identified products.|`apache`|
-|prod_name|Identified products|`http_server`|
+|prod_name|Identified products.|`http_server`|
 |prod_version|Version of identified products.|`2.2.14`|
 |prod_trigger|Trigger of identified products.|`Apache/2.2.14`|
-|prod_type|Product category (Web or CMS or Framework etc..)|`Web`|
-|prod_vuln|CVE number according to identified products (descending order of CVSS score).|`CVE-2017-3167, CVE-2017-3169, CVE-2017-7668` ...|
-|origin_login|Login page is existing or not (Log: analysis of HTTP response using Machine Leaerning, Url: String pattern matching of URL.|`Log : 37.5 %\nUrl : 100.0 %`|
+|prod_type|Product category (Web or CMS or Framework etc..).|`Web`|
+|prod_vuln|CVE number according to identified products (desc CVSS score).|`CVE-2017-3167, CVE-2017-3169, CVE-2017-7668` ...|
+|origin_login|Login page is existing or not (Log: Analysis using Machine Leaerning, Url: Analysis using string pattern matching in URL.|`Log : 37.5 %\nUrl : 100.0 %`|
 |origin_login_trigger|Trigger of identifed login page.|`Log : name",<input type="password"\nUrl : login`|
 |wrong_comment|Identified unnecessary comments.|`パスワードは「password1234」です。`|
 |error_msg|Identified unnecessary debug messages.|`Warning: mysql_connect() ..snip.. in auth.php on line 38`|
@@ -308,7 +309,7 @@ signature_page_type_from_url.txt
 ```
 
 #### `signature_product.txt`  
-This is string matching patterns for identification of product that uses <a name='default_mode'>default mode</a>.  
+This is string matching patterns for identification of product in <a name='default_mode'>default mode</a>.  
 If you want to add new string matching pattern, you have to write it such following format.   
  
 ```
@@ -336,7 +337,7 @@ CMS@drupal@drupal@8.0@.*(X-Generator: Drupal 8).*
 | If you want to extract product version, you write two regex groups (**the second regex is used for version extraction**). |
 
 #### `signature_default_content.txt`  
-This is string matching patterns for identification of product that uses <a name='explore_contents_mode'>Exploration of default contents mode</a>.  
+This is string matching patterns for identification of product in <a name='explore_contents_mode'>Exploration of default contents mode</a>.  
 If you want to add new string matching pattern, you have to write it such following format.   
 
 ```
@@ -366,8 +367,12 @@ CMS@sixapart@movabletype@*@/readme.html@.*(Movable Type).*@(v=([0-9]+[\.0-9]*[\.
 |:-----|
 | If you want to extract product version, you write two regex groups (**the second regex is used for version extraction**). |
 
+| Note |
+|:-----|
+| If GyoiThon cannot confirm the product by just `Explore path`, you need to indicate the `Regex of to confirm product` field. GyoiThon accesses the URL that `Explore path` and examines the HTTP response using `Regex of to confirm product`. If this regex matches, GyoiThon judges that the product exists. |
+
 #### `signature_search_query.txt`  
-This is Google Custom Search query for identification of product that uses <a name='google_hacking_mode'>Google Hacking mode</a>.  
+This is Google Custom Search query for identification of product in <a name='google_hacking_mode'>Google Hacking mode</a>.  
 If you want to add new query, you have to write it such following format.   
 
 ```
@@ -398,8 +403,12 @@ CMS@sixapart@movabletype@*@inurl:/readme.html@.*(Movable Type).*@(v=([0-9]+[\.0-
 |:-----|
 | If you want to extract product version, you write two regex groups (**the second regex is used for version extraction**). |
 
+| Note |
+|:-----|
+| If GyoiThon cannot confirm the product by just `Google Custom Search query`, you need to indicate the `Regex of to confirm product` field. GyoiThon accesses the URL included in the execution result of Google Custom Search API and examines the HTTP response using `Regex of to confirm product`. If this regex matches, GyoiThon judges that the product exists. |
+
 #### `signature_comment.txt`  
-This is string matching patterns for identification of unnecessary comments that uses <a name='default_mode'>default mode</a>.  
+This is string matching patterns for identification of unnecessary comments in <a name='default_mode'>default mode</a>.  
 If you want to add new string matching pattern, you have to write it such following format.   
 
 ```
@@ -417,7 +426,7 @@ Format: field1
 ```
 
 #### `signature_error.txt`  
-This is string matching patterns for identification of unnecessary debug message that uses <a name='default_mode'>default mode</a>.  
+This is string matching patterns for identification of unnecessary debug message in <a name='default_mode'>default mode</a>.  
 If you want to add new string matching pattern, you have to write it such following format.   
 
 ```
@@ -435,7 +444,7 @@ Format: field1
 ```
 
 #### `signature_page_type_from_url.txt`  
-This is string matching patterns for identification of page type that uses <a name='default_mode'>default mode</a>.  
+This is string matching patterns for URL based identification of page type in <a name='default_mode'>default mode</a>.  
 If you want to add new string matching pattern, you have to write it such following format.   
 
 ```
@@ -454,10 +463,10 @@ Login@.*(login|log_in|logon|log_on|signin|sign_in).*
 
 |Note|
 |:---|
-|Vendor name and product name must be match a name that [CPE format](https://en.wikipedia.org/wiki/Common_Platform_Enumeration).|
+|Above vendor name and product name must be match a name in [CPE format](https://en.wikipedia.org/wiki/Common_Platform_Enumeration).|
 
 ### 2. How to add learning data.  
-`signatures` path includes four files corresponding to each product categories.  
+`modules/train_data/` path includes two train data for Machine Learning.  
 
 ```
 root@kali:~/GyoiThon/modules/train_data/ ls
@@ -466,7 +475,7 @@ train_page_type.txt
 ```
 
 #### `train_cms_in.txt`  
-This is train data for Machine Learning analysis that uses <a name='machine_learning_mode'>Machine Learning mode</a>.  
+This is train data for Machine Learning analysis in <a name='machine_learning_mode'>Machine Learning mode</a>.  
 If you want to add new train data, you have to write it such following format.   
 
 ```
@@ -478,7 +487,7 @@ Format: field1@field2@field3@field4
 |Required|1|Vendor name.|`joomla`|
 |Required|2|Product name.|`joomla\!`|
 |Optional|3|Version binded with this signature.|`*` |
-|Required|4|Regex of target product's feature.|`(Set-Cookie: [a-z0-9]{32}=.*);`|
+|Required|4|Feature of product expressed by regex.|`(Set-Cookie: [a-z0-9]{32}=.*);`|
 
 If you don't need optional field, you must set `*` to this field.  
 
@@ -490,18 +499,22 @@ heartcore@heartcore@*@(Set-Cookie:.*=[A-Z0-9]{32});.*
 heartcore@heartcore@*@(<meta name=["']author["'] content=["']{2}).*
 ```
 
+|Note|
+|:---|
+|Above vendor name and product name must be match a name in [CPE format](https://en.wikipedia.org/wiki/Common_Platform_Enumeration).|
+
 #### `train_page_type.txt`  
-This is train data for identifying page type usin Machine Learning that uses <a name='default_mode'>default mode</a>.  
+This is train data for identifying page type usin Machine Learning in <a name='default_mode'>default mode</a>.  
 If you want to add new train data, you have to write it such following format.   
 
 ```
-Format: field1@field2@field3@field4
+Format: field1@field2
 ```
 
 |Type|Field#|Description|Example|
 |:---|:---|:---|:---|
 |Required|1|Category.|`Login`|
-|Required|2|Regex of page's feature.|`.*(<input.*type=[\"']text[\"'].*name=[\"']user|uid|username|user_name|name[\"']).*>`|
+|Required|2|Feature of page expressed by regex.|`.*(<input.*type=[\"']text[\"'].*name=[\"']user|uid|username|user_name|name[\"']).*>`|
 
 * Example  
 ```
@@ -511,9 +524,14 @@ Login@.*(<input.*type=[\"']password[\"']).*>
 
 ### 3. How to change "Exploit module's option".
 When GyoiThon exploits, it uses **default value** of Exploit module options.  
-If you want to change option values, please input any value to `"user_specify"` in [`exploit_tree.json`](https://raw.githubusercontent.com/gyoisamurai/GyoiThon/master/classifier4gyoithon/data/exploit_tree.json) as following.
+If you want to change option values, please input any value to `"user_specify"` in `exploit_tree.json` as following.  
 
 ```
+root@kali:~/GyoiThon/modules/data/ ls
+exploit_tree.json
+root@kali:~/GyoiThon/modules/data/ vim exploit_tree.json
+
+...snip...
 
 "unix/webapp/joomla_media_upload_exec": {
     "targets": {
@@ -534,6 +552,7 @@ If you want to change option values, please input any value to `"user_specify"` 
             "user_specify": "/my_original_dir/"
         },
 ```
+
 Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "`/my_original_dir/`" from "`/joomla`".  
 
 ## Operation check environment
