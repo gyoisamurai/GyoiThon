@@ -107,7 +107,7 @@ class ContentExplorer:
                 # Write log.
                 log_name = protocol + '_' + fqdn + '_' + str(port) + '_' + date + '.log'
                 log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'),
-                                             fqdn + '_' + root_path.replace('/', ''))
+                                             fqdn + '_' + str(port) + '_' + root_path.replace('/', ''))
                 if os.path.exists(log_path_fqdn) is False:
                     os.mkdir(log_path_fqdn)
                 log_file = os.path.join(log_path_fqdn, log_name)
