@@ -135,6 +135,10 @@ By change the parameters in `config.ini`, you can change setting of Scrapy.
 |:----|:----|:----|
 |Spider|depth_limit|Maximum depth of crawling. Default value is `2` layer. |
 ||delay_time|Delay time of crawling. Default value is `3` (sec). |
+||time_out|Spider close option. Timeout of crawling. Default value is `600` (sec). |
+||item_count|Spider close option. Maximum items. Default value is `300`. |
+||page_count|Spider close option. Maximum items per page. Default value is `0` (no limit). |
+||error_count|Spider close option. Maximum errors. Default value is `0` (no limit). |
 
 #### 2. Examination of cloud services mode.  
 ```
