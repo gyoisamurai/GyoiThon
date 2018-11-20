@@ -9,7 +9,7 @@ import socket
 import ipaddress
 import configparser
 from datetime import datetime
-from logging import getLogger, FileHandler, StreamHandler, Formatter
+from logging import getLogger, FileHandler, Formatter
 
 # Printing colors.
 OK_BLUE = '\033[94m'      # [*]

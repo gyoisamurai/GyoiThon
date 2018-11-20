@@ -187,7 +187,7 @@ if __name__ == '__main__':
             continue
 
         # Create report header.
-        report.create_report_header(fqdn_list[idx], path_list[idx].replace('/', ''))
+        report.create_report_header(fqdn_list[idx], port_list[idx], path_list[idx].replace('/', ''))
 
         # Check cloud service.
         cloud_type = 'Unknown'
@@ -278,7 +278,10 @@ if __name__ == '__main__':
 
                     # Write log.
                     log_name = protocol_list[idx] + '_' + fqdn_list[idx] + '_' + str(port_list[idx]) + '_' + date + '.log'
-                    log_path_fqdn = os.path.join(log_path, fqdn_list[idx] + '_' + path_list[idx].replace('/', ''))
+                    log_path_fqdn = os.path.join(log_path,
+                                                 fqdn_list[idx] + '_' +
+                                                 str(port_list[idx]) + '_' +
+                                                 path_list[idx].replace('/', ''))
                     if os.path.exists(log_path_fqdn) is False:
                         os.mkdir(log_path_fqdn)
                     log_file = os.path.join(log_path_fqdn, log_name)
@@ -323,6 +326,7 @@ if __name__ == '__main__':
         if opt_gcs:
             product_list = google_hack.execute_google_hack(cve_explorer,
                                                            fqdn_list[idx],
+                                                           port_list[idx],
                                                            path_list[idx].replace('/', ''),
                                                            report)
 
@@ -340,12 +344,14 @@ if __name__ == '__main__':
         if opt_exploit:
             exploit = Exploit(utility)
             exploit_product = list(map(list, set(map(tuple, [[products[1], products[2]] for products in product_list]))))
-            exploit.exploit({'ip': utility.forward_lookup(fqdn_list[idx]),
+            exploit.exploit({'fqdn': fqdn_list[idx],
+                             'ip': utility.forward_lookup(fqdn_list[idx]),
                              'port': int(port_list[idx]),
-                             'prod_list': exploit_product})
+                             'prod_list': exploit_product,
+                             'path': path_list[idx].replace('/', '')})
 
             # Create exploiting report.
-            report.create_exploit_report()
+            report.create_exploit_report(fqdn_list[idx], port_list[idx], path_list[idx].replace('/', ''))
 
         utility.write_log(20, 'End ' + msg)
 
