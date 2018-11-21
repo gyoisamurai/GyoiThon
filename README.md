@@ -19,6 +19,10 @@ Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
  * [Tips](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Tips)  
  * [Demonstration](https://www.youtube.com/watch?v=cFgyBJuYQQ4) (Youtube)  
 
+## Slack
+ * [https://gyoithon.slack.com](https://gyoithon.slack.com)  
+ [Let's join GyoiThon Slack!!](https://docs.google.com/forms/d/e/1FAIpQLSeuT-HNF-geek1IM3qBWViTVJbLUr3GZR2Hzuow30734X70gw/viewform)  
+
 ## Overview
 GyoiThon is **Intelligence Gathering tool** for Web Server.  
 
@@ -490,7 +494,7 @@ Format: field1@field2@field3@field4
 |:---|:---|:---|:---|
 |Required|1|Vendor name.|`joomla`|
 |Required|2|Product name.|`joomla\!`|
-|Optional|3|Version binded with this signature.|`*` |
+|Optional|3|Version binded with this train data.|`*` |
 |Required|4|Feature of product expressed by regex.|`(Set-Cookie: [a-z0-9]{32}=.*);`|
 
 If you don't need optional field, you must set `*` to this field.  
@@ -565,6 +569,7 @@ Above example is to change value of `TARGETURI` option in exploit module "`explo
    * Memory: 8.0GB  
    * Metasploit Framework 4.16.48-dev  
    * Python 3.6.1 (Anaconda3)  
+ * Dependent Python libraries  
    * censys==0.0.8  
    * docopt==0.6.2  
    * google-api-python-client==1.7.4
@@ -576,9 +581,6 @@ Above example is to change value of `TARGETURI` option in exploit module "`explo
 
 ## Licence
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
-
-## SNS
- * [Slack](https://gyoithon.slack.com)
 
 ## Contact us
  gyoiler3@gmail.com  
