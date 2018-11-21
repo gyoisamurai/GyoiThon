@@ -38,14 +38,22 @@ class Censys:
         self.utility.write_log(20, '[In] Search Censys [{}].'.format(self.file_name))
 
         api = censys.ipv4.CensysIPv4(api_id=self.api_id, api_secret=self.secret)
+        self.utility.print_message(OK, 'Check open web ports.')
         for result in api.search('ip:{}'.format(ip_addr)):
-            self.utility.print_message(OK, 'Open web ports: {}'.format(result['protocols']))
+            self.utility.print_message(WARNING, 'Open web ports: {}'.format(result['protocols']))
 
         # Check cloud service name.
         if protocol == 'https':
+            self.utility.print_message(OK, 'Check certification.')
             api = censys.certificates.CensysCertificates(api_id=self.api_id, api_secret=self.secret)
-            fields = ['parsed.subject_dn', 'parsed.fingerprint_sha256', 'parsed.validity']
+            fields = ['parsed.subject_dn', 'parsed.validity', 'parsed.signature_algorithm', 'parsed.subject']
             for cert in api.search('tags: trusted and parsed.names: {}'.format(fqdn), fields=fields):
-                self.utility.print_message(OK, 'Certification info: {}'.format(cert))
+                self.utility.print_message(WARNING, 'Sig Algorithm: {}'.format(cert['parsed.signature_algorithm.name']))
+                for idx, common_name in enumerate(cert['parsed.subject.common_name']):
+                    self.utility.print_message(WARNING, 'Common Name {}: {}'.format(idx+1, common_name))
+                self.utility.print_message(WARNING, 'Validity Start: {}'.format(cert['parsed.validity.start']))
+                self.utility.print_message(WARNING, 'Validity End  : {}'.format(cert['parsed.validity.end']))
+                for idx, org_name in enumerate(cert['parsed.subject.organization']):
+                    self.utility.print_message(WARNING, 'Organization {}: {}'.format(idx+1, org_name))
 
         self.utility.write_log(20, '[Out] Search Censys [{}].'.format(self.file_name))
