@@ -460,7 +460,7 @@ Format: field1@field2
 ```
 
 |Type|Field#|Description|
-|:---|:---|:---|:---|
+|:---|:---|:---|
 |Required|1|Page type.|
 |Required|2|Regex of identifying page type.|
 
@@ -519,10 +519,10 @@ If you want to add new train data, you have to write it such following format.
 Format: field1@field2
 ```
 
-|Type|Field#|Description|Example|
-|:---|:---|:---|:---|
-|Required|1|Category.|`Login`|
-|Required|2|Feature of page expressed by regex.|`.*(<input.*type=[\"']text[\"'].*name=[\"']user|uid|username|user_name|name[\"']).*>`|
+|Type|Field#|Description|
+|:---|:---|:---|
+|Required|1|Category.|
+|Required|2|Feature of page expressed by regex.|
 
 * Example  
 ```
