@@ -459,10 +459,10 @@ If you want to add new string matching pattern, you have to write it such follow
 Format: field1@field2
 ```
 
-|Type|Field#|Description|Example|
+|Type|Field#|Description|
 |:---|:---|:---|:---|
-|Required|1|Page type.|`Login`|
-|Required|2|Regex of identifying page type.|`.*(login|log_in|logon|log_on|signin|sign_in).*`|
+|Required|1|Page type.|
+|Required|2|Regex of identifying page type.|
 
 * Example  
 ```
