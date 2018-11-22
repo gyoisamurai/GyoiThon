@@ -106,8 +106,7 @@ class ContentExplorer:
 
                 # Write log.
                 log_name = protocol + '_' + fqdn + '_' + str(port) + '_' + date + '.log'
-                log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'),
-                                             fqdn + '_' + str(port) + '_' + root_path.replace('/', ''))
+                log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'), fqdn + '_' + str(port))
                 if os.path.exists(log_path_fqdn) is False:
                     os.mkdir(log_path_fqdn)
                 log_file = os.path.join(log_path_fqdn, log_name)
@@ -130,7 +129,7 @@ class ContentExplorer:
                         page_type = {}
                         if is_login == '1':
                             page_type = {'ml': {'prob': '-', 'reason': '-'}, 'url': {'prob': '100%', 'reason': path}}
-                        report.create_report_body(target_url, fqdn, root_path, port, '*', self.method_name, product,
+                        report.create_report_body(target_url, fqdn, port, '*', self.method_name, product,
                                                   page_type, [], [], server_header, log_file, print_date)
 
                 time.sleep(self.delay_time)

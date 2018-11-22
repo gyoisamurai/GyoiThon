@@ -126,8 +126,7 @@ class GoogleCustomSearch:
 
                             # Write log.
                             log_name = 'google_custom_search_' + fqdn + '_' + str(port) + '_' + date + '.log'
-                            log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'),
-                                                         fqdn + '_' + str(port) + '_' + path.replace('/', ''))
+                            log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'), fqdn + '_' + str(port))
                             if os.path.exists(log_path_fqdn) is False:
                                 os.mkdir(log_path_fqdn)
                             log_file = os.path.join(log_path_fqdn, log_name)
@@ -172,7 +171,7 @@ class GoogleCustomSearch:
                         if is_login == 1:
                             page_type = {'ml': {'prob': '-', 'reason': '-'},
                                          'url': {'prob': '100%', 'reason': search_option}}
-                        report.create_report_body('-', fqdn, '*', '*', self.method_name, product, page_type,
+                        report.create_report_body('-', fqdn, '*', self.method_name, product, page_type,
                                                   [], [], '*', '*', print_date)
 
                 time.sleep(self.delay_time)
