@@ -33,27 +33,67 @@ class Censys:
             sys.exit(1)
 
     # Control censys.
-    def search_censys(self, protocol, ip_addr, fqdn):
+    def search_censys(self, ip_addr, fqdn):
         self.utility.print_message(NOTE, 'Search Censys.')
         self.utility.write_log(20, '[In] Search Censys [{}].'.format(self.file_name))
 
-        api = censys.ipv4.CensysIPv4(api_id=self.api_id, api_secret=self.secret)
-        self.utility.print_message(OK, 'Check open web ports.')
-        for result in api.search('ip:{}'.format(ip_addr)):
-            self.utility.print_message(WARNING, 'Open web ports: {}'.format(result['protocols']))
+        server_info = []
+        cert_info = []
+        try:
+            # Check network expose information.
+            is_https = False
+            api = censys.ipv4.CensysIPv4(api_id=self.api_id, api_secret=self.secret)
+            self.utility.print_message(OK, 'Check open web ports.')
 
-        # Check cloud service name.
-        if protocol == 'https':
-            self.utility.print_message(OK, 'Check certification.')
-            api = censys.certificates.CensysCertificates(api_id=self.api_id, api_secret=self.secret)
-            fields = ['parsed.subject_dn', 'parsed.validity', 'parsed.signature_algorithm', 'parsed.subject']
-            for cert in api.search('tags: trusted and parsed.names: {}'.format(fqdn), fields=fields):
-                self.utility.print_message(WARNING, 'Sig Algorithm: {}'.format(cert['parsed.signature_algorithm.name']))
-                for idx, common_name in enumerate(cert['parsed.subject.common_name']):
-                    self.utility.print_message(WARNING, 'Common Name {}: {}'.format(idx+1, common_name))
-                self.utility.print_message(WARNING, 'Validity Start: {}'.format(cert['parsed.validity.start']))
-                self.utility.print_message(WARNING, 'Validity End  : {}'.format(cert['parsed.validity.end']))
-                for idx, org_name in enumerate(cert['parsed.subject.organization']):
-                    self.utility.print_message(WARNING, 'Organization {}: {}'.format(idx+1, org_name))
+            # Extract search result.
+            for result in api.search('ip:{}'.format(ip_addr)):
+                for idx, items in enumerate(result['protocols']):
+                    # Get port number and protocol type.
+                    server_info.append({'Open Port': items.split('/')[0], 'Protocol': items.split('/')[1]})
+                    self.utility.print_message(WARNING, 'Open web port {}: {}'.format(idx+1, items))
+                    if items.split('/')[1] == 'https':
+                        is_https = True
+
+            # Check certification.
+            if is_https is True:
+                self.utility.print_message(OK, 'Check certification.')
+                api = censys.certificates.CensysCertificates(api_id=self.api_id, api_secret=self.secret)
+                fields = ['parsed.subject_dn', 'parsed.validity', 'parsed.signature_algorithm', 'parsed.subject']
+
+                # Extract search result.
+                for cert in api.search('tags: trusted and parsed.names: {}'.format(fqdn), fields=fields):
+                    # Get signature algorithm.
+                    sig_alg = cert['parsed.signature_algorithm.name']
+                    self.utility.print_message(WARNING, 'Signature Algorithm: {}'.format(sig_alg))
+
+                    # Get common name.
+                    common_names = []
+                    for idx, common_name in enumerate(cert['parsed.subject.common_name']):
+                        common_names.append(common_name)
+                        self.utility.print_message(WARNING, 'Common Name {}: {}'.format(idx+1, common_name))
+
+                    # Get validity start and end date.
+                    valid_start = cert['parsed.validity.start']
+                    valid_end = cert['parsed.validity.end']
+                    self.utility.print_message(WARNING, 'Validity Start Date : {}'.format(valid_start))
+                    self.utility.print_message(WARNING, 'Validity End Date   : {}'.format(valid_end))
+
+                    # Get organization name.
+                    org_names = []
+                    for idx, org_name in enumerate(cert['parsed.subject.organization']):
+                        org_names.append(org_name)
+                        self.utility.print_message(WARNING, 'Organization Name {}: {}'.format(idx+1, org_name))
+
+                    cert_info.append({'Signature Algorithm': sig_alg,
+                                      'Common Name': common_names,
+                                      'Validty Date': [valid_start, valid_end],
+                                      'Organization Name': org_names})
+
+            if len(server_info) == 0:
+                self.utility.print_message(WARNING, 'Cannot search {} information using Censys'.format(fqdn))
+        except Exception as e:
+            self.utility.print_message(FAIL, 'Censys execution is failure : {}'.format(e))
+            self.utility.write_log(30, 'Censys execution is failure : {}'.format(e))
 
         self.utility.write_log(20, '[Out] Search Censys [{}].'.format(self.file_name))
+        return server_info, cert_info
