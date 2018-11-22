@@ -196,7 +196,15 @@ if __name__ == '__main__':
 
         # Search Censys.
         if opt_censys:
-            censys.search_censys(protocol_list[idx], utility.forward_lookup(fqdn_list[idx]), fqdn_list[idx])
+            date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
+            print_date = utility.transform_date_string(utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
+            server_info,  cert_info = censys.search_censys(utility.forward_lookup(fqdn_list[idx]), fqdn_list[idx])
+            report.create_censys_report(fqdn_list[idx],
+                                        port_list[idx],
+                                        path_list[idx].replace('/', ''),
+                                        server_info,
+                                        cert_info,
+                                        print_date)
 
         # Analysis HTTP responses.
         product_list = []
