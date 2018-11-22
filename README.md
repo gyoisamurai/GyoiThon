@@ -271,21 +271,26 @@ After finished execution of GyoiThon, reports of each target are generated to th
 
 ```
 root@kali:~/GyoiThon/report# ls
-gyoithon_report_192.168.220.129_1082018338.csv
-gyoithon_report_192.168.220.129_bodgeit.csv
-gyoithon_report_192.168.220.129_cyclone.csv
-gyoithon_report_192.168.220.129_vicnum.csv
-gyoithon_report_192.168.220.129_WackoPicko.csv
+gyoithon_report_192.168.220.129_80_1082018338.csv
+gyoithon_report_192.168.220.129_80_bodgeit.csv
+gyoithon_report_192.168.220.129_80_cyclone.csv
+gyoithon_report_192.168.220.129_80_vicnum.csv
+gyoithon_report_192.168.220.129_80_WackoPicko.csv
+gyoithon_censys_report_www.gyoithon.example.com_443_test.csv
 ```
 
-Report format is `gyoithon_report_target FQDN(or IP address)_Root Path.csv`.  
-Each column's detail is following.  
+GyoiThon generates following two types report.  
+
+ * `gyoithon_report_target FQDN(or IP address)_Port number_Root Path.csv`.  
+ This is main report that mainly including product name, version, cve etc,.  
+ Report format is `gyoithon_report_target FQDN(or IP address)_Port number_Root Path.csv`.  
+ Each column's detail is following.  
 
 |Column|Description|Example|
 |:----|:----|:----|
 |fqdn|FQDN of target web server.|`www.gyoithon.example.com`|
 |ip_addr|IP address of target web server.|`192.168.220.129`|
-|port|Port number of target web server.|80|
+|port|Port number of target web server.|`80`|
 |cloud_type|Cloud service name (Azure or AWS or GCP or Unknown).|`AWS`|
 |method|Examination way of GyoiThon.|`Crawling`|
 |url|Accessed URL.|`http://192.168.220.129:80/WackoPicko/admin/index.php?page=login`|
@@ -302,6 +307,29 @@ Each column's detail is following.
 |server_header|Server header of HTTP response.|`Server: Apache/2.2.14 (Ubuntu) mod_mono/2.4.3 PHP/5.3.2`|
 |log|Path of raw data.|`/usr/home/~snip~/http_192.168.220.129_80_20181112170525765.log`|
 |date|Examination date.|`2018/11/12  17:05:25`|
+
+ * `gyoithon_censys_report_target FQDN(or IP address)_Port number_Root Path.csv`.  
+ This is search result report using Censys that including open ports, certification information etc,.  
+ Report format is `gyoithon_censys_report_target FQDN(or IP address)_Port number_Root Path.csv`.  
+ Each column's detail is following.  
+
+|Column|Description|Example|
+|:----|:----|:----|
+|fqdn|FQDN of target web server.|`www.gyoithon.example.com`|
+|ip_addr|IP address of target web server.|`192.168.220.129`|
+|category|Information category.|`Server Info` or `Certification Info`|
+|open_port|Open web port.|`443`|
+|protocol|Protocol of open web port.|`https`|
+|sig_algorithm|Signature algorithm of certification.|`SHA256-RSA`|
+|cname|Common name of certification.|`www.gyoithon.example.com`|
+|valid_start|Validity start date of certification.|`2018-08-15T00:00:00Z`|
+|valid_end|Validity end date of certification.|`2019-09-16T12:00:00Z`|
+|organization|Organization name of certification.|`GyoiThon coorporation, Inc.`|
+|date|Examination date.|`2018/11/22  11:19:36`|
+
+| Note |
+|:-----|
+| Because Censys needs several days to several weeks to survey the entire Internet, the information obtained from Censys may not be up-to-date.|
 
 ## <a name='Tips'>Tips</a>
 ### 1. How to add new signature (string matching patterns).  
