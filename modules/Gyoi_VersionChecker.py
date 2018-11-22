@@ -41,13 +41,17 @@ class VersionChecker:
             # Identify product name and version.
             with codecs.open(self.signature_file, 'r', 'utf-8') as fin:
                 matching_patterns = fin.readlines()
-                for pattern in matching_patterns:
+                for idx, pattern in enumerate(matching_patterns):
                     items = pattern.replace('\r', '').replace('\n', '').split('@')
                     category = items[0]
                     vendor = items[1].lower()
                     product = items[2].lower()
                     default_ver = items[3]
                     signature = items[4]
+                    self.utility.print_message(OK, '{}/{} Check {} using [{}]'.format(idx+1,
+                                                                                      len(matching_patterns),
+                                                                                      product,
+                                                                                      signature))
                     obj_match = re.search(signature, response, flags=re.IGNORECASE)
                     if obj_match is not None:
                         trigger = obj_match.group(1)
@@ -60,7 +64,7 @@ class VersionChecker:
                         # Add product name and version.
                         product_list.append([category, vendor, product, version, trigger])
                         msg = 'Find product={}/{}, verson={}, trigger={}'.format(vendor, product, version, trigger)
-                        self.utility.print_message(OK, msg)
+                        self.utility.print_message(WARNING, msg)
                         self.utility.write_log(20, msg)
         except Exception as e:
             msg = 'Identifying product is failure : {}'.format(e)

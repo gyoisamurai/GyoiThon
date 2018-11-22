@@ -28,6 +28,7 @@ class SpiderControl:
 
         try:
             self.output_filename = config['Spider']['output_filename']
+            self.spider_concurrent_reqs = config['Spider']['concurrent_reqs']
             self.spider_depth_limit = config['Spider']['depth_limit']
             self.spider_delay_time = config['Spider']['delay_time']
             self.spider_time_out = config['Spider']['time_out']
@@ -46,7 +47,7 @@ class SpiderControl:
         # Original log of GyoiThon.
         now_time = self.utility.get_current_date('%Y%m%d%H%M%S')
         gyoithon_log = protocol + '_' + target_fqdn + '_' + target_port + '_crawl_response_' + now_time + '.log'
-        target_dir_name = target_fqdn + '_' + str(target_port) + '_' + target_path.replace('/', '')
+        target_dir_name = target_fqdn + '_' + str(target_port)
         base_log_path = os.path.join('logs', target_dir_name)
         if os.path.exists(base_log_path) is False:
             os.mkdir(base_log_path)
@@ -58,8 +59,9 @@ class SpiderControl:
         # Assemble command options.
         target_url = protocol + '://' + target_fqdn + ':' + target_port + target_path
         option = ' -a target_url=' + target_url + ' -a allow_domain=' + target_fqdn + \
-                 ' -a depth_limit=' + self.spider_depth_limit + ' -a delay=' + self.spider_delay_time + \
-                 ' -a store_path=' + gyoithon_log_path + ' -o ' + scrapy_log_path
+                 ' -a concurrent=' + self.spider_concurrent_reqs + ' -a depth_limit=' + self.spider_depth_limit + \
+                 ' -a delay=' + self.spider_delay_time + ' -a store_path=' + gyoithon_log_path + \
+                 ' -o ' + scrapy_log_path
         close_opton = ' -s CLOSESPIDER_TIMEOUT=' + self.spider_time_out + \
                       ' -s CLOSESPIDER_ITEMCOUNT=' + self.spider_item_count + \
                       ' -s CLOSESPIDER_PAGECOUNT=' + self.spider_page_count + \

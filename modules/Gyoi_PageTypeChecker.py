@@ -52,6 +52,7 @@ class PageChecker:
             return 'unknown'
 
         # Predict page type using Naive Bayes.
+        self.utility.print_message(OK, 'Predict page type.')
         predict_result, prob, keywords, classified_list = nb.classify(response)
         if len(keywords) == 0:
             self.utility.print_message(OK, 'Page type is unknown.')

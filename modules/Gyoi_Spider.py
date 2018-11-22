@@ -13,13 +13,19 @@ class SimpleSpider(scrapy.Spider):
         super(SimpleSpider, self).__init__(*args, **kwargs)
         self.start_urls = getattr(self, 'target_url', None)
         self.allowed_domains = [getattr(self, 'allow_domain', None)]
+        self.concurrent = int(getattr(self, 'concurrent', None))
         self.depth_limit = int(getattr(self, 'depth_limit', None))
         self.delay_time = float(getattr(self, 'delay', None))
         self.store_path = getattr(self, 'store_path', None)
         self.custom_settings = {
+            'CONCURRENT_REQUESTS': self.concurrent,
+            'CONCURRENT_REQUESTS_PER_DOMAIN': self.concurrent,
             'DEPTH_LIMIT ': self.depth_limit,
             'DOWNLOAD_DELAY': self.delay_time,
             'ROBOTSTXT_OBEY': True,
+            'HTTPCACHE_ENABLED': True,
+            'HTTPCACHE_EXPIRATION_SECS': 60 * 60 * 24,
+            'HTTPCACHE_DIR': self.store_path,
             'FEED_EXPORT_ENCODING': 'utf-8'
         }
         self.fout = codecs.open(self.store_path, 'a', encoding='utf-8')

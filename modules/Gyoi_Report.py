@@ -28,6 +28,8 @@ class CreateReport:
         config.read(os.path.join(self.root_path, 'config.ini'))
 
         try:
+            self.report_file_name = ''
+            self.report_file_name_censys = ''
             self.report_dir = os.path.join(self.root_path, config['Report']['report_path'])
             self.report_path = os.path.join(self.report_dir, config['Report']['report_name'])
             self.report_path_censys = os.path.join(self.report_dir, config['Report']['report_name_censys'])
@@ -43,16 +45,16 @@ class CreateReport:
             sys.exit(1)
 
     # Create report's header.
-    def create_report_header(self, fqdn, port, path):
+    def create_report_header(self, fqdn, port):
         self.utility.print_message(NOTE, 'Create report header : {}'.format(self.report_path))
         self.utility.write_log(20, '[In] Create report header [{}].'.format(self.file_name))
 
-        report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + path)
-        pd.DataFrame([], columns=self.header).to_csv(report_file_name, mode='w', index=False)
+        self.report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + self.utility.get_random_token(10))
+        pd.DataFrame([], columns=self.header).to_csv(self.report_file_name, mode='w', index=False)
         self.utility.write_log(20, '[Out] Create report header [{}].'.format(self.file_name))
 
     # Create report's body.
-    def create_report_body(self, url, fqdn, path, port, cloud, method, products, type, comments, errors, srv_header, log_file, date):
+    def create_report_body(self, url, fqdn, port, cloud, method, products, type, comments, errors, srv_header, log_file, date):
         self.utility.print_message(NOTE, 'Create {}:{} report\'s body.'.format(fqdn, port))
         self.utility.write_log(20, '[In] Create report body [{}].'.format(self.file_name))
 
@@ -112,21 +114,22 @@ class CreateReport:
             report.append(error_record)
 
         # Output report.
-        report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + path)
-        msg = 'Create report : {}'.format(report_file_name)
+        msg = 'Create report : {}'.format(self.report_file_name)
         self.utility.print_message(OK, msg)
         self.utility.write_log(20, msg)
-        pd.DataFrame(report).to_csv(report_file_name, mode='a', header=False, index=False)
+        pd.DataFrame(report).to_csv(self.report_file_name, mode='a', header=False, index=False)
 
         self.utility.write_log(20, '[Out] Create report body [{}].'.format(self.file_name))
 
     # Create Censys report.
-    def create_censys_report(self, fqdn, port, path, server_info, cert_info, date):
+    def create_censys_report(self, fqdn, port, server_info, cert_info, date):
         self.utility.print_message(NOTE, 'Create Censys report of {}.'.format(fqdn))
         self.utility.write_log(20, '[In] Create Censys report [{}].'.format(self.file_name))
 
-        report_file_name = self.report_path_censys.replace('*', fqdn + '_' + str(port) + '_' + path)
-        pd.DataFrame([], columns=self.header_censys).to_csv(report_file_name, mode='w', index=False)
+        self.report_file_name_censys = self.report_path_censys.replace('*', fqdn + '_' +
+                                                                       str(port) + '_' +
+                                                                       self.utility.get_random_token(10))
+        pd.DataFrame([], columns=self.header_censys).to_csv(self.report_file_name_censys, mode='w', index=False)
 
         # Build base structure.
         report = []
@@ -164,18 +167,17 @@ class CreateReport:
             report.append(cert_record)
 
         # Output report.
-        msg = 'Create Censys report : {}'.format(report_file_name)
+        msg = 'Create Censys report : {}'.format(self.report_file_name_censys)
         self.utility.print_message(OK, msg)
         self.utility.write_log(20, msg)
-        pd.DataFrame(report).to_csv(report_file_name, mode='a', header=False, index=False)
+        pd.DataFrame(report).to_csv(self.report_file_name_censys, mode='a', header=False, index=False)
 
         self.utility.write_log(20, '[Out] Create Censys report [{}].'.format(self.file_name))
 
     # Create exploit's report
-    def create_exploit_report(self, fqdn, port, path):
+    def create_exploit_report(self, fqdn, port):
         # Gather reporting items.
-        log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'),
-                                     fqdn + '_' + str(port) + '_' + path.replace('/', ''))
+        log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'), fqdn + '_' + str(port))
         if os.path.exists(log_path_fqdn) is False:
             os.mkdir(log_path_fqdn)
         csv_file_list = glob.glob(os.path.join(log_path_fqdn, self.report_temp))
@@ -208,5 +210,8 @@ class CreateReport:
         template = env.get_template(self.template)
         pd.set_option('display.max_colwidth', -1)
         html = template.render({'title': 'GyoiThon Scan Report', 'items': items})
+        self.report_path_exploit = self.report_path_exploit.replace('*', fqdn + '_' +
+                                                                    str(port) + '_' +
+                                                                    self.utility.get_random_token(10))
         with open(self.report_path_exploit, 'w') as fout:
             fout.write(html)
