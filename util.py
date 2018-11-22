@@ -159,7 +159,8 @@ class Utilty:
         if isinstance(path, str) is False and isinstance(path, int) is False:
             self.print_message(FAIL, 'Invalid path : {}'.format(path))
             return False
-        elif path.startswith('/') is False or path.endswith('/') is False:
+        # elif path.startswith('/') is False or path.endswith('/') is False:
+        elif path.startswith('/') is False:
             self.print_message(FAIL, 'Invalid path : {}'.format(path))
             return False
 

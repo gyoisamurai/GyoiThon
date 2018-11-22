@@ -3,6 +3,7 @@
 import os
 import codecs
 import time
+import random
 import glob
 import configparser
 import urllib3
@@ -142,11 +143,19 @@ if __name__ == '__main__':
     log_path = ''
     method_crawl = ''
     method_log = ''
+    max_target_url = 0
+    max_target_byte = 0
+    is_scramble = False
     try:
         log_dir = config['Common']['log_path']
         log_path = os.path.join(full_path, log_dir)
         method_crawl = config['Common']['method_crawl']
         method_log = config['Common']['method_log']
+        max_target_url = int(config['Common']['max_target_url'])
+        max_target_byte = int(config['Common']['max_target_byte'])
+        if int(config['Common']['scramble']) == 1:
+            is_scramble = True
+
     except Exception as e:
         msg = 'Reading config.ini is failure : {}'.format(e)
         utility.print_exception(e, msg)
@@ -187,7 +196,7 @@ if __name__ == '__main__':
             continue
 
         # Create report header.
-        report.create_report_header(fqdn_list[idx], port_list[idx], path_list[idx].replace('/', ''))
+        report.create_report_header(fqdn_list[idx], port_list[idx])
 
         # Check cloud service.
         cloud_type = 'Unknown'
@@ -201,7 +210,6 @@ if __name__ == '__main__':
             server_info,  cert_info = censys.search_censys(utility.forward_lookup(fqdn_list[idx]), fqdn_list[idx])
             report.create_censys_report(fqdn_list[idx],
                                         port_list[idx],
-                                        path_list[idx].replace('/', ''),
                                         server_info,
                                         cert_info,
                                         print_date)
@@ -247,7 +255,6 @@ if __name__ == '__main__':
                             # Create report.
                             report.create_report_body('-',
                                                       fqdn_list[idx],
-                                                      path_list[idx].replace('/', ''),
                                                       port_list[idx],
                                                       cloud_type,
                                                       method_log,
@@ -267,8 +274,20 @@ if __name__ == '__main__':
 
             # Get HTTP responses.
             for target in web_target_info:
-                for count, target_url in enumerate(target[2]):
-                    utility.print_message(NOTE, '{}/{} Start analyzing: {}'.format(count+1, len(target[2]), target_url))
+                # Scramble and Cutting loop count.
+                target_list = target[2]
+                if is_scramble is True:
+                    utility.print_message(WARNING, 'Scramble target list.')
+                    target_list = random.sample(target[2], len(target[2]))
+                if max_target_url != 0 and max_target_url < len(target_list):
+                    utility.print_message(WARNING, 'Cutting target list {} to {}.'.format(len(target[2]),
+                                                                                          max_target_url))
+                    target_list = target_list[:max_target_url]
+
+                for count, target_url in enumerate(target_list):
+                    utility.print_message(NOTE, '{}/{} Start analyzing: {}'.format(count+1,
+                                                                                   len(target_list),
+                                                                                   target_url))
 
                     # Check target url.
                     parsed = None
@@ -286,15 +305,18 @@ if __name__ == '__main__':
 
                     # Write log.
                     log_name = protocol_list[idx] + '_' + fqdn_list[idx] + '_' + str(port_list[idx]) + '_' + date + '.log'
-                    log_path_fqdn = os.path.join(log_path,
-                                                 fqdn_list[idx] + '_' +
-                                                 str(port_list[idx]) + '_' +
-                                                 path_list[idx].replace('/', ''))
+                    log_path_fqdn = os.path.join(log_path, fqdn_list[idx] + '_' + str(port_list[idx]))
                     if os.path.exists(log_path_fqdn) is False:
                         os.mkdir(log_path_fqdn)
                     log_file = os.path.join(log_path_fqdn, log_name)
                     with codecs.open(log_file, 'w', 'utf-8') as fout:
                         fout.write(target_url + '\n\n' + res_header + res_body)
+
+                    # Cutting response byte.
+                    if max_target_byte != 0 and (max_target_byte < len(res_body)):
+                        utility.print_message(WARNING, 'Cutting response byte {} to {}.'.format(len(res_body),
+                                                                                                max_target_byte))
+                        res_body = res_body[:max_target_byte]
 
                     # Check product name/version using signature.
                     product_list = version_checker.get_product_name(res_header + res_body)
@@ -318,7 +340,6 @@ if __name__ == '__main__':
                     # Create report.
                     report.create_report_body(target_url,
                                               fqdn_list[idx],
-                                              path_list[idx].replace('/', ''),
                                               port_list[idx],
                                               cloud_type,
                                               method_crawl,
@@ -359,7 +380,7 @@ if __name__ == '__main__':
                              'path': path_list[idx].replace('/', '')})
 
             # Create exploiting report.
-            report.create_exploit_report(fqdn_list[idx], port_list[idx], path_list[idx].replace('/', ''))
+            report.create_exploit_report(fqdn_list[idx], port_list[idx])
 
         utility.write_log(20, 'End ' + msg)
 
