@@ -30,10 +30,12 @@ class CreateReport:
         try:
             self.report_dir = os.path.join(self.root_path, config['Report']['report_path'])
             self.report_path = os.path.join(self.report_dir, config['Report']['report_name'])
+            self.report_path_censys = os.path.join(self.report_dir, config['Report']['report_name_censys'])
             self.report_path_exploit = os.path.join(self.report_dir, config['Report']['report_name_exploit'])
             self.report_temp = config['Report']['report_temp']
             self.template = config['Report']['template']
             self.header = str(config['Report']['header']).split('@')
+            self.header_censys = str(config['Report']['header_censys']).split('@')
 
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
@@ -110,13 +112,64 @@ class CreateReport:
             report.append(error_record)
 
         # Output report.
-        msg = 'Create report : {}'.format(self.report_path)
+        report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + path)
+        msg = 'Create report : {}'.format(report_file_name)
         self.utility.print_message(OK, msg)
         self.utility.write_log(20, msg)
-        report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + path)
         pd.DataFrame(report).to_csv(report_file_name, mode='a', header=False, index=False)
 
         self.utility.write_log(20, '[Out] Create report body [{}].'.format(self.file_name))
+
+    # Create Censys report.
+    def create_censys_report(self, fqdn, port, path, server_info, cert_info, date):
+        self.utility.print_message(NOTE, 'Create Censys report of {}.'.format(fqdn))
+        self.utility.write_log(20, '[In] Create Censys report [{}].'.format(self.file_name))
+
+        report_file_name = self.report_path_censys.replace('*', fqdn + '_' + str(port) + '_' + path)
+        pd.DataFrame([], columns=self.header_censys).to_csv(report_file_name, mode='w', index=False)
+
+        # Build base structure.
+        report = []
+        record = []
+        record.insert(0, fqdn)                                # FQDN.
+        record.insert(1, self.utility.forward_lookup(fqdn))   # IP address.
+        record.insert(2, '-')      # Category.
+        record.insert(3, '-')      # Discover open_port.
+        record.insert(4, '-')      # Discover protocol.
+        record.insert(5, '-')      # Cert of signature algorithm.
+        record.insert(6, '-')      # Cert of Common name.
+        record.insert(7, '-')      # Cert of validity start date.
+        record.insert(8, '-')      # Cert of validity end date.
+        record.insert(9, '-')      # Cert of organization name.
+        record.insert(10, date)    # Creating date.
+        # report.append(record)
+
+        # Build server information record.
+        for info in server_info:
+            port_record = copy.deepcopy(record)
+            port_record[2] = 'Server Info'
+            port_record[3] = info['Open Port']
+            port_record[4] = info['Protocol']
+            report.append(port_record)
+
+        # Build certification record.
+        for cert in cert_info:
+            cert_record = copy.deepcopy(record)
+            cert_record[2] = 'Certification Info'
+            cert_record[5] = cert['Signature Algorithm']
+            cert_record[6] = cert['Common Name']
+            cert_record[7] = cert['Validty Date'][0]
+            cert_record[8] = cert['Validty Date'][1]
+            cert_record[9] = cert['Organization Name']
+            report.append(cert_record)
+
+        # Output report.
+        msg = 'Create Censys report : {}'.format(report_file_name)
+        self.utility.print_message(OK, msg)
+        self.utility.write_log(20, msg)
+        pd.DataFrame(report).to_csv(report_file_name, mode='a', header=False, index=False)
+
+        self.utility.write_log(20, '[Out] Create Censys report [{}].'.format(self.file_name))
 
     # Create exploit's report
     def create_exploit_report(self, fqdn, port, path):
