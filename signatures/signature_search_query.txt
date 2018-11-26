@@ -6,6 +6,11 @@ Web@apache@http_server@*@inurl:/icons/small/README.txt@(These icons are provided
 Web@apache@http_server@*@inurl:/manual/@(<title>Apache)@*@0
 Web@apache@http_server@*@inurl:/manual/images/@(<title>Apache)@*@0
 Web@apache@http_server@*@inurl:/manual/style/@(<title>Apache)@*@0
+Web@tableausoftware@tableau_server@*@inurl:/api/3.0/serverinfo@(build=)@(build=.*>([0-9].*))</productVersion>@0
+Web@caucho@resin@*@inurl:/resin-admin@*@*@0
+Web@caucho@resin@*@inurl:/resin-doc@*@*@0
+Web@caucho@resin@*@inurl:/ROOT_@*@*@0
+Web@caucho@resin@*@inurl:/caucho-status@*@*@0
 Web@microsoft@internet_information_server@*@filetype:webinfo@*@*@0
 Web@microsoft@internet_information_server@*@filetype:exe@*@*@0
 Web@microsoft@internet_information_server@*@filetype:htr@*@*@0
@@ -22,17 +27,33 @@ CMS@wordpress@wordpress@*@inurl:/wp-includes/@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@wordpress@wordpress@*@inurl:/wp-json/@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@wordpress@wordpress@*@inurl:/wp-json/wp/v2/users@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@wordpress@wordpress@*@inurl:/xmlrpc.php@(XML-RPC server accepts POST requests only)*@*@0
+CMS@wordpress@wordpress@*@inurl:/feed/@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@wordpress@wordpress@*@inurl:/wp-admin/install.php@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@wordpress@wordpress@*@inurl:/wp-admin/upgrade.php@*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/readme.html@.*(<title>WordPress).*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/readme-ja.html@.*(<title>WordPress).*@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/license.txt@(WordPress)@*@0
 CMS@wordpress@wordpress@*@inurl:/?author=1@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=2@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=3@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=4@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=5@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=6@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=7@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=8@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=9@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/?author=10@.*(/author/).*.@(ver=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@wordpress@wordpress@*@inurl:/wp-links-opml.php@*@(WordPress/([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@drupal@drupal@*@inurl:/user/login@(/drupal)@*@1
 CMS@drupal@drupal@*@inurl:/core/misc/drupalSettingsLoader.js@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@drupal@drupal@*@inurl:/core/misc/drupal.js@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@drupal@drupal@*@inurl:/core/misc/drupal.init.js@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@drupal@drupal@*@inurl:/themes/bootstrap/js/drupal.bootstrap.js@*@*@0
 CMS@drupal@drupal@*@inurl:/drupal/@*@*@0
+CMS@joomla@joomla\!@*@inurl:/administrator/@*@*@1
 CMS@joomla@joomla\!@*@inurl:/joomla/@*@*@0
 CMS@joomla@joomla\!@*@inurl:/templates/joomla/@*@*@0
+CMS@joomla@joomla\!@*@inurl:/administrator/manifests/files/joomla.xml@*@*@0
 CMS@sixapart@movabletype@*@inurl:/mt.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
 CMS@sixapart@movabletype@*@inurl:/mt.cgi?__lang=ja@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
 CMS@sixapart@movabletype@*@inurl:/mt/mt.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
@@ -43,7 +64,87 @@ CMS@sixapart@movabletype@*@inurl:/mt-sp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
 CMS@sixapart@movabletype@*@inurl:/mt/mt-sp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
 CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-sp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@1
 CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt.psgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt/@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-atom.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-check.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-comments.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-config.cgi-original@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-cp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-feed.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-ftsearch.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-search.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-upgrade.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/mt-wizard.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/readme.html@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/cgi-bin/mt/search.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt.psgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt.psgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt/@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-atom.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-check.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-comments.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-config.cgi-original@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-cp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-feed.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-ftsearch.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-search.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-upgrade.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/mt-wizard.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/readme.html@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt/search.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-atom.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-check.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-comments.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-config.cgi-original@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-cp.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-feed.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-ftsearch.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-search.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-static/@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-tb.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-testbg.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-upgrade.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/mt-wizard.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/readme.html@.*(Movable Type).*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sixapart@movabletype@*@inurl:/search.cgi@.*(Movable Type).*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@sugarcrm@sugarcrm@*@inurl:/sugarcrm/@*@*@0
 CMS@tiki@tikiwiki_cms\/groupware@*@inurl:/tikiwiki/@*@*@0
+CMS@concrete5@concrete5@*@inurl:/index.php/login@(concrete5 \-)@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@concrete5@concrete5@*@inurl:/index.php/login/@(concrete5 \-)@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@concrete5@concrete5@*@inurl:/login@(concrete5 \-)@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@concrete5@concrete5@*@inurl:/login/@(concrete5 \-)@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@concrete5@concrete5@*@inurl:/concrete/libraries/3rdparty/adodb/readme.txt@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/concrete/libraries/3rdparty/adodb/docs/docs-adodb.htm@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/updates/concrete/libraries/3rdparty/adodb/readme.txt@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/updates/concrete/libraries/3rdparty/adodb/docs/docs-adodb.htm@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/concrete/libraries/3rdparty/StandardAnalyzer/Readme.txt@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/updates/concrete/libraries/3rdparty/StandardAnalyzer/Readme.txt@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/concrete/libraries/3rdparty/securimage/README.txt@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/updates/libraries/3rdparty/securimage/README.txt@(concrete)@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/concrete/blocks/video/README@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/updates/concrete/blocks/video/README@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/updates/@(concrete)@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@concrete5@concrete5@*@inurl:/updates/concrete/@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@heartcore@heartcore@*@inurl:/webadmin/login.jsp@(HeartCore Web Content Management System)@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@heartcore@heartcore@*@inurl:/webadmin/login.aspx@(HeartCore Web Content Management System)@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@heartcore@heartcore@*@inurl:/webadmin/login.php@(HeartCore Web Content Management System)@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@heartcore@heartcore@*@inurl:/webadmin/help/index.aspx@(HeartCore Web Content Management System)@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@heartcore@heartcore@*@inurl:/webadmin/help/index.jsp@(HeartCore Web Content Management System)@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@heartcore@heartcore@*@inurl:/webadmin/help/index.php@(HeartCore Web Content Management System)@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@heartcore@heartcore@*@inurl:/webadmin/WebsiteAdministratorGuide.pdf@*@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))@0
+CMS@heartcore@heartcore@*@inurl:/config.aspx@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
+CMS@heartcore@heartcore@*@inurl:/config.jsp@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
+CMS@heartcore@heartcore@*@inurl:/config.php@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
+CMS@heartcore@heartcore@*@inurl:/webadmin/module/config.aspx@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
+CMS@heartcore@heartcore@*@inurl:/webadmin/module/config.jsp@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
+CMS@heartcore@heartcore@*@inurl:/webadmin/module/config.php@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
+CMS@sitecore@cms@*@inurl:/sitecore/login@(<script.*src=[\"']/sitecore/login/login\.js[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sitecore@cms@*@inurl:/sitecore/login@(<form.*action=[\"']/sitecore/login[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sitecore@cms@*@inurl:/sitecore/login/login/@(<script.*src=[\"']/sitecore/login/login\.js[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sitecore@cms@*@inurl:/sitecore/login/login/@(<form.*action=[\"']/sitecore/login[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
+CMS@sitecore@cms@*@inurl:/sitecore/@*@(<version>(.*)</version>)@0
+CMS@sitecore@cms@*@inurl:/sitecore/shell/sitecore.version.xml@*@(<version>(.*)</version>)@0
 CMS@n-i-agroinformatics@soy_cms@*@inurl:/cms/admin/index.php@*@*@1
 CMS@n-i-agroinformatics@soy_cms@*@inurl:/soy/admin/index.php@*@*@1
 CMS@mediawiki@mediawiki@*@inurl:/index.php?Special:UserLogin@*@*@1
@@ -64,18 +165,33 @@ Framework@apache@tomcat@*@inurl:/examples/jsp/snp/snoop.jsp@*@*@0
 Framework@apache@tomcat@*@inurl:/examples/jsp/servlets/@*@*@0
 Framework@apache@tomcat@*@inurl:/webdav/@*@*@0
 Framework@apache@tomcat@*@inurl:/admin/@.*(Licensed to the Apache Software Foundation).*@*@0
+Framework@apache@tomcat@*@inurl:/manager/status.xsd@.*(Licensed to the Apache Software Foundation).*@*@0
+Framework@apache@tomcat@*@inurl:/manager/xform.xsl@.*(Licensed to the Apache Software Foundation).*@*@0
 Framework@apache@tomcat@*@inurl:/config.aspx@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
 Framework@apache@tomcat@*@inurl:/config.jsp@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
 Framework@apache@tomcat@*@inurl:/config.php@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
+Framework@apache@tomcat@*@inurl:/webadmin/module/config.aspx@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
+Framework@apache@tomcat@*@inurl:/webadmin/module/config.jsp@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
+Framework@apache@tomcat@*@inurl:/webadmin/module/config.php@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
 Framework@apache@coyote_http_connector@*@inurl:/tomcat-docs/@*@*@0
 Framework@apache@coyote_http_connector@*@inurl:/examples/jsp@*@*@0
 Framework@apache@coyote_http_connector@*@inurl:/examples/servlets/@*@*@0
 Framework@apache@coyote_http_connector@*@inurl:/webdav/@*@*@0
 Framework@apache@coyote_http_connector@*@inurl:/admin/@*@*@0
+Framework@apache@tapestry@*@inurl:/login.form@.*(Tapestry Version).*@*@1
 Framework@adobe@coldfusion@*@inurl:/CFIDE/@*@*@0
 Framework@adobe@coldfusion@*@inurl:/cfdocs/@*@*@0
 Framework@adobe@coldfusion@*@filetype:cfm@*@*@0
+Framework@ibm@lotus_domino@*@inurl:/help/help85_client.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*IBM Lotus Notes ([0-9]).*@0
+Framework@ibm@lotus_domino@*@inurl:/help/help85_designer.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*IBM Lotus Notes ([0-9]).*@0
+Framework@ibm@lotus_domino@*@inurl:/help/help85_admin.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*IBM Lotus Notes ([0-9]).*@0
+Framework@xampp@apache_distribution@*@inurl:/xampp/@*@*@1
+Framework@swsoft@plesk@*@inurl:/login_up.php3@*@*@1
+Framework@swsoft@plesk@*@inurl:/vz/cp/panel/plesk/frameset@*@*@1
 Language@php@php@*@inurl:/?=PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000@*@*@0
+Language@php@php@*@inurl:/?=PHPE9568F34-D428-11d2-A769-00AA001ACF42@.*(Content-Type: image/gif).*@*@0
+Language@php@php@*@inurl:/?=PHPE9568F35-D428-11d2-A769-00AA001ACF42@.*(Content-Type: image/gif).*@*@0
+Language@php@php@*@inurl:/?=PHPE9568F36-D428-11d2-A769-00AA001ACF42@.*(Content-Type: image/gif).*@*@0
 Language@php@php@*@inurl:/info.php@*@*@0
 Language@php@php@*@inurl:/phpinfo.php@*@*@0
 Language@php@php@*@inurl:/test.php@*@*@0
@@ -97,6 +213,7 @@ Language@perl@perl@*@filetype:psgi@*@*@0
 Tool@squirrelmail@squirrelmail@*@inurl:/webmail/src/login.php@*@*@1
 Tool@squirrelmail@squirrelmail@*@inurl:/sqwebmail/@*@*@0
 Tool@squirrelmail@squirrelmail@*@inurl:/webmail/@*@*@0
+Tool@squirrelmail@squirrelmail@*@inurl:/webmail/src/configtest.php@*@*@0
 Tool@apache@subversion@*@inurl:/svn/@*@*@0
 Tool@apache@subversion@*@inurl:/.svn/entries@*@*@0
 Tool@apache@subversion@*@inurl:/repos/@*@*@0
@@ -109,17 +226,60 @@ Tool@htdig@htdig@*@inurl:/htsearch/@*@*@0
 Tool@gnu@mailman@*@inurl:/mailman/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
 Tool@gnu@mailman@*@inurl:/mailman/admin/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
 Tool@gnu@mailman@*@inurl:/mailman/admin/mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/private/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/private/mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/listinfo/mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
 Tool@gnu@mailman@*@inurl:/mailman/create@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
 Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
 Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/index.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
 Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
 Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/index.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/Documentation.html@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/Documentation.html@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/README@*@.*(Version .*)@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/README@*@.*(Version .*)@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/changelog.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/changelog.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/ChangeLog@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/ChangeLog@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup/index.php?page=config@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup/index.php?page=config@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl://phpmyadmin/doc/html/index.html@*@*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl://phpMyAdmin/doc/html/index.html@*@*@0
+Tool@roundcube@webmail@*@inurl:/roundcube/@*@*@0
+Tool@awstats@awstats@*@inurl:/awstats/@*@generator(([0-9]+\.[0-9]+)from config)@0
+Tool@awstats@awstats@*@inurl:/awstats.pl@*@generator(([0-9]+\.[0-9]+)from config)@0
+Tool@awstats@awstats@*@inurl:/awstats/awstats.pl@*@generator(([0-9]+\.[0-9]+)from config)@0
+Tool@awstats@awstats@*@inurl:/cgi-bin/awstats.pl@*@generator(([0-9]+\.[0-9]+)from config)@0
 Tool@awstats@awstats@*@inurl:/webstat/@*@*@0
+Tool@awstats@awstats@*@inurl:/awredir.pl?url=http://www.mbsd.jp@*@*@0
+Tool@awstats@awstats@*@inurl:/awstats/awredir.pl?url=http://www.mbsd.jp@*@*@0
+Tool@awstats@awstats@*@inurl:/cgi-bin/awredir.pl?url=http://www.mbsd.jp@*@*@0
+Tool@adobe@dreamweaver@*@inurl:/_notes/dwsync.xml@*@*@0
+Tool@bradford_barrett@webalizer@*@inurl:/webalizer/@*@*@0
+Tool@stephen_turner@analog@*@inurl:/analog/@*@*@0
 Tool@mrtg@mrtgconfig@*@inurl:/mrtg/@*@*@0
 Tool@mrtg@multi_router_traffic_grapher_cgi@*@inurl:/mrtg/@*@*@0
 Tool@webmin@webmin@*@inurl:/webmin/@*@*@0
 Tool@phpbb@phpbb@*@inurl:/phpbb/@*@*@0
+Tool@dell@openmanage@*@inurl:/UDataArea?plugin=com.dell.oma.webplugins.AboutWebPlugin&vid=@*@.*(Version.*[0-9]).*@0
+Tool@dell@openmanage@*@inurl:/openwebmail.pl@*@.*(Version.*[0-9]).*@0
+Tool@dell@openmanage@*@inurl:/webmail/openwebmail.pl@*@.*(Version.*[0-9]).*@0
+Tool@oracle@business_intelligence@*@inurl:/analytics/saw.dll?Logon&Done=%2fanalytics%2fsaw.dll%2f@*@.*(img alt\=.*[0-9]).*@0
+Tool@oracle@business_intelligence@*@inurl:/analytics/saw.dll?bieehome&startPage=1/analytics/res/sk_blafp/login@*@.*(img alt\=.*[0-9]).*@0
 Tool@dwr@dwr@*@inurl:/dwr/index.html@*@*@0
+Tool@ckeditor@ckeditor@*@inurl:/resources/js/ckeditor/CHANGES.md@*@*@0
+Tool@ckeditor@ckeditor@*@inurl:/resources/js/CKeditor/CHANGES.md@*@*@0
+Tool@ckeditor@ckeditor@*@inurl:/CKeditor/CHANGES.md@*@*@0
+Tool@ckeditor@ckeditor@*@inurl:/ckeditor/CHANGES.md@*@*@0
+Tool@ckeditor@fckeditor@*@inurl:/fckeditor/_whatsnew.html@*@*@0
+Tool@ckeditor@fckeditor@*@inurl:/FCKeditor/_whatsnew.html@*@*@0
+Tool@tcpdf_project@tcpdf@*@inurl:/includes/tcpdf/README.TXT@*@*@0
+Tool@zabbix@zabbix@*@inurl:/zabbix/@*@*@0
 *@*@*@*@intitle:"index of"@*@*@0
 *@*@*@*@filetype:bak@*@*@0
 *@*@*@*@filetype:bk@*@*@0
