@@ -236,6 +236,12 @@ if __name__ == '__main__':
                             utility.print_message(OK, msg)
                             utility.write_log(20, msg)
 
+                            # Cutting response byte.
+                            if max_target_byte != 0 and (max_target_byte < len(target_log)):
+                                utility.print_message(WARNING, 'Cutting response byte {} to {}.'
+                                                      .format(len(target_log), max_target_byte))
+                                target_log = target_log[:max_target_byte]
+
                             # Check product name/version using signature.
                             product_list = version_checker.get_product_name(target_log)
 
