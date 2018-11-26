@@ -39,7 +39,14 @@ class CommentChecker:
     def get_html_comments(self, soup):
         self.utility.write_log(20, '[In] Get html comments [{}].'.format(self.file_name))
         self.utility.write_log(20, '[Out] Get html comments [{}].'.format(self.file_name))
-        return list(set(soup.find_all(string=lambda text: isinstance(text, Comment))))
+        temp_comment_list = list(set(soup.find_all(string=lambda text: isinstance(text, Comment))))
+
+        # Delete IE condition (ex. "[if IE 9").
+        comment_list = []
+        for comment in temp_comment_list:
+            if len(comment) < 3 or comment[:3].lower() != '[if':
+                comment_list.append(comment)
+        return comment_list
 
     # Get JavaScript comments.
     def get_js_comments(self, soup):
@@ -49,7 +56,7 @@ class CommentChecker:
         for script_tag in script_tags:
             target_text = script_tag.get_text()
             js_comment_list.extend(re.findall(r'(/\*[\s\S]*?\*/)', target_text))
-            js_comment_list.extend(re.findall(r'(//.*[\r\n])', target_text))
+            js_comment_list.extend(re.findall(r'(^//.*[\r\n]|\s//.*[\r\n])', target_text))
         self.utility.write_log(20, '[Out] Get Javascript comments [{}].'.format(self.file_name))
         return list(set(js_comment_list))
 
