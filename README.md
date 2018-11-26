@@ -133,17 +133,32 @@ The default mode gathers following minimum information.
  5. Examination of unneccesary debug messages.  
  6. Examination of login pages.  
 
-GyoiThon uses `Scrapy` that Python's library.  
-By change the parameters in `config.ini`, you can change setting of Scrapy.  
+ * Crawling setting  
+ GyoiThon uses `Scrapy` that Python's library.  
+ By change the parameters in `config.ini`, you can change setting of Scrapy.  
+ 
+ |Category|Parameter|Description|
+ |:----|:----|:----|
+ |Spider|depth_limit|Maximum depth of crawling. Default value is `2` layer. |
+ ||delay_time|Delay time of crawling. Default value is `3` (sec). |
+ ||time_out|Spider close option. Timeout of crawling. Default value is `600` (sec). |
+ ||item_count|Spider close option. Maximum items. Default value is `300`. |
+ ||page_count|Spider close option. Maximum items per page. Default value is `0` (no limit). |
+ ||error_count|Spider close option. Maximum errors. Default value is `0` (no limit). |
 
-|Category|Parameter|Description|
-|:----|:----|:----|
-|Spider|depth_limit|Maximum depth of crawling. Default value is `2` layer. |
-||delay_time|Delay time of crawling. Default value is `3` (sec). |
-||time_out|Spider close option. Timeout of crawling. Default value is `600` (sec). |
-||item_count|Spider close option. Maximum items. Default value is `300`. |
-||page_count|Spider close option. Maximum items per page. Default value is `0` (no limit). |
-||error_count|Spider close option. Maximum errors. Default value is `0` (no limit). |
+ * Examination speed setting  
+ The examination number and HTTP response size greatly affect examination times.   
+ By change the parameters in `config.ini`, you can adjust examination speed.  
+ 
+ |Category|Parameter|Description|
+ |:----|:----|:----|
+ |Common|max_target_url|Maximum examination URL number. If the URL number gathered by Web Crawling exceeds this parameter value, excess URL number is discarded. Default value is `100`. `0` is unlimited.|
+ ||max_target_byte|Maximum examination response size. If the response size exceeds this parameter value, excess response size is discarded. Default value is `10000` byte. `0` is unlimited.|
+ ||scramble|The URL list gathered by Web crawling is randomly ordered. Default value is `1` (validity). `0` is invalid.|
+ 
+ | Note |
+ |:-----|
+ | The examination speed and accuracy are trade-off. |
 
 #### 2. Examination of cloud services mode.  
 ```
