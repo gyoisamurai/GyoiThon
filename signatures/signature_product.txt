@@ -43,6 +43,8 @@ CMS@typo3@typo3@*@(Set-Cookie: .*typo.*=[a-z0-9]{32});
 CMS@typo3@typo3@*@.*(TYPO[0-9]).*
 CMS@site_publis@site_publis@*@(X-PUBLIS-Status:\s+REDIRECT\sTO\sPublisRedirectUri)
 CMS@oscommerce@oscommerce@*@(Set-Cookie: osCsid=.*);
+CMS@concrete5@concrete5@*@(concrete5 \- ([0-9]+[\.0-9]*[\.0-9]*))
+CMS@heartcore@heartcore@*@(HeartCore Web Content Management System v([0-9]+[\.0-9]*[\.0-9]*))
 Framework@apache@tomcat@*@.*(Tomcat/([0-9]+[\.0-9]*[\.0-9]*))
 Framework@apache@tomcat@*@.*(Apache Tomcat User Guide)
 Framework@apache@tomcat@*@.*(Tomcat\s([0-9])\sServlet/JSP container)
@@ -69,6 +71,9 @@ Framework@adobe@coldfusion@*@.*(ColdFusion Documentation)
 Framework@adobe@coldfusion@*@.*(what_you_can_do_in_coldfusion_administrator)
 Framework@oracle@webLogic@*@.*(WebLogic/([0-9]+[\.0-9]*[\.0-9]*))
 Framework@jboss@jboss@*@X-Powered-By:.*(JBoss-([0-9]+[\.0-9]*[\.0-9]*))
+Framework@oracle@application_server@*@.*(Oracle-Application-Server.*([0-9]+))
+Framework@ibm@lotus_domino@*@.*(IBM Lotus Notes ([0-9])).*
+Framework@apache@tapestry@*@.*(Apache Tapestry Framework).*
 OS@redhat@enterprise_linux@*@Server:.*(\(Red Hat\))
 OS@redhat@enterprise_linux@*@Server:.*(\(Red Hat Enterprise linux\))
 OS@ubuntu@ubuntu_linux@*@Server:.*(\(Ubuntu\))
@@ -102,7 +107,11 @@ Web@microsoft@internet_information_server@*@Server:.*(Microsoft-IIS/([0-9]+\.[0-
 Web@microsoft@internet_information_server@*@Server:.*(IIS/([0-9]+\.[0-9]+))
 Web@microsoft@internet_information_server@*@Server:.*(IIS)
 Web@microsoft@internet_information_server@*@.*(It works).*
+Web@ibm@http_server@*@Server:.*(IBM_HTTP_SERVER/([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+))
+Web@ibm@http_server@*@Server:.*(IBM_HTTP_SERVER)
+Web@ibm@http_server@*@.*(IBM_HTTP_SERVER/([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+))
 Web@f5@big-ip@*@Server:.*(bigip)
+Web@minihttpserver.net@web_forums_server@*@Server:.*(min_httpd)
 Language@php@php@*@Server:.*(PHP/([0-9]+[\.0-9]*[\.0-9]*))
 Language@php@php@*@X-Powered-By:.*(PHP/([0-9]+[\.0-9]*[\.0-9]*))
 Language@php@php@*@Set-Cookie:.*(PHPSESSID=.*;)
@@ -123,6 +132,7 @@ Tool@squirrelmail@squirrelmail@*@.*(SquirrelMail version ([0-9]+))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]))
 Tool@mod_ssl@mod_ssl@*@Server:.*(mod_ssl/([0-9]+\.[0-9]+\.[0-9]+))
+Tool@adobe@dreamweaver@*@.*(dwsync)
 Tool@gnu@mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*
 Tool@awstats@awstats@*@.*(AWStats for domain).*
 WAF@bitforest@scutum@*@Server:.*(Scutum)
