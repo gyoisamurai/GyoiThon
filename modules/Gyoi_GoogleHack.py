@@ -154,8 +154,8 @@ class GoogleCustomSearch:
                                 if is_login == '1':
                                     page_type = {'ml': {'prob': '-', 'reason': '-'},
                                                  'url': {'prob': '100%', 'reason': target_url}}
-                                report.create_report_body(target_url, fqdn, path, target_url, '*', self.method_name,
-                                                          product, page_type, [], [], server_header, log_file, print_date)
+                                report.create_report_body(target_url, fqdn, port, '*', self.method_name, product,
+                                                          page_type, [], [], server_header, log_file, print_date)
 
                             time.sleep(self.delay_time_direct_access)
                     else:
