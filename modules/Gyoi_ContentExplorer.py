@@ -69,7 +69,7 @@ class ContentExplorer:
         return result
 
     # Explore unnecessary contents.
-    def content_explorer(self, cve_explorer, protocol, fqdn, root_path, port, path, report):
+    def content_explorer(self, cve_explorer, protocol, fqdn, port, path, report, max_target_byte):
         self.utility.print_message(NOTE, 'Explore unnecessary contents.')
         self.utility.write_log(20, '[In] Explore contents [{}].'.format(self.file_name))
 
@@ -114,6 +114,12 @@ class ContentExplorer:
                     fout.write(target_url + '\n\n' + res_header + res_body)
 
                 if res.status in [200, 301, 302]:
+                    # Cutting response byte.
+                    if max_target_byte != 0 and (max_target_byte < len(res_body)):
+                        self.utility.print_message(WARNING, 'Cutting response byte {} to {}.'
+                                                   .format(len(res_body), max_target_byte))
+                        res_body = res_body[:max_target_byte]
+
                     # Examine HTTP response.
                     result = self.examine_response(check_pattern, default_ver, version_pattern, res_header + res_body)
                     if result[0] is True:
