@@ -75,7 +75,7 @@ class GoogleCustomSearch:
             result.append(default_ver)
         return result
 
-    def execute_google_hack(self, cve_explorer, fqdn, port, path, report):
+    def execute_google_hack(self, cve_explorer, fqdn, port, report, max_target_byte):
         self.utility.print_message(NOTE, 'Execute Google hack.')
         self.utility.write_log(20, '[In] Execute Google hack [{}].'.format(self.file_name))
 
@@ -132,6 +132,12 @@ class GoogleCustomSearch:
                             log_file = os.path.join(log_path_fqdn, log_name)
                             with codecs.open(log_file, 'w', 'utf-8') as fout:
                                 fout.write(target_url + '\n\n' + res_header + res_body)
+
+                            # Cutting response byte.
+                            if max_target_byte != 0 and (max_target_byte < len(res_body)):
+                                self.utility.print_message(WARNING, 'Cutting response byte {} to {}.'
+                                                           .format(len(res_body), max_target_byte))
+                                res_body = res_body[:max_target_byte]
 
                             # Examine HTTP response.
                             result = self.examine_response(check_pattern,
