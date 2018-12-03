@@ -190,20 +190,8 @@ class GoogleCustomSearch:
         # Google Custom Search API.
         self.utility.write_log(20, '[In] Execute Google custom search [{}].'.format(self.file_name))
 
-        # Set proxy server.
-        service = None
-        if self.utility.proxy != '':
-            parsed = util.parse_url(self.utility.proxy)
-            proxy_info = httplib2.ProxyInfo(proxy_type=socks.PROXY_TYPE_HTTP,
-                                            proxy_host=parsed.host,
-                                            proxy_port=parsed.port)
-            the_http = httplib2.Http(proxy_info=proxy_info)
-            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
-            service = build("customsearch", "v1", developerKey=self.api_key, http=the_http)
-        else:
-            service = build("customsearch", "v1", developerKey=self.api_key)
-
         # Setting of Google Custom Search.
+        service = build("customsearch", "v1", developerKey=self.api_key)
         response = []
         urls = []
         result_count = 0
