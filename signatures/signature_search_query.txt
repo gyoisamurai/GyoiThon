@@ -182,9 +182,9 @@ Framework@apache@tapestry@*@inurl:/login.form@.*(Tapestry Version).*@*@1
 Framework@adobe@coldfusion@*@inurl:/CFIDE/@*@*@0
 Framework@adobe@coldfusion@*@inurl:/cfdocs/@*@*@0
 Framework@adobe@coldfusion@*@filetype:cfm@*@*@0
-Framework@ibm@lotus_domino@*@inurl:/help/help85_client.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*IBM Lotus Notes ([0-9]).*@0
-Framework@ibm@lotus_domino@*@inurl:/help/help85_designer.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*IBM Lotus Notes ([0-9]).*@0
-Framework@ibm@lotus_domino@*@inurl:/help/help85_admin.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*IBM Lotus Notes ([0-9]).*@0
+Framework@ibm@lotus_domino@*@inurl:/help/help85_client.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*(IBM Lotus Notes ([0-9])).*@0
+Framework@ibm@lotus_domino@*@inurl:/help/help85_designer.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*(IBM Lotus Notes ([0-9])).*@0
+Framework@ibm@lotus_domino@*@inurl:/help/help85_admin.nsf/ContentsIntro?OpenPage&BaseTarget=Topic&AutoFramed@*@.*(IBM Lotus Notes ([0-9])).*@0
 Framework@xampp@apache_distribution@*@inurl:/xampp/@*@*@1
 Framework@swsoft@plesk@*@inurl:/login_up.php3@*@*@1
 Framework@swsoft@plesk@*@inurl:/vz/cp/panel/plesk/frameset@*@*@1
@@ -223,31 +223,31 @@ Tool@webdruid@webdruid@*@inurl:/webdruid/@*@*@0
 Tool@webdruid@webdruid@*@inurl:/usage/@*@*@0
 Tool@htdig@htdig@*@inurl:/htdig/@*@*@0
 Tool@htdig@htdig@*@inurl:/htsearch/@*@*@0
-Tool@gnu@mailman@*@inurl:/mailman/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
-Tool@gnu@mailman@*@inurl:/mailman/admin/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
-Tool@gnu@mailman@*@inurl:/mailman/admin/mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
-Tool@gnu@mailman@*@inurl:/mailman/private/@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
-Tool@gnu@mailman@*@inurl:/mailman/private/mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
-Tool@gnu@mailman@*@inurl:/mailman/listinfo/mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
-Tool@gnu@mailman@*@inurl:/mailman/create@*@.*Delivered by (Mailman.*[0-9])</td>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/index.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/index.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@1
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup/@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/Documentation.html@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/Documentation.html@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/README@*@.*(Version .*)@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/README@*@.*(Version .*)@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/changelog.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/changelog.php@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/ChangeLog@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/ChangeLog@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup/index.php?page=config@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
-Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup/index.php?page=config@*@.*<title>(phpMyAdmin.*[0-9])</title>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/@*@.*Delivered by (Mailman.*([0-9]))</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/admin/@*@.*Delivered by (Mailman.*([0-9]))</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/admin/mailman@*@.*Delivered by (Mailman.*([0-9]))</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/private/@*@.*Delivered by (Mailman.*([0-9]))</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/private/mailman@*@.*Delivered by (Mailman.*([0-9]))</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/listinfo/mailman@*@.*Delivered by (Mailman.*([0-9]))</td>.*@0
+Tool@gnu@mailman@*@inurl:/mailman/create@*@.*Delivered by (Mailman.*([0-9]))</td>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/index.php@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/index.php@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@1
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup.php@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup.php@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup/@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup/@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/Documentation.html@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/Documentation.html@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/README@*@.*(Version\s(.*))$@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/README@*@.*(Version\s(.*))$@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/changelog.php@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/changelog.php@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/ChangeLog@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/ChangeLog@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpmyadmin/setup/index.php?page=config@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
+Tool@phpmyadmin@phpmyadmin@*@inurl:/phpMyAdmin/setup/index.php?page=config@*@.*<title>(phpMyAdmin.*([0-9]))</title>.*@0
 Tool@phpmyadmin@phpmyadmin@*@inurl://phpmyadmin/doc/html/index.html@*@*@0
 Tool@phpmyadmin@phpmyadmin@*@inurl://phpMyAdmin/doc/html/index.html@*@*@0
 Tool@roundcube@webmail@*@inurl:/roundcube/@*@*@0
@@ -266,11 +266,11 @@ Tool@mrtg@mrtgconfig@*@inurl:/mrtg/@*@*@0
 Tool@mrtg@multi_router_traffic_grapher_cgi@*@inurl:/mrtg/@*@*@0
 Tool@webmin@webmin@*@inurl:/webmin/@*@*@0
 Tool@phpbb@phpbb@*@inurl:/phpbb/@*@*@0
-Tool@dell@openmanage@*@inurl:/UDataArea?plugin=com.dell.oma.webplugins.AboutWebPlugin&vid=@*@.*(Version.*[0-9]).*@0
-Tool@dell@openmanage@*@inurl:/openwebmail.pl@*@.*(Version.*[0-9]).*@0
-Tool@dell@openmanage@*@inurl:/webmail/openwebmail.pl@*@.*(Version.*[0-9]).*@0
-Tool@oracle@business_intelligence@*@inurl:/analytics/saw.dll?Logon&Done=%2fanalytics%2fsaw.dll%2f@*@.*(img alt\=.*[0-9]).*@0
-Tool@oracle@business_intelligence@*@inurl:/analytics/saw.dll?bieehome&startPage=1/analytics/res/sk_blafp/login@*@.*(img alt\=.*[0-9]).*@0
+Tool@dell@openmanage@*@inurl:/UDataArea?plugin=com.dell.oma.webplugins.AboutWebPlugin&vid=@*@.*(Version.*([0-9])).*@0
+Tool@dell@openmanage@*@inurl:/openwebmail.pl@*@.*(Version.*([0-9])).*@0
+Tool@dell@openmanage@*@inurl:/webmail/openwebmail.pl@*@.*(Version.*([0-9])).*@0
+Tool@oracle@business_intelligence@*@inurl:/analytics/saw.dll?Logon&Done=%2fanalytics%2fsaw.dll%2f@*@.*(<img alt=[\"']([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)[\"']\s)@0
+Tool@oracle@business_intelligence@*@inurl:/analytics/saw.dll?bieehome&startPage=1/analytics/res/sk_blafp/login@*@.*(<img alt=[\"']([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)[\"']\s)@0
 Tool@dwr@dwr@*@inurl:/dwr/index.html@*@*@0
 Tool@ckeditor@ckeditor@*@inurl:/resources/js/ckeditor/CHANGES.md@*@*@0
 Tool@ckeditor@ckeditor@*@inurl:/resources/js/CKeditor/CHANGES.md@*@*@0
