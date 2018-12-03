@@ -53,7 +53,17 @@ class CloudChecker:
 
         # Get IP range list.
         self.utility.write_log(20, 'Accessing : {}'.format(self.aws_ip_range))
-        http = urllib3.PoolManager(timeout=self.utility.con_timeout)
+
+        # Set proxy server.
+        http = None
+        if self.utility.proxy != '':
+            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
+            http = urllib3.ProxyManager(timeout=self.utility.con_timeout,
+                                        headers=self.utility.ua,
+                                        proxy_url=self.utility.proxy)
+        else:
+            http = urllib3.PoolManager(timeout=self.utility.con_timeout, headers=self.utility.ua)
+
         res = http.request('GET', self.aws_ip_range)
         aws_nw_addres = json.loads(res.data.decode('utf-8'))['prefixes']
 
@@ -82,7 +92,17 @@ class CloudChecker:
 
         # Get IP range list.
         self.utility.write_log(20, 'Accessing : {}'.format(self.azure_ip_range))
-        http = urllib3.PoolManager(timeout=self.utility.con_timeout)
+
+        # Set proxy server.
+        http = None
+        if self.utility.proxy != '':
+            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
+            http = urllib3.ProxyManager(timeout=self.utility.con_timeout,
+                                        headers=self.utility.ua,
+                                        proxy_url=self.utility.proxy)
+        else:
+            http = urllib3.PoolManager(timeout=self.utility.con_timeout, headers=self.utility.ua)
+
         res = http.request('GET', self.azure_ip_range)
         soup = BeautifulSoup(res.data.decode('utf-8').lower(), 'lxml')
         regions = soup.find_all('region')
