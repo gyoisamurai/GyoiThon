@@ -362,18 +362,18 @@ if __name__ == '__main__':
             product_list = google_hack.execute_google_hack(cve_explorer,
                                                            fqdn_list[idx],
                                                            port_list[idx],
-                                                           path_list[idx].replace('/', ''),
-                                                           report)
+                                                           report,
+                                                           max_target_byte)
 
         # Check unnecessary contents using Explore contents.
         if opt_explore:
             product_list.extend(content_explorer.content_explorer(cve_explorer,
                                                                   protocol_list[idx],
                                                                   fqdn_list[idx],
-                                                                  path_list[idx].replace('/', ''),
                                                                   port_list[idx],
                                                                   path_list[idx],
-                                                                  report))
+                                                                  report,
+                                                                  max_target_byte))
 
         # Execute exploitation.
         if opt_exploit:
