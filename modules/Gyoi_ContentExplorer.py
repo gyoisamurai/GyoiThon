@@ -5,10 +5,7 @@ import sys
 import codecs
 import re
 import time
-import urllib3
 import configparser
-from urllib3.exceptions import InsecureRequestWarning
-urllib3.disable_warnings(InsecureRequestWarning)
 
 # Type of printing.
 OK = 'ok'         # [*]

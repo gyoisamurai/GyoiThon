@@ -156,7 +156,16 @@ class CveExplorerNVD:
     def create_vuln_yearly_db(self, cve_year, last_modified_date):
         # Get cve list from NVD.
         self.utility.write_log(20, '[In] Create yearly vulnerability database [{}]'.format(self.file_name))
-        http = urllib3.PoolManager(timeout=self.con_timeout)
+
+        # Set proxy server.
+        http = None
+        if self.utility.proxy != '':
+            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
+            http = urllib3.ProxyManager(timeout=self.con_timeout,
+                                        headers=self.utility.ua,
+                                        proxy_url=self.utility.proxy)
+        else:
+            http = urllib3.PoolManager(timeout=self.con_timeout)
         target_url = self.nvd_zip_url.replace('*', cve_year)
         tmp_file = os.path.join(self.nvd_db_dir, 'temp_' + cve_year + '.zip')
 
@@ -184,7 +193,17 @@ class CveExplorerNVD:
     def initialize_vuln_db(self):
         # Get vulnerabilities information.
         self.utility.write_log(20, '[In] Initialize vulnerability database [{}].'.format(self.file_name))
-        http = urllib3.PoolManager(timeout=self.con_timeout)
+
+        # Set proxy server.
+        http = None
+        if self.utility.proxy != '':
+            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
+            http = urllib3.ProxyManager(timeout=self.con_timeout,
+                                        headers=self.utility.ua,
+                                        proxy_url=self.utility.proxy)
+        else:
+            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.utility.ua)
+
         update_flag = False
         for cve_year in self.cve_year_list:
             # Get last modified date and file hash.
