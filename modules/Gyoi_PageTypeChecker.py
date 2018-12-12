@@ -65,13 +65,22 @@ class PageChecker:
             self.utility.print_message(OK, msg)
             self.utility.write_log(20, msg)
 
-        # Predict page type using URL.
-        predict_result, page_type['url']['prob'], page_type['url']['reason'] = self.predict_page_type(target_url)
+        # Predict Basic Authenticate.
+        predict_result, page_type['url']['prob'], page_type['url']['reason'] = self.predict_basic_auth(response)
         msg = 'URL: Page type={}/{}%, reason={}'.format(predict_result,
                                                         page_type['url']['prob'],
                                                         page_type['url']['reason'])
         self.utility.print_message(OK, msg)
         self.utility.write_log(20, msg)
+
+        if page_type['url']['prob'] != '100.0':
+            # Predict page type using URL.
+            predict_result, page_type['url']['prob'], page_type['url']['reason'] = self.predict_page_type(target_url)
+            msg = 'URL: Page type={}/{}%, reason={}'.format(predict_result,
+                                                            page_type['url']['prob'],
+                                                            page_type['url']['reason'])
+            self.utility.print_message(OK, msg)
+            self.utility.write_log(20, msg)
 
         self.utility.write_log(20, '[Out] Judge page type [{}].'.format(self.file_name))
         return page_type
@@ -102,6 +111,24 @@ class PageChecker:
             self.utility.print_exception(e, msg)
             self.utility.write_log(30, msg)
         self.utility.write_log(20, '[Out] Predict page type [{}].'.format(self.file_name))
+        return 'Login', '0.0', '-'
+
+    # Predict page type using HTTP status code.
+    def predict_basic_auth(self, response):
+        self.utility.write_log(20, '[In] Predict page type [{}].'.format(self.file_name))
+
+        # Identify product name and version.
+        obj_match = re.search(r'[\r\n](WWW-Authenticate:\sBasic).*[\r\n]', response, flags=re.IGNORECASE)
+
+        # Judge page type.
+        if obj_match is not None:
+            reason = obj_match.group(1)
+            msg = 'Identify page type : page type={}/100%, reason={}'.format('Login', reason)
+            self.utility.print_message(OK, msg)
+            self.utility.write_log(20, msg)
+            self.utility.write_log(20, '[Out] Predict page type [{}].'.format(self.file_name))
+            return 'Login', '100.0', reason
+
         return 'Login', '0.0', '-'
 
     # Execute learning / Get learned data.
