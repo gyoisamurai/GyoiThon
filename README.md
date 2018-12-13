@@ -613,7 +613,7 @@ If you want to use proxy server, please input proxy server information in `confi
 
 |Category|Parameter|Description|
 |:----|:----|:----|
-|Common|proxy|Proxy server information (ex: `http://proxy-example:8083`). |
+|Common|proxy|Proxy server information. Format is `scheme://hostname:port` (ex: `http://proxy-example:8083`). |
 ||proxy_user|If you need the proxy authentication, please input auth user. |
 ||proxy_pass|If you need the proxy authentication, please input auth password. |
 
