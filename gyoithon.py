@@ -341,7 +341,7 @@ if __name__ == '__main__':
                     errors = error_checker.get_error_message(res_body)
 
                     # Check login page.
-                    page_type = page_checker.judge_page_type(target_url, res_body)
+                    page_type = page_checker.judge_page_type(target_url, res_header + res_body)
 
                     # Create report.
                     report.create_report_body(target_url,

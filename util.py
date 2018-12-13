@@ -47,6 +47,8 @@ class Utilty:
             self.log_path = os.path.join(os.path.join(full_path, self.log_dir), self.log_file)
             self.modules_dir = config['Common']['module_path']
             self.proxy = config['Common']['proxy']
+            self.proxy_user = config['Common']['proxy_user']
+            self.proxy_pass = config['Common']['proxy_pass']
             self.ua = {'User-Agent': config['Common']['user-agent']}
         except Exception as e:
             self.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
@@ -169,7 +171,7 @@ class Utilty:
         return True
 
     # Send http request.
-    def send_request(self, method, target_url):
+    def send_request(self, method, target_url, preload_content=True):
         res_header = ''
         res_body = ''
         server_header = '-'
@@ -179,12 +181,21 @@ class Utilty:
         http = None
         if self.proxy != '':
             self.print_message(WARNING, 'Set proxy server: {}'.format(self.proxy))
-            http = urllib3.ProxyManager(timeout=self.con_timeout, headers=self.ua, proxy_url=self.proxy)
+            if self.proxy_user != '':
+                headers = urllib3.make_headers(proxy_basic_auth=self.proxy_user + ':' + self.proxy_pass)
+                http = urllib3.ProxyManager(timeout=self.con_timeout,
+                                            headers=self.ua,
+                                            proxy_url=self.proxy,
+                                            proxy_headers=headers)
+            else:
+                http = urllib3.ProxyManager(timeout=self.con_timeout,
+                                            headers=self.ua,
+                                            proxy_url=self.proxy)
         else:
             http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.ua)
 
         try:
-            res = http.request(method, target_url)
+            res = http.request(method, target_url, preload_content=preload_content)
             for header in res.headers.items():
                 res_header += header[0] + ': ' + header[1] + '\r\n'
                 if header[0].lower() == 'server':
