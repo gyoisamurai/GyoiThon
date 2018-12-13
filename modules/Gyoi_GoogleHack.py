@@ -107,7 +107,7 @@ class GoogleCustomSearch:
                 # Execute.
                 urls, result_count = self.custom_search(query, self.start_index)
 
-                msg = '{}/{} Execute query: {}'.format(idx + 1, len(signature), query)
+                msg = '{}/{} Execute query: {}'.format(idx + 1, len(signatures), query)
                 self.utility.print_message(OK, msg)
                 self.utility.write_log(20, msg)
 
@@ -177,8 +177,8 @@ class GoogleCustomSearch:
                         if is_login == 1:
                             page_type = {'ml': {'prob': '-', 'reason': '-'},
                                          'url': {'prob': '100%', 'reason': search_option}}
-                        report.create_report_body('-', fqdn, '*', self.method_name, product, page_type,
-                                                  [], [], '*', '*', print_date)
+                        report.create_report_body('-', fqdn, port, '*', self.method_name, product,
+                                                  page_type, [], [], '*', '*', print_date)
 
                 time.sleep(self.delay_time)
         self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
@@ -191,12 +191,32 @@ class GoogleCustomSearch:
         self.utility.write_log(20, '[In] Execute Google custom search [{}].'.format(self.file_name))
 
         # Setting of Google Custom Search.
-        service = build("customsearch", "v1", developerKey=self.api_key)
+        service = None
+        if self.utility.proxy != '':
+            # Set proxy.
+            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
+            parsed = util.parse_url(self.utility.proxy)
+            proxy = None
+            if self.utility.proxy_pass != '':
+                proxy = httplib2.ProxyInfo(proxy_type=socks.PROXY_TYPE_HTTP,
+                                           proxy_host=parsed.host,
+                                           proxy_port=parsed.port,
+                                           proxy_user=self.utility.proxy_user,
+                                           proxy_pass=self.utility.proxy_pass)
+            else:
+                proxy = httplib2.ProxyInfo(proxy_type=socks.PROXY_TYPE_HTTP,
+                                           proxy_host=parsed.host,
+                                           proxy_port=parsed.port)
+            my_http = httplib2.Http(proxy_info=proxy, disable_ssl_certificate_validation=True)
+            service = build("customsearch", "v1", developerKey=self.api_key, http=my_http)
+        else:
+            # None proxy.
+            service = build("customsearch", "v1", developerKey=self.api_key)
+
+        # Execute search.
         response = []
         urls = []
         result_count = 0
-
-        # Execute search.
         try:
             response.append(service.cse().list(
                 q=query,
