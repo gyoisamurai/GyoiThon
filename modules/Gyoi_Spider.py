@@ -2,6 +2,7 @@
 # coding:utf-8
 import time
 import codecs
+import base64
 import scrapy
 from scrapy.http import Request
 

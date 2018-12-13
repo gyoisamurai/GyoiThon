@@ -58,10 +58,23 @@ class SpiderControl:
 
         # Assemble command options.
         target_url = protocol + '://' + target_fqdn + ':' + target_port + target_path
+
+        # Proxy setting.
+        proxy = ''
+        if self.utility.proxy != '':
+            parsed = util.parse_url(self.utility.proxy)
+            if self.utility.proxy_user != '':
+                proxy = parsed.scheme + '://' + \
+                        self.utility.proxy_user + ':' + self.utility.proxy_pass + '@' + \
+                        parsed.netloc
+            else:
+                proxy = parsed.scheme + '://' + parsed.netloc
+
+        # Assemble Scrapy command.
         option = ' -a target_url=' + target_url + ' -a allow_domain=' + target_fqdn + \
                  ' -a concurrent=' + self.spider_concurrent_reqs + ' -a depth_limit=' + self.spider_depth_limit + \
                  ' -a delay=' + self.spider_delay_time + ' -a store_path=' + gyoithon_log_path + \
-                 ' -a proxy_server=' + self.utility.proxy + ' -a user_agent="' + self.utility.ua['User-Agent'] + '"'\
+                 ' -a proxy_server=' + proxy + ' -a user_agent="' + self.utility.ua['User-Agent'] + '"'\
                  ' -o ' + scrapy_log_path
         close_opton = ' -s CLOSESPIDER_TIMEOUT=' + self.spider_time_out + \
                       ' -s CLOSESPIDER_ITEMCOUNT=' + self.spider_item_count + \

@@ -48,6 +48,7 @@ class CveExplorerNVD:
             self.nvd_chk_date_regex = config['CveExplorerNVD']['nvd_chk_date_regex']
             self.nvd_chk_hash_regex = config['CveExplorerNVD']['nvd_chk_hash_regex']
             self.nvd_date_format = config['CveExplorerNVD']['nvd_date_format']
+            self.headers = urllib3.make_headers(proxy_basic_auth=self.utility.proxy_user + ':' + self.utility.proxy_pass)
             self.db_colmns = {}
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
@@ -157,15 +158,6 @@ class CveExplorerNVD:
         # Get cve list from NVD.
         self.utility.write_log(20, '[In] Create yearly vulnerability database [{}]'.format(self.file_name))
 
-        # Set proxy server.
-        http = None
-        if self.utility.proxy != '':
-            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
-            http = urllib3.ProxyManager(timeout=self.con_timeout,
-                                        headers=self.utility.ua,
-                                        proxy_url=self.utility.proxy)
-        else:
-            http = urllib3.PoolManager(timeout=self.con_timeout)
         target_url = self.nvd_zip_url.replace('*', cve_year)
         tmp_file = os.path.join(self.nvd_db_dir, 'temp_' + cve_year + '.zip')
 
@@ -173,7 +165,8 @@ class CveExplorerNVD:
         target_json_name = ''
         self.utility.write_log(20, 'Accessing : {}'.format(target_url))
         self.utility.print_message(OK, 'Get {} CVE list from {}'.format(cve_year, target_url))
-        with http.request('GET', target_url, preload_content=False) as res, open(tmp_file, 'wb') as fout:
+        with self.utility.send_request('GET', target_url, preload_content=False) as (res, _, _, _), \
+                open(tmp_file, 'wb') as fout:
             shutil.copyfileobj(res, fout)
 
         with zipfile.ZipFile(tmp_file, 'r') as downloaded_zip:
@@ -194,16 +187,6 @@ class CveExplorerNVD:
         # Get vulnerabilities information.
         self.utility.write_log(20, '[In] Initialize vulnerability database [{}].'.format(self.file_name))
 
-        # Set proxy server.
-        http = None
-        if self.utility.proxy != '':
-            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
-            http = urllib3.ProxyManager(timeout=self.con_timeout,
-                                        headers=self.utility.ua,
-                                        proxy_url=self.utility.proxy)
-        else:
-            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.utility.ua)
-
         update_flag = False
         for cve_year in self.cve_year_list:
             # Get last modified date and file hash.
@@ -212,7 +195,7 @@ class CveExplorerNVD:
                 target_url = self.nvd_meta_url.replace('*', cve_year)
                 self.utility.print_message(OK, 'Get {} meta information from {}'.format(cve_year, target_url))
                 self.utility.write_log(20, 'Accessing : {}'.format(target_url))
-                res_meta = http.request('GET', target_url)
+                res_meta, _, _, _ = self.utility.send_request('GET', target_url)
                 obj_match = re.match(self.nvd_chk_date_regex, res_meta.data.decode('utf-8'))
                 last_modified_date = obj_match.group(obj_match.lastindex)
 
