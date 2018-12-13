@@ -607,6 +607,20 @@ root@kali:~/GyoiThon/modules/data/ vim exploit_tree.json
 
 Above example is to change value of `TARGETURI` option in exploit module "`exploit/unix/webapp/joomla_media_upload_exec`" to "`/my_original_dir/`" from "`/joomla`".  
 
+### 4. How to access via proxy server.
+GyoiThon can access to target server via **proxy server**.  
+If you want to use proxy server, please input proxy server information in `config.ini`.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|Common|proxy|Proxy server information (ex: `http://proxy-example:8083`). |
+||proxy_user|If you need the proxy authentication, please input auth user. |
+||proxy_pass|If you need the proxy authentication, please input auth password. |
+
+| Note |
+|:-----|
+| Now, GyoiThon is implemented only Basic Authentication. |
+
 ## Operation check environment
  * Kali Linux 2018.2 (for Metasploit)  
    * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz  
