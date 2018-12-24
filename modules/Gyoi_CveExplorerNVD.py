@@ -165,9 +165,29 @@ class CveExplorerNVD:
         target_json_name = ''
         self.utility.write_log(20, 'Accessing : {}'.format(target_url))
         self.utility.print_message(OK, 'Get {} CVE list from {}'.format(cve_year, target_url))
-        with self.utility.send_request('GET', target_url, preload_content=False) as (res, _, _, _), \
-                open(tmp_file, 'wb') as fout:
-            shutil.copyfileobj(res, fout)
+
+        http = None
+        if self.utility.proxy != '':
+            self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
+            if self.utility.proxy_user != '':
+                headers = urllib3.make_headers(proxy_basic_auth=self.utility.proxy_user + ':' + self.utility.proxy_pass)
+                http = urllib3.ProxyManager(timeout=self.con_timeout,
+                                            headers=self.utility.ua,
+                                            proxy_url=self.utility.proxy,
+                                            proxy_headers=headers)
+            else:
+                http = urllib3.ProxyManager(timeout=self.con_timeout,
+                                            headers=self.utility.ua,
+                                            proxy_url=self.utility.proxy)
+        else:
+            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.utility.ua)
+
+        try:
+            with http.request('GET', target_url, preload_content=False) as res, open(tmp_file, 'wb') as fout:
+                shutil.copyfileobj(res, fout)
+        except Exception as e:
+            self.utility.print_exception(e, 'Access is failure : {}'.format(target_url))
+            self.utility.write_log(30, 'Accessing is failure : {}'.format(target_url))
 
         with zipfile.ZipFile(tmp_file, 'r') as downloaded_zip:
             target_json_name = downloaded_zip.namelist()[0]
