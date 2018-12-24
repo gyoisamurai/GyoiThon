@@ -200,7 +200,8 @@ class Utilty:
                 res_header += header[0] + ': ' + header[1] + '\r\n'
                 if header[0].lower() == 'server':
                     server_header = header[0] + ': ' + header[1]
-            res_body = '\r\n\r\n' + res.data.decode('utf-8')
+
+            res_body = res.data.decode('utf-8')
         except Exception as e:
             self.print_exception(e, 'Access is failure : {}'.format(target_url))
             self.write_log(30, 'Accessing is failure : {}'.format(target_url))
