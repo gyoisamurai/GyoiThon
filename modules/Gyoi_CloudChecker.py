@@ -53,8 +53,8 @@ class CloudChecker:
 
         # Get IP range list.
         self.utility.write_log(20, 'Accessing : {}'.format(self.aws_ip_range))
-        res, _, _, _ = self.utility.send_request('GET', self.aws_ip_range)
-        aws_nw_addres = json.loads(res.data.decode('utf-8'))['prefixes']
+        res, _, _, _, encoding = self.utility.send_request('GET', self.aws_ip_range)
+        aws_nw_addres = json.loads(res.data.decode(encoding))['prefixes']
 
         # Check all aws ip_address.
         target_ip = ipaddress.ip_address(ip_addr)
@@ -81,8 +81,8 @@ class CloudChecker:
 
         # Get IP range list.
         self.utility.write_log(20, 'Accessing : {}'.format(self.azure_ip_range))
-        res, _, _, _ = self.utility.send_request('GET', self.azure_ip_range)
-        soup = BeautifulSoup(res.data.decode('utf-8').lower(), 'lxml')
+        res, _, _, _, encoding = self.utility.send_request('GET', self.azure_ip_range)
+        soup = BeautifulSoup(res.data.decode(encoding).lower(), 'lxml')
         regions = soup.find_all('region')
 
         # Check all azure ip_address.

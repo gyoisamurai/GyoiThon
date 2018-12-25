@@ -96,7 +96,7 @@ class ContentExplorer:
                 date = self.utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
                 print_date = self.utility.transform_date_string(
                     self.utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
-                res, server_header, res_header, res_body = self.utility.send_request('GET', target_url)
+                res, server_header, res_header, res_body, _ = self.utility.send_request('GET', target_url)
                 msg = '{}/{} Accessing : Status: {}, Url: {}'.format(idx + 1, len(signatures), res.status, target_url)
                 self.utility.print_message(OK, msg)
                 self.utility.write_log(20, msg)
@@ -108,7 +108,7 @@ class ContentExplorer:
                     os.mkdir(log_path_fqdn)
                 log_file = os.path.join(log_path_fqdn, log_name)
                 with codecs.open(log_file, 'w', 'utf-8') as fout:
-                    fout.write(target_url + '\n\n' + res_header + res_body)
+                    fout.write(target_url + '\n\n' + res_header + '\n\n' + res_body)
 
                 if res.status in [200, 301, 302]:
                     # Cutting response byte.
@@ -118,7 +118,10 @@ class ContentExplorer:
                         res_body = res_body[:max_target_byte]
 
                     # Examine HTTP response.
-                    result = self.examine_response(check_pattern, default_ver, version_pattern, res_header + res_body)
+                    result = self.examine_response(check_pattern,
+                                                   default_ver,
+                                                   version_pattern,
+                                                   res_header + '\n\n' + res_body)
                     if result[0] is True:
                         # Found unnecessary content or CMS admin page.
                         product = [category, vendor, product_name, result[1], path]

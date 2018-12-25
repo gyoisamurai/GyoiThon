@@ -116,7 +116,7 @@ class GoogleCustomSearch:
                         for url_idx, target_url in enumerate(urls):
                             # Get HTTP response (header + body).
                             date = self.utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
-                            res, server_header, res_header, res_body = self.utility.send_request('GET', target_url)
+                            res, server_header, res_header, res_body, _ = self.utility.send_request('GET', target_url)
                             msg = '{}/{} Accessing : Status: {}, Url: {}'.format(url_idx + 1,
                                                                                  len(urls),
                                                                                  res.status,
@@ -131,7 +131,7 @@ class GoogleCustomSearch:
                                 os.mkdir(log_path_fqdn)
                             log_file = os.path.join(log_path_fqdn, log_name)
                             with codecs.open(log_file, 'w', 'utf-8') as fout:
-                                fout.write(target_url + '\n\n' + res_header + res_body)
+                                fout.write(target_url + '\n\n' + res_header + '\n\n' + res_body)
 
                             # Cutting response byte.
                             if max_target_byte != 0 and (max_target_byte < len(res_body)):
@@ -143,7 +143,7 @@ class GoogleCustomSearch:
                             result = self.examine_response(check_pattern,
                                                            default_ver,
                                                            version_pattern,
-                                                           res_header + res_body)
+                                                           res_header + '\n\n' + res_body)
 
                             if result[0] is True:
                                 # Found unnecessary content or CMS admin page.

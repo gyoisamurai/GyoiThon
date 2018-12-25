@@ -2,7 +2,6 @@
 # coding:utf-8
 import time
 import codecs
-import base64
 import scrapy
 from scrapy.http import Request
 
@@ -20,6 +19,7 @@ class SimpleSpider(scrapy.Spider):
         self.store_path = getattr(self, 'store_path', None)
         self.proxy_server = getattr(self, 'proxy_server', None)
         self.user_agent = getattr(self, 'user_agent', None)
+        self.encoding = getattr(self, 'encoding', None)
         self.custom_settings = {
             'CONCURRENT_REQUESTS': self.concurrent,
             'CONCURRENT_REQUESTS_PER_DOMAIN': self.concurrent,
@@ -30,9 +30,9 @@ class SimpleSpider(scrapy.Spider):
             'HTTPCACHE_ENABLED': True,
             'HTTPCACHE_EXPIRATION_SECS': 60 * 60 * 24,
             'HTTPCACHE_DIR': self.store_path,
-            'FEED_EXPORT_ENCODING': 'utf-8'
+            'FEED_EXPORT_ENCODING': self.encoding
         }
-        self.fout = codecs.open(self.store_path, 'a', encoding='utf-8')
+        self.fout = codecs.open(self.store_path, 'a', encoding=self.encoding)
 
     def start_requests(self):
         url = self.start_urls
@@ -47,7 +47,7 @@ class SimpleSpider(scrapy.Spider):
         # yield Request(url, self.parse)
 
     def parse(self, response):
-        self.fout.write(response.body.decode('utf-8'))
+        self.fout.write(response.body.decode(self.encoding))
         for href in response.css('a::attr(href)'):
             full_url = response.urljoin(href.extract())
             time.sleep(self.delay_time)
@@ -61,7 +61,7 @@ class SimpleSpider(scrapy.Spider):
 
     def parse_item(self, response):
         urls = []
-        self.fout.write(response.body.decode('utf-8'))
+        self.fout.write(response.body.decode(self.encoding))
         for href in response.css('a::attr(href)'):
             full_url = response.urljoin(href.extract())
             urls.append(full_url)
