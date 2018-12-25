@@ -4,7 +4,9 @@ import os
 import sys
 import string
 import random
+import re
 import urllib3
+import cchardet
 import socket
 import ipaddress
 import configparser
@@ -50,6 +52,7 @@ class Utilty:
             self.proxy_user = config['Common']['proxy_user']
             self.proxy_pass = config['Common']['proxy_pass']
             self.ua = {'User-Agent': config['Common']['user-agent']}
+            self.encoding = config['Common']['default_charset']
         except Exception as e:
             self.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             sys.exit(1)
@@ -176,6 +179,8 @@ class Utilty:
         res_body = ''
         server_header = '-'
         res = None
+        encoding = ''
+        content_type_value = ''
 
         # Set proxy server.
         http = None
@@ -196,16 +201,25 @@ class Utilty:
 
         try:
             res = http.request(method, target_url, preload_content=preload_content)
+
             for header in res.headers.items():
                 res_header += header[0] + ': ' + header[1] + '\r\n'
                 if header[0].lower() == 'server':
                     server_header = header[0] + ': ' + header[1]
+                if header[0].lower() == 'content-type':
+                    content_type_value = header[1]
 
-            res_body = res.data.decode('utf-8')
+            # Detect encoding.
+            encoding = self.detect_encoding(res.data, content_type_value)
+
+            # Get response body.
+            res_body = res.data.decode(encoding)
         except Exception as e:
+            self.print_message(WARNING, 'Use default charset: {}'.format(self.encoding))
+            encoding = self.encoding
             self.print_exception(e, 'Access is failure : {}'.format(target_url))
             self.write_log(30, 'Accessing is failure : {}'.format(target_url))
-        return res, server_header, res_header, res_body
+        return res, server_header, res_header, res_body, encoding
 
     # Forward lookup.
     def forward_lookup(self, fqdn):
@@ -222,3 +236,25 @@ class Utilty:
         except Exception as e:
             self.print_exception(e, 'Reverse lookup error: {}'.format(ip_addr))
             return 'unknown'
+
+    # Detect encoding of target site.
+    def detect_encoding(self, data, content_type_value):
+        obj_match = None
+        encoding = ''
+        if content_type_value != '':
+            obj_match = re.search(r'charset=(.*)\Z', content_type_value, flags=re.IGNORECASE)
+
+        if obj_match is not None:
+            encoding = obj_match.group(1)
+            self.print_message(WARNING, 'Set encoding: {}'.format(encoding))
+        else:
+            guess = cchardet.detect(data)
+            if guess['encoding'] is not None:
+                encoding = guess['encoding']
+                self.print_message(WARNING, 'Set encoding: {}'.format(encoding))
+            else:
+                encoding = self.encoding
+                self.print_message(WARNING, 'Charset not detected.')
+                self.print_message(WARNING, 'Use default charset: {}'.format(encoding))
+
+        return encoding
