@@ -215,8 +215,8 @@ class CveExplorerNVD:
                 target_url = self.nvd_meta_url.replace('*', cve_year)
                 self.utility.print_message(OK, 'Get {} meta information from {}'.format(cve_year, target_url))
                 self.utility.write_log(20, 'Accessing : {}'.format(target_url))
-                res_meta, _, _, _ = self.utility.send_request('GET', target_url)
-                obj_match = re.match(self.nvd_chk_date_regex, res_meta.data.decode('utf-8'))
+                res_meta, _, _, _, encoding = self.utility.send_request('GET', target_url)
+                obj_match = re.match(self.nvd_chk_date_regex, res_meta.data.decode(encoding))
                 last_modified_date = obj_match.group(obj_match.lastindex)
 
                 year_db = self.nvd_year_path.replace('*', cve_year)
