@@ -198,6 +198,14 @@ if __name__ == '__main__':
         # Create report header.
         report.create_report_header(fqdn_list[idx], port_list[idx])
 
+        # Check encoding.
+        test_url = ''
+        if int(port_list[idx]) in [80, 443]:
+            test_url = protocol_list[idx] + '://' + fqdn_list[idx] + path_list[idx]
+        else:
+            test_url = protocol_list[idx] + '://' + fqdn_list[idx] + ':' + port_list[idx] + path_list[idx]
+        _, server_header, res_header, res_body, encoding = utility.send_request('GET', test_url)
+
         # Check cloud service.
         cloud_type = 'Unknown'
         if opt_cloud:
@@ -276,6 +284,7 @@ if __name__ == '__main__':
                         utility.write_log(30, 'Not read log : {}'.format(path))
         else:
             # Gather target url using Spider.
+            spider.utility.encoding = encoding
             web_target_info = spider.run_spider(protocol_list[idx], fqdn_list[idx], port_list[idx], path_list[idx])
 
             # Get HTTP responses.
@@ -307,7 +316,7 @@ if __name__ == '__main__':
                     # Get HTTP response (header + body).
                     date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
                     print_date = utility.transform_date_string(utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
-                    _, server_header, res_header, res_body = utility.send_request('GET', target_url)
+                    _, server_header, res_header, res_body, _ = utility.send_request('GET', target_url)
 
                     # Write log.
                     log_name = protocol_list[idx] + '_' + fqdn_list[idx] + '_' + str(port_list[idx]) + '_' + date + '.log'
@@ -316,7 +325,7 @@ if __name__ == '__main__':
                         os.mkdir(log_path_fqdn)
                     log_file = os.path.join(log_path_fqdn, log_name)
                     with codecs.open(log_file, 'w', 'utf-8') as fout:
-                        fout.write(target_url + '\n\n' + res_header + res_body)
+                        fout.write(target_url + '\n\n' + res_header + '\n\n' + res_body)
 
                     # Cutting response byte.
                     if max_target_byte != 0 and (max_target_byte < len(res_body)):
