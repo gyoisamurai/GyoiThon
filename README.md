@@ -13,7 +13,7 @@ Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
  * August 12th,2018:[DEFCON26 DemoLabs](https://www.defcon.org/html/defcon-26/dc-26-demolabs.html#GyoiThon)  
  * October 24th,2018:[OWS in CSS2018](https://www.iwsec.org/ows/2018/)  
  * November 3rd,2018:[AV TOKYO 2018 HIVE](http://ja.avtokyo.org/avtokyo2018/event)  
- * December 22-23th,2018:[SECCON 2018](https://2018.seccon.jp/seccon/yorozu2018.html)  
+ * December 22-23th,2018:[SECCON YOROZU 2018](https://2018.seccon.jp/seccon/yorozu2018.html)  
 
 ## Documents
  * [Installation](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Installation)  
