@@ -108,6 +108,7 @@ Web@microsoft@internet_information_server@*@Server:.*(Microsoft-IIS/([0-9]+\.[0-
 Web@microsoft@internet_information_server@*@Server:.*(IIS/([0-9]+\.[0-9]+))
 Web@microsoft@internet_information_server@*@Server:.*(IIS)
 Web@microsoft@internet_information_server@*@.*(It works).*
+Web@microsoft@personal_web_server@*@Server:.*(PWS/([0-9]+[\.0-9]*[\.0-9]*))
 Web@ibm@http_server@*@Server:.*(IBM_HTTP_SERVER/([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+))
 Web@ibm@http_server@*@Server:.*(IBM_HTTP_SERVER)
 Web@ibm@http_server@*@.*(IBM_HTTP_SERVER/([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+))
