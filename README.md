@@ -627,16 +627,7 @@ If you want to use proxy server, please input proxy server information in `confi
    * CPU: Intel(R) Core(TM) i5-5200U 2.20GHz  
    * Memory: 8.0GB  
    * Metasploit Framework 4.16.48-dev  
-   * Python 3.6.1 (Anaconda3)  
- * Dependent Python libraries  
-   * censys==0.0.8  
-   * docopt==0.6.2  
-   * google-api-python-client==1.7.4
-   * jinja2==2.10  
-   * msgpack-python==0.5.6  
-   * pandas==0.23.4  
-   * urllib3==1.23  
-   * Scrapy==1.5.1  
+   * Python 3.6.6  
 
 ## Licence
 [Apache License 2.0](https://github.com/gyoisamurai/GyoiThon/blob/master/LICENSE)
