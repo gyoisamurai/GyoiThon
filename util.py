@@ -53,6 +53,10 @@ class Utilty:
             self.proxy_pass = config['Common']['proxy_pass']
             self.ua = {'User-Agent': config['Common']['user-agent']}
             self.encoding = config['Common']['default_charset']
+            if config['Common']['redirect'] == '0':
+                self.redirect = False
+            else:
+                self.redirect = True
         except Exception as e:
             self.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             sys.exit(1)
@@ -200,7 +204,7 @@ class Utilty:
             http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.ua)
 
         try:
-            res = http.request(method, target_url, preload_content=preload_content)
+            res = http.request(method, target_url, preload_content=preload_content, redirect=self.redirect)
 
             for header in res.headers.items():
                 res_header += header[0] + ': ' + header[1] + '\r\n'

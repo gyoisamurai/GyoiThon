@@ -261,7 +261,16 @@ if __name__ == '__main__':
                             product_list = cve_explorer.cve_explorer(product_list)
 
                             # Check unnecessary comments.
-                            comments = comment_checker.get_bad_comment(target_log)
+                            comments, comment_list = comment_checker.get_bad_comment(target_log)
+
+                            # Save all gotten comments to the local file.
+                            boundary = '-' * 5 + '[' + path + ']' + '-\n' + date + '\n'
+                            comment_log_name = 'all_comments.log'
+                            comment_log_path = os.path.join(opt_log_path, comment_log_name)
+                            with codecs.open(comment_log_path, 'a', 'utf-8') as fout:
+                                fout.write(boundary)
+                                for comment in comment_list:
+                                    fout.write(comment + '\n')
 
                             # Check unnecessary error messages.
                             errors = error_checker.get_error_message(target_log)
@@ -344,10 +353,19 @@ if __name__ == '__main__':
                     product_list = cve_explorer.cve_explorer(product_list)
 
                     # Check unnecessary comments.
-                    comments = comment_checker.get_bad_comment(res_body)
+                    comments, comment_list = comment_checker.get_bad_comment(res_body)
+
+                    # Save all gotten comments to the local file.
+                    boundary = '-' * 5 + '[' + target_url + ']' + '-' * 5 + '\n' + date + '\n'
+                    comment_log_name = 'all_comments.log'
+                    comment_log_path = os.path.join(log_path_fqdn, comment_log_name)
+                    with codecs.open(comment_log_path, 'a', 'utf-8') as fout:
+                        fout.write(boundary)
+                        for comment in comment_list:
+                            fout.write(comment + '\n')
 
                     # Check unnecessary error messages.
-                    errors = error_checker.get_error_message(res_body)
+                    errors = error_checker.get_error_message(res_header + res_body)
 
                     # Check login page.
                     page_type = page_checker.judge_page_type(target_url, res_header + res_body)
