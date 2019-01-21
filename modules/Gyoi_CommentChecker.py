@@ -100,4 +100,4 @@ class CommentChecker:
         self.utility.write_log(20, '[Out] Checkt unnecessary comments [{}].'.format(self.file_name))
         if len(bad_comment_list) == 0:
             self.utility.print_message(OK, 'Unnecessary comment not found.')
-        return list(set(bad_comment_list))
+        return list(set(bad_comment_list)), comment_list
