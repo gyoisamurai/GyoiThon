@@ -264,7 +264,7 @@ if __name__ == '__main__':
                             comments, comment_list = comment_checker.get_bad_comment(target_log)
 
                             # Save all gotten comments to the local file.
-                            boundary = '-' * 5 + '[' + path + ']' + '-\n' + date + '\n'
+                            boundary = '-' * 5 + '[' + path + ']' + '-' * 5 + '\n' + date + '\n'
                             comment_log_name = 'all_comments.log'
                             comment_log_path = os.path.join(opt_log_path, comment_log_name)
                             with codecs.open(comment_log_path, 'a', 'utf-8') as fout:
