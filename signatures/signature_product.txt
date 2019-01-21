@@ -32,7 +32,8 @@ CMS@drupal@drupal@*@.*(X-Drupal-.*Cache: MISS).*
 CMS@drupal@drupal@*@.*(X-Drupal-Dynamic-.*Cache: MISS).*
 CMS@drupal@drupal@7.0@.*(X-Generator: Drupal 7).*
 CMS@drupal@drupal@8.0@.*(X-Generator: Drupal 8).*
-CMS@joomla@joomla\!@*@<meta\s+(content=[\"']Joomla).*>
+CMS@joomla@joomla\!@*@<meta\s.+(content=[\"']Joomla).*>
+CMS@joomla@joomla\!@*@<meta\s.+(content=[\"']Joomla[!\s]+([0-9]\.[0-9])).*>
 CMS@joomla@joomla\!@*@<script\s+(src=[\"']/templates/joomla/).*>
 CMS@joomla@joomla\!@*@Set-Cookie:.*(jfcookie=.*;)
 CMS@joomla@joomla\!@*@(X-Content-Encoded-By:\s+Joomla!\s+([0-9]+[\.0-9]*[\.0-9]*)).*
@@ -132,7 +133,9 @@ Tool@phpmyadmin@phpmyadmin@*@.*(phpmyadmin.svn.sourceforge.net/svnroot/phpmyadmi
 Tool@phpmyadmin@phpmyadmin@*@.*(phpMyAdmin - ChangeLog).*
 Tool@squirrelmail@squirrelmail@*@.*(SquirrelMail version ([0-9]+))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]))
+Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]-fips))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]))
+Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]-fips))
 Tool@mod_ssl@mod_ssl@*@Server:.*(mod_ssl/([0-9]+\.[0-9]+\.[0-9]+))
 Tool@adobe@dreamweaver@*@.*(dwsync)
 Tool@gnu@mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*
