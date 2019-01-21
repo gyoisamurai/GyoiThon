@@ -14,6 +14,7 @@ Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
  * October 24th,2018:[OWS in CSS2018](https://www.iwsec.org/ows/2018/)  
  * November 3rd,2018:[AV TOKYO 2018 HIVE](http://ja.avtokyo.org/avtokyo2018/event)  
  * December 22-23th,2018:[SECCON YOROZU 2018](https://2018.seccon.jp/seccon/yorozu2018.html)  
+ * March 28th,2019:[Black Hat ASIA 2019 Arsenal](https://www.blackhat.com/asia-19/arsenal/schedule/index.html#gyoithon-penetration-testing-using-machine-learning-14359)  
 
 ## Documents
  * [Installation](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#Installation)  
