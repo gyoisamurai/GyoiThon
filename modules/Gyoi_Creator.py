@@ -5,6 +5,8 @@ import sys
 import configparser
 import collections
 import pandas as pd
+import matplotlib.pyplot as plt
+import networkx as nx
 from datetime import datetime
 
 
@@ -24,7 +26,7 @@ class Creator:
         self.header = str(config['Creator']['header']).split('@')
 
         # Count directory number.
-        self.offset_layer_num = self.count_dir_layer(self.target_dir)
+        self.offset_layer_num, _ = self.count_dir_layer(self.target_dir)
 
     # Count directory layer.
     def count_dir_layer(self, target_dir):
@@ -35,13 +37,14 @@ class Creator:
 
         tmp_dir_list = os.path.splitdrive(target_dir)[1].split(split_symbol)
         tmp_dir_list.remove('')
-        return len(tmp_dir_list)
+        return len(tmp_dir_list), tmp_dir_list
 
     # Grep.
     def execute_grep(self, target_product, target_dir):
+        base_index = 0
         report = []
         if os.path.exists(target_dir):
-            for root, dirs, files in os.walk(target_dir):
+            for root, _, files in os.walk(target_dir):
                 file_count = 0
                 ext_list = []
                 for file in files:
@@ -54,19 +57,56 @@ class Creator:
 
                 # Save information each directory.
                 record = []
-                record.insert(0, target_product)
-                record.insert(1, root.replace(self.target_dir, ''))
-                record.insert(2, self.count_dir_layer(root) - self.offset_layer_num)
-                record.insert(3, file_count)
-                record.insert(4, list(set(ext_list)))
-                record.insert(5, collections.Counter(ext_list))
+                record.insert(0, base_index)
+                record.insert(1, target_product)
+                record.insert(2, root.replace(self.target_dir, ''))
+                dir_count, _ = self.count_dir_layer(root)
+                record.insert(3, dir_count - self.offset_layer_num)
+                record.insert(4, file_count)
+                record.insert(5, list(set(ext_list)))
+                record.insert(6, collections.Counter(ext_list))
                 report.append(record)
+                base_index += 1
 
             # Save extracted information.
             pd.DataFrame(report).to_csv(self.save_path, mode='a', header=False, index=False)
         else:
             print('Error: Path or file is not found.\n=> {}'.format(target_dir))
             sys.exit(1)
+        return report
+
+    # Split index and directory name.
+    def split_index_dirname(self, target_label):
+        return int(target_label.split('/')[0])
+
+    # Create Network using networkx.
+    def create_network(self, records):
+        # Create direction graph.
+        graph = nx.DiGraph()
+        dir_pool = {}
+        node_index = 0
+        for index, record in enumerate(records):
+            print('{}/{} Analyzing "{}"'.format(index + 1, len(records), record[2]))
+            _, dirs = self.count_dir_layer(record[2])
+            parent_dir = ''
+            label = '\\'
+            for layer_index, dir_name in enumerate(dirs):
+                label += str(dir_name) + '\\'
+
+                # Set parent node.
+                if label in dir_pool.keys():
+                    parent_dir = label
+                else:
+                    # Add new node.
+                    dir_pool[label] = node_index
+                    graph.add_node(node_index, ext_type=record[5], ext_count=record[6])
+                    node_index += 1
+
+                    # Create edge that connecting two nodes.
+                    if parent_dir != '' and label != parent_dir:
+                        graph.add_edge(dir_pool[parent_dir], dir_pool[label])
+                        print('Create edge node.{} <-> node.{}'.format(dir_pool[parent_dir], dir_pool[label]))
+        return graph
 
     # Main control.
     def extract_file_structure(self):
@@ -80,7 +120,17 @@ class Creator:
         try:
             for target in target_list:
                 # Extract file path each products.
-                self.execute_grep(target, os.path.join(self.target_dir, target))
+                record = self.execute_grep(target, os.path.join(self.target_dir, target))
+                graph = self.create_network(record)
+
+                # Show graph.
+                print('Creating network image...')
+                plt.figure(figsize=(10, 10))
+                nx.draw_networkx(graph)
+                plt.axis('off')
+                file_name = os.path.join(self.full_path, target + '.png')
+                plt.savefig(file_name)
+                plt.show()
         except Exception as e:
             print('{}'.format(e.args))
 
