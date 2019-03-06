@@ -24,6 +24,10 @@ class Creator:
         self.save_file = config['Creator']['result_file'].replace('*', datetime.now().strftime('%Y%m%d%H%M%S'))
         self.save_path = os.path.join(self.full_path, self.save_file)
         self.header = str(config['Creator']['header']).split('@')
+        self.score_table_path = os.path.join(self.full_path, config['Exploit']['data_path'])
+
+        # Load score table.
+        self.pd_score_table = pd.read_csv(os.path.join(self.score_table_path, config['Creator']['score_table']))
 
         # Count directory number.
         self.offset_layer_num, _ = self.count_dir_layer(self.target_dir)
@@ -75,9 +79,19 @@ class Creator:
             sys.exit(1)
         return report
 
-    # Split index and directory name.
-    def split_index_dirname(self, target_label):
-        return int(target_label.split('/')[0])
+    # Calculate score of node.
+    def calc_score(self, ext_type, ext_counts):
+        score = 0.0
+        count = 0
+        for ext in ext_type:
+            # Get defined score from score table.
+            pd_score = self.pd_score_table[self.pd_score_table['extension'] == ext.lower()]
+            ext_count = ext_counts[ext]
+            count += ext_count
+            if len(pd_score) != 0:
+                # Calculate score.
+                score += pd_score['probability'].values[0] * ext_count
+        return score / count
 
     # Create Network using networkx.
     def create_network(self, records):
@@ -97,9 +111,14 @@ class Creator:
                 if label in dir_pool.keys():
                     parent_dir = label
                 else:
+                    # Calculate score.
+                    score = 0.0
+                    if len(record[5]) != 0:
+                        score = self.calc_score(record[5], record[6])
+
                     # Add new node.
                     dir_pool[label] = node_index
-                    graph.add_node(node_index, ext_type=record[5], ext_count=record[6])
+                    graph.add_node(node_index, ext_type=record[5], ext_count=record[6], score=score)
                     node_index += 1
 
                     # Create edge that connecting two nodes.
