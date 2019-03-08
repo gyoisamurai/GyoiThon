@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import zipfile
+import tarfile
 import configparser
 import collections
+import statistics
 import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -19,18 +22,33 @@ class Creator:
         self.root_path = os.path.join(self.full_path, '../')
         config.read(os.path.join(self.root_path, 'config.ini'))
 
+        self.compress_dir = os.path.join(self.root_path, config['Creator']['compress_dir'])
         self.target_dir = os.path.join(self.root_path, config['Creator']['target_dir'])
         self.prohibit_ext_list = config['Creator']['prohibit_ext'].split('@')
         self.save_file = config['Creator']['result_file'].replace('*', datetime.now().strftime('%Y%m%d%H%M%S'))
         self.save_path = os.path.join(self.full_path, self.save_file)
         self.header = str(config['Creator']['header']).split('@')
         self.score_table_path = os.path.join(self.full_path, config['Exploit']['data_path'])
+        self.score_table = os.path.join(self.score_table_path, config['Creator']['score_table'])
+        self.threshold = float(config['Creator']['threshold'])
+        self.unknown_score = float(config['Creator']['unknown_score'])
+
+        # Check necessary directories.
+        self.is_dir_existance(self.compress_dir)
+        self.is_dir_existance(self.target_dir)
+        self.is_dir_existance(self.score_table)
 
         # Load score table.
-        self.pd_score_table = pd.read_csv(os.path.join(self.score_table_path, config['Creator']['score_table']))
+        self.pd_score_table = pd.read_csv(self.score_table)
 
         # Count directory number.
         self.offset_layer_num, _ = self.count_dir_layer(self.target_dir)
+
+    # Check necessary directory.
+    def is_dir_existance(self, target_dir):
+        if os.path.exists(self.compress_dir) is False:
+            print('Directory is not found: {}'.format(target_dir))
+            sys.exit(1)
 
     # Count directory layer.
     def count_dir_layer(self, target_dir):
@@ -79,19 +97,34 @@ class Creator:
             sys.exit(1)
         return report
 
+    # Show graph.
+    def show_graph(self, target, graph):
+        print('Creating network image...')
+        plt.figure(figsize=(10, 10))
+        nx.draw_networkx(graph)
+        plt.axis('off')
+        file_name = os.path.join(self.full_path, target + '.png')
+        plt.savefig(file_name)
+        plt.show()
+
     # Calculate score of node.
-    def calc_score(self, ext_type, ext_counts):
-        score = 0.0
-        count = 0
+    def calc_score(self, ext_type):
+        score_list = []
         for ext in ext_type:
             # Get defined score from score table.
             pd_score = self.pd_score_table[self.pd_score_table['extension'] == ext.lower()]
-            ext_count = ext_counts[ext]
-            count += ext_count
+
+            # Calculate score.
             if len(pd_score) != 0:
-                # Calculate score.
-                score += pd_score['probability'].values[0] * ext_count
-        return score / count
+                if pd_score['probability'].values[0] == 1.0:
+                    return 1.0
+                elif pd_score['probability'].values[0] == 0.0:
+                    return 0.0
+                else:
+                    score_list.append(pd_score['probability'].values[0])
+            else:
+                score_list.append(self.unknown_score)
+        return statistics.median(score_list)
 
     # Create Network using networkx.
     def create_network(self, records):
@@ -111,14 +144,15 @@ class Creator:
                 if label in dir_pool.keys():
                     parent_dir = label
                 else:
-                    # Calculate score.
+                    # Calculate score and classification.
                     score = 0.0
                     if len(record[5]) != 0:
-                        score = self.calc_score(record[5], record[6])
+                        score = self.calc_score(record[5])
+                    # TODO: 白黒（5段階くらいでも良いかも）情報も属性に含める。
 
                     # Add new node.
                     dir_pool[label] = node_index
-                    graph.add_node(node_index, ext_type=record[5], ext_count=record[6], score=score)
+                    graph.add_node(node_index, path=record[2], ext_type=record[5], ext_count=record[6], score=score)
                     node_index += 1
 
                     # Create edge that connecting two nodes.
@@ -127,8 +161,47 @@ class Creator:
                         print('Create edge node.{} <-> node.{}'.format(dir_pool[parent_dir], dir_pool[label]))
         return graph
 
+    # Extract tar file.
+    def extract_tar(self, file, path):
+        with tarfile.open(file) as tf:
+            tf.extractall(path)
+
+    # Extract zip file.
+    def extract_zip(self, file, path):
+        with zipfile.ZipFile(file) as zf:
+            zf.extractall(os.path.join(path))
+
+    # Decompress compressed package file.
+    def decompress_file(self):
+        # Extract path and file name from target directory.
+        target_list = os.listdir(self.compress_dir)
+
+        for target in target_list:
+            # Create extraction directory name.
+            extract_dir_name = ''
+            if '.tar' in os.path.splitext(target)[0]:
+                extract_dir_name = os.path.splitext(target)[0]
+            else:
+                extract_dir_name = os.path.splitext(target)[0].replace('.tar', '')
+            extract_path = os.path.join(self.target_dir, extract_dir_name)
+
+            try:
+                # Execute extraction.
+                target_path = os.path.join(self.compress_dir, target)
+                if '.tar' in target:
+                    print('Decompress {}'.format(target))
+                    self.extract_tar(target_path, extract_path)
+                elif '.zip' in target:
+                    print('Decompress {}'.format(target))
+                    self.extract_zip(target_path, extract_path)
+            except Exception as e:
+                print('{}'.format(e.args))
+
     # Main control.
     def extract_file_structure(self):
+        # Decompress compressed package file.
+        self.decompress_file()
+
         # Extract path and file name from target directory.
         target_list = os.listdir(self.target_dir)
 
@@ -143,13 +216,7 @@ class Creator:
                 graph = self.create_network(record)
 
                 # Show graph.
-                print('Creating network image...')
-                plt.figure(figsize=(10, 10))
-                nx.draw_networkx(graph)
-                plt.axis('off')
-                file_name = os.path.join(self.full_path, target + '.png')
-                plt.savefig(file_name)
-                plt.show()
+                # self.show_graph(target, graph)
         except Exception as e:
             print('{}'.format(e.args))
 
