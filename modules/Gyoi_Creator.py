@@ -32,6 +32,10 @@ class Creator:
         self.score_table = os.path.join(self.score_table_path, config['Creator']['score_table'])
         self.threshold = float(config['Creator']['threshold'])
         self.unknown_score = float(config['Creator']['unknown_score'])
+        self.turn_inside_num = int(config['Creator']['turn_inside_num'])
+        if self.turn_inside_num > 2:
+            self.turn_inside_num = 2
+        self.try_othello_num = int(config['Creator']['try_othello_num'])
 
         # Check necessary directories.
         self.is_dir_existance(self.compress_dir)
@@ -40,9 +44,6 @@ class Creator:
 
         # Load score table.
         self.pd_score_table = pd.read_csv(self.score_table)
-
-        # Count directory number.
-        self.offset_layer_num, _ = self.count_dir_layer(self.target_dir)
 
     # Check necessary directory.
     def is_dir_existance(self, target_dir):
@@ -82,11 +83,9 @@ class Creator:
                 record.insert(0, base_index)
                 record.insert(1, target_product)
                 record.insert(2, root.replace(self.target_dir, ''))
-                dir_count, _ = self.count_dir_layer(root)
-                record.insert(3, dir_count - self.offset_layer_num)
-                record.insert(4, file_count)
-                record.insert(5, list(set(ext_list)))
-                record.insert(6, collections.Counter(ext_list))
+                record.insert(3, list(set(ext_list)))
+                record.insert(4, collections.Counter(ext_list))
+                record.insert(5, list(set(files)))
                 report.append(record)
                 base_index += 1
 
@@ -126,6 +125,21 @@ class Creator:
                 score_list.append(self.unknown_score)
         return statistics.median(score_list)
 
+    # Set node label.
+    def set_node_label(self, score):
+        label = 0.0
+        if score == 0.0:
+            label = 0.00
+        elif 0.1 <= score <= 0.3:
+            label = 0.25
+        elif 0.4 <= score <= 0.6:
+            label = 0.50
+        elif 0.7 < score <= 0.9:
+            label = 0.75
+        elif score == 1.0:
+            label = 1.00
+        return label
+
     # Create Network using networkx.
     def create_network(self, records):
         # Create direction graph.
@@ -146,13 +160,18 @@ class Creator:
                 else:
                     # Calculate score and classification.
                     score = 0.0
-                    if len(record[5]) != 0:
-                        score = self.calc_score(record[5])
-                    # TODO: 白黒（5段階くらいでも良いかも）情報も属性に含める。
+                    if len(record[3]) != 0:
+                        score = self.calc_score(record[3])
+                    rank = self.set_node_label(score)
 
-                    # Add new node.
+                    # Add new node within attributes.
                     dir_pool[label] = node_index
-                    graph.add_node(node_index, path=record[2], ext_type=record[5], ext_count=record[6], score=score)
+                    graph.add_node(node_index,
+                                   path=record[2],
+                                   ext_type=record[3],
+                                   ext_count=record[4],
+                                   files=record[5],
+                                   rank=rank)
                     node_index += 1
 
                     # Create edge that connecting two nodes.
@@ -197,10 +216,53 @@ class Creator:
             except Exception as e:
                 print('{}'.format(e.args))
 
+    # Explore open path.
+    def explore_open_path(self, graph, all_paths):
+        open_paths = []
+        for idx, path in enumerate(all_paths):
+            tmp_open_paths = []
+            close_path_index = len(path) - 1
+            print('{}/{} Explore path: {}'.format(idx + 1, len(all_paths), path))
+            for idx2, node_index in enumerate(path[::-1]):
+                print('Checking turn inside node.{}:{}'.format(node_index, graph.nodes[node_index]['path']))
+
+                # Add open path.
+                if graph.nodes[node_index]['rank'] == 1.0:
+                    print('Add node {} to open path list.'.format(node_index))
+                    tmp_open_paths.append([node_index, graph.nodes[node_index]['path']])
+                    close_path_index = len(path) - idx2 - 2
+                # Execute "Othello".
+                elif 0 < (len(path) - idx2 - 1) < len(path) - 1:
+                    # Extract ranks of parent and child node.
+                    parent_node_rank = graph.nodes[path[len(path) - idx2 - 2]]['rank']
+                    child_node_rank = graph.nodes[path[len(path) - idx2]]['rank']
+
+                    # Checking turn inside the node rank.
+                    if parent_node_rank == 1.0 and child_node_rank == 1.0:
+                        print('Turned inside rank={} -> 1.0.'.format(graph.nodes[node_index]['rank']))
+                        print('Add node {} to open path list.'.format(node_index))
+                        tmp_open_paths.append([node_index, graph.nodes[node_index]['path']])
+                        graph.nodes[node_index]['rank'] = 1.0
+                        close_path_index = len(path) - idx2 - 2
+                    else:
+                        if close_path_index < len(path) - idx2 - 1:
+                            close_path_index = len(path) - idx2 - 1
+                else:
+                    if close_path_index < len(path) - idx2 - 1:
+                        close_path_index = len(path) - idx2 - 1
+
+            # Cut unnecessary path (root path -> open path).
+            if close_path_index != -1:
+                for tmp_path in tmp_open_paths:
+                    delete_seq = len(graph.nodes[path[close_path_index]]['path'])
+                    open_paths.append([tmp_path[0], tmp_path[1][delete_seq:]])
+
+        return list(map(list, set(map(tuple, open_paths))))
+
     # Main control.
     def extract_file_structure(self):
         # Decompress compressed package file.
-        self.decompress_file()
+        # self.decompress_file()
 
         # Extract path and file name from target directory.
         target_list = os.listdir(self.target_dir)
@@ -214,6 +276,32 @@ class Creator:
                 # Extract file path each products.
                 record = self.execute_grep(target, os.path.join(self.target_dir, target))
                 graph = self.create_network(record)
+
+                # Extract all paths to end node from root node.
+                all_paths = []
+                node_num = len(graph._adj)
+                for end_node_idx in range(node_num):
+                    print('{}/{} Analyzing node={}'.format(end_node_idx + 1, node_num, end_node_idx))
+                    if len(graph._adj[end_node_idx]) == 0:
+                        for path in nx.all_simple_paths(graph, source=0, target=end_node_idx):
+                            print('Extract path that source={} <-> target={}, path={}'.format(0, end_node_idx, path))
+                            all_paths.append(path)
+
+                # Execute "Othello".
+                open_paths = []
+                for try_num in range(self.try_othello_num):
+                    print('{}/{} Execute "Othello".'.format(try_num + 1, self.try_othello_num))
+                    open_paths.extend(self.explore_open_path(graph, all_paths))
+
+                # Create signature.
+                open_paths = list(map(list, set(map(tuple, open_paths))))
+                signature_list = []
+                for item in open_paths:
+                    files = graph.nodes[item[0]]['files']
+                    signature_list.append(item[1].replace('\\', '/'))
+                    for file in files:
+                        signature_list.append(os.path.join(item[1], file))
+                print()
 
                 # Show graph.
                 # self.show_graph(target, graph)
