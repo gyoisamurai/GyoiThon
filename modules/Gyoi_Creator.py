@@ -4,6 +4,7 @@ import os
 import sys
 import zipfile
 import tarfile
+import codecs
 import configparser
 import collections
 import statistics
@@ -12,10 +13,18 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from datetime import datetime
 
+# Type of printing.
+OK = 'ok'         # [*]
+NOTE = 'note'     # [+]
+FAIL = 'fail'     # [-]
+WARNING = 'warn'  # [!]
+NONE = 'none'     # No label.
+
 
 class Creator:
-    def __init__(self):
+    def __init__(self, utility):
         # Read config.ini.
+        self.utility = utility
         config = configparser.ConfigParser()
         self.file_name = os.path.basename(__file__)
         self.full_path = os.path.dirname(os.path.abspath(__file__))
@@ -23,10 +32,13 @@ class Creator:
         config.read(os.path.join(self.root_path, 'config.ini'))
 
         self.compress_dir = os.path.join(self.root_path, config['Creator']['compress_dir'])
-        self.target_dir = os.path.join(self.root_path, config['Creator']['target_dir'])
+        self.signature_dir = os.path.join(self.root_path, config['Creator']['signature_dir'])
+        self.tmp_sig_product = os.path.join(self.signature_dir, config['Creator']['created_prd_sig'])
+        self.tmp_sig_def_content = os.path.join(self.signature_dir, config['Creator']['created_def_sig'])
+        self.tmp_train_in = os.path.join(self.signature_dir, config['Creator']['created_train'])
         self.prohibit_ext_list = config['Creator']['prohibit_ext'].split('@')
         self.save_file = config['Creator']['result_file'].replace('*', datetime.now().strftime('%Y%m%d%H%M%S'))
-        self.save_path = os.path.join(self.full_path, self.save_file)
+        self.save_path = os.path.join(self.signature_dir, self.save_file)
         self.header = str(config['Creator']['header']).split('@')
         self.score_table_path = os.path.join(self.full_path, config['Exploit']['data_path'])
         self.score_table = os.path.join(self.score_table_path, config['Creator']['score_table'])
@@ -39,17 +51,17 @@ class Creator:
 
         # Check necessary directories.
         self.is_dir_existance(self.compress_dir)
-        self.is_dir_existance(self.target_dir)
-        self.is_dir_existance(self.score_table)
+        self.is_dir_existance(self.signature_dir)
 
         # Load score table.
         self.pd_score_table = pd.read_csv(self.score_table)
 
     # Check necessary directory.
     def is_dir_existance(self, target_dir):
-        if os.path.exists(self.compress_dir) is False:
-            print('Directory is not found: {}'.format(target_dir))
-            sys.exit(1)
+        if os.path.exists(target_dir) is False:
+            os.mkdir(target_dir)
+            self.utility.print_message(WARNING, 'Directory is not found: {}.'.format(target_dir))
+            self.utility.print_message(WARNING, 'Maked directory: {}.'.format(target_dir))
 
     # Count directory layer.
     def count_dir_layer(self, target_dir):
@@ -71,7 +83,8 @@ class Creator:
                 file_count = 0
                 ext_list = []
                 for file in files:
-                    print('Check file : {}/{}'.format(root.replace(self.target_dir, ''), file))
+                    msg = 'Check file : {}/{}'.format(root.replace(target_dir, '').replace('\\', '/'), file)
+                    self.utility.print_message(OK, msg)
                     _, ext = os.path.splitext(file)
                     if ext[1:] not in self.prohibit_ext_list:
                         # Count file number and target extension.
@@ -82,7 +95,7 @@ class Creator:
                 record = []
                 record.insert(0, base_index)
                 record.insert(1, target_product)
-                record.insert(2, root.replace(self.target_dir, ''))
+                record.insert(2, root.replace(target_dir, ''))
                 record.insert(3, list(set(ext_list)))
                 record.insert(4, collections.Counter(ext_list))
                 record.insert(5, list(set(files)))
@@ -92,13 +105,13 @@ class Creator:
             # Save extracted information.
             pd.DataFrame(report).to_csv(self.save_path, mode='a', header=False, index=False)
         else:
-            print('Error: Path or file is not found.\n=> {}'.format(target_dir))
+            self.utility.print_message(FAIL, 'Path or file is not found.\n=> {}'.format(target_dir))
             sys.exit(1)
         return report
 
     # Show graph.
     def show_graph(self, target, graph):
-        print('Creating network image...')
+        self.utility.print_message(NOTE, 'Creating network image...')
         plt.figure(figsize=(10, 10))
         nx.draw_networkx(graph)
         plt.axis('off')
@@ -125,6 +138,15 @@ class Creator:
                 score_list.append(self.unknown_score)
         return statistics.median(score_list)
 
+    # Return score of extension.
+    def return_score(self, file_name):
+        _, ext = os.path.splitext(file_name)
+        pd_score = self.pd_score_table[self.pd_score_table['extension'] == ext[1:].lower()]
+        score = 0.0
+        if len(pd_score) > 0:
+            score = pd_score['probability'].values[0]
+        return score
+
     # Set node label.
     def set_node_label(self, score):
         label = 0.0
@@ -147,7 +169,7 @@ class Creator:
         dir_pool = {}
         node_index = 0
         for index, record in enumerate(records):
-            print('{}/{} Analyzing "{}"'.format(index + 1, len(records), record[2]))
+            self.utility.print_message(NOTE, '{}/{} Analyzing "{}"'.format(index + 1, len(records), record[2]))
             _, dirs = self.count_dir_layer(record[2])
             parent_dir = ''
             label = '\\'
@@ -171,13 +193,15 @@ class Creator:
                                    ext_type=record[3],
                                    ext_count=record[4],
                                    files=record[5],
+                                   score=score,
                                    rank=rank)
                     node_index += 1
 
                     # Create edge that connecting two nodes.
                     if parent_dir != '' and label != parent_dir:
                         graph.add_edge(dir_pool[parent_dir], dir_pool[label])
-                        print('Create edge node.{} <-> node.{}'.format(dir_pool[parent_dir], dir_pool[label]))
+                        msg = 'Create edge node.{} <-> node.{}'.format(dir_pool[parent_dir], dir_pool[label])
+                        self.utility.print_message(OK, msg)
         return graph
 
     # Extract tar file.
@@ -191,30 +215,28 @@ class Creator:
             zf.extractall(os.path.join(path))
 
     # Decompress compressed package file.
-    def decompress_file(self):
+    def decompress_file(self, package_path):
         # Extract path and file name from target directory.
-        target_list = os.listdir(self.compress_dir)
+        self.utility.print_message(NOTE, 'Starting decompress: {}.'.format(package_path))
 
-        for target in target_list:
-            # Create extraction directory name.
-            extract_dir_name = ''
-            if '.tar' in os.path.splitext(target)[0]:
-                extract_dir_name = os.path.splitext(target)[0]
-            else:
-                extract_dir_name = os.path.splitext(target)[0].replace('.tar', '')
-            extract_path = os.path.join(self.target_dir, extract_dir_name)
+        # Create extraction directory name.
+        extract_dir_name = ''
+        if '.tar' in os.path.splitext(package_path)[0]:
+            extract_dir_name = os.path.splitext(package_path)[0]
+        else:
+            extract_dir_name = os.path.splitext(package_path)[0].replace('.tar', '')
 
-            try:
-                # Execute extraction.
-                target_path = os.path.join(self.compress_dir, target)
-                if '.tar' in target:
-                    print('Decompress {}'.format(target))
-                    self.extract_tar(target_path, extract_path)
-                elif '.zip' in target:
-                    print('Decompress {}'.format(target))
-                    self.extract_zip(target_path, extract_path)
-            except Exception as e:
-                print('{}'.format(e.args))
+        try:
+            # Execute extraction.
+            if '.tar' in package_path:
+                self.utility.print_message(OK, 'Decompress... : {}'.format(package_path))
+                self.extract_tar(package_path, extract_dir_name)
+            elif '.zip' in package_path:
+                self.utility.print_message(OK, 'Decompress... : {}'.format(package_path))
+                self.extract_zip(package_path, extract_dir_name)
+        except Exception as e:
+            self.utility.print_exception(e, '{}'.format(e.args))
+        return extract_dir_name
 
     # Explore open path.
     def explore_open_path(self, graph, all_paths):
@@ -222,14 +244,18 @@ class Creator:
         for idx, path in enumerate(all_paths):
             tmp_open_paths = []
             close_path_index = len(path) - 1
-            print('{}/{} Explore path: {}'.format(idx + 1, len(all_paths), path))
+            self.utility.print_message(NOTE, '{}/{} Explore path: {}'.format(idx + 1, len(all_paths), path))
             for idx2, node_index in enumerate(path[::-1]):
-                print('Checking turn inside node.{}:{}'.format(node_index, graph.nodes[node_index]['path']))
+                msg = 'Checking turn inside node.{}:{}'.format(node_index, graph.nodes[node_index]['path'])
+                self.utility.print_message(OK, msg)
 
                 # Add open path.
-                if graph.nodes[node_index]['rank'] == 1.0:
-                    print('Add node {} to open path list.'.format(node_index))
-                    tmp_open_paths.append([node_index, graph.nodes[node_index]['path']])
+                rank = graph.nodes[node_index]['rank']
+                if graph.nodes[node_index]['rank'] >= self.threshold:
+                    self.utility.print_message(OK, 'Add node {} to open path list.'.format(node_index))
+                    tmp_open_paths.append([node_index, graph.nodes[node_index]['path'], rank])
+
+                    # Set close path index.
                     close_path_index = len(path) - idx2 - 2
                 # Execute "Othello".
                 elif 0 < (len(path) - idx2 - 1) < len(path) - 1:
@@ -238,79 +264,152 @@ class Creator:
                     child_node_rank = graph.nodes[path[len(path) - idx2]]['rank']
 
                     # Checking turn inside the node rank.
-                    if parent_node_rank == 1.0 and child_node_rank == 1.0:
-                        print('Turned inside rank={} -> 1.0.'.format(graph.nodes[node_index]['rank']))
-                        print('Add node {} to open path list.'.format(node_index))
-                        tmp_open_paths.append([node_index, graph.nodes[node_index]['path']])
+                    if parent_node_rank >= self.threshold and child_node_rank >= self.threshold:
+                        msg = 'Turned inside rank={} -> 1.0.'.format(graph.nodes[node_index]['rank'])
+                        self.utility.print_message(WARNING, msg)
+                        self.utility.print_message(WARNING, 'Add node {} to open path list.'.format(node_index))
+                        tmp_open_paths.append([node_index, graph.nodes[node_index]['path'], 1.0])
                         graph.nodes[node_index]['rank'] = 1.0
+
+                        # Set close path index.
                         close_path_index = len(path) - idx2 - 2
                     else:
                         if close_path_index < len(path) - idx2 - 1:
+                            # Set close path index.
                             close_path_index = len(path) - idx2 - 1
+                # Do not execute "Othello".
                 else:
                     if close_path_index < len(path) - idx2 - 1:
+                        # Set close path index.
                         close_path_index = len(path) - idx2 - 1
 
             # Cut unnecessary path (root path -> open path).
             if close_path_index != -1:
                 for tmp_path in tmp_open_paths:
                     delete_seq = len(graph.nodes[path[close_path_index]]['path'])
-                    open_paths.append([tmp_path[0], tmp_path[1][delete_seq:]])
+                    open_paths.append([tmp_path[0], tmp_path[1][delete_seq:], tmp_path[2]])
+            else:
+                open_paths.extend(tmp_open_paths)
 
         return list(map(list, set(map(tuple, open_paths))))
 
-    # Main control.
-    def extract_file_structure(self):
-        # Decompress compressed package file.
-        # self.decompress_file()
+    # Exchange path to signature/train data.
+    def transform_path_sig(self, category, vendor, name, version, target_path):
+        sig_product = category + '@' + vendor + '@' + name + '@' + version + '@(' + target_path + ')\n'
+        sig_cotent = category + '@' + vendor + '@' + name + '@' + version + '@' + target_path + '@*@*@0\n'
+        train = category + '@' + vendor + '@' + name + '@' + version + '@(' + target_path + ')\n'
+        return sig_product, sig_cotent, train
 
-        # Extract path and file name from target directory.
-        target_list = os.listdir(self.target_dir)
+    # Main control.
+    def extract_file_structure(self, category, vendor, package):
+        # Check package path.
+        package_path = os.path.join(self.compress_dir, package)
+        if os.path.exists(package_path) is False:
+            self.utility.print_message(FAIL, 'Package is not found: {}.'.format(package_path))
+            return
+
+        # Decompress compressed package file.
+        extract_path = self.decompress_file(package_path)
+
+        # Extract product name and version.
+        # ex) Package name must be "wordpress_4.9.8_.tar.gz".
+        package_info = package.split('@')
+        prod_name = ''
+        prod_ver = ''
+        if len(package_info) < 2:
+            prod_name = package_info[0]
+            prod_ver = 'unknown'
+        else:
+            prod_name = package_info[0]
+            prod_ver = package_info[1]
 
         # Create report header.
         pd.DataFrame([], columns=self.header).to_csv(self.save_path, mode='w', index=False)
 
         # Extract file structures.
         try:
-            for target in target_list:
-                # Extract file path each products.
-                record = self.execute_grep(target, os.path.join(self.target_dir, target))
-                graph = self.create_network(record)
+            # Extract file path each products.
+            target_name = prod_name + ' ' + prod_ver
+            self.utility.print_message(NOTE, 'Extract package {}'.format(extract_path))
+            record = self.execute_grep(target_name, extract_path)
+            graph = self.create_network(record)
 
-                # Extract all paths to end node from root node.
-                all_paths = []
-                node_num = len(graph._adj)
-                for end_node_idx in range(node_num):
-                    print('{}/{} Analyzing node={}'.format(end_node_idx + 1, node_num, end_node_idx))
-                    if len(graph._adj[end_node_idx]) == 0:
-                        for path in nx.all_simple_paths(graph, source=0, target=end_node_idx):
-                            print('Extract path that source={} <-> target={}, path={}'.format(0, end_node_idx, path))
-                            all_paths.append(path)
+            # Extract all paths to end node from root node.
+            all_paths = []
+            node_num = len(graph._adj)
+            for end_node_idx in range(node_num):
+                msg = '{}/{} Analyzing node={}'.format(end_node_idx + 1, node_num, end_node_idx)
+                self.utility.print_message(OK, msg)
+                if len(graph._adj[end_node_idx]) == 0:
+                    for path in nx.all_simple_paths(graph, source=0, target=end_node_idx):
+                        msg = 'Extract path that source={} <-> target={}, path={}'.format(0, end_node_idx, path)
+                        self.utility.print_message(OK, msg)
+                        all_paths.append(path)
 
-                # Execute "Othello".
-                open_paths = []
-                for try_num in range(self.try_othello_num):
-                    print('{}/{} Execute "Othello".'.format(try_num + 1, self.try_othello_num))
-                    open_paths.extend(self.explore_open_path(graph, all_paths))
+            # Execute "Othello".
+            open_paths = []
+            for try_num in range(self.try_othello_num):
+                self.utility.print_message(OK, '{}/{} Execute "Othello".'.format(try_num + 1, self.try_othello_num))
+                open_paths.extend(self.explore_open_path(graph, all_paths))
 
+            # Create signature.
+            open_paths = list(map(list, set(map(tuple, open_paths))))
+            fout_product = codecs.open(self.tmp_sig_product.replace('*', target_name), 'a', encoding='utf-8')
+            fout_default_content = codecs.open(self.tmp_sig_def_content.replace('*', target_name), 'a', encoding='utf-8')
+            fout_train = codecs.open(self.tmp_train_in.replace('*', target_name), 'a', encoding='utf-8')
+            for idx, item in enumerate(open_paths):
                 # Create signature.
-                open_paths = list(map(list, set(map(tuple, open_paths))))
-                signature_list = []
-                for item in open_paths:
-                    files = graph.nodes[item[0]]['files']
-                    signature_list.append(item[1].replace('\\', '/'))
+                files = graph.nodes[item[0]]['files']
+                if item[2] == 1.0 and len(files) > 0:
+                    # Create path type signature.
+                    sig_path = item[1].replace('\\', '/')
+                    if sig_path.endswith('/') is False:
+                        sig_path += '/'
+                    s_path_prod, s_path_cont, t_path = self.transform_path_sig(category, vendor, prod_name, prod_ver, sig_path)
+
+                    # Calculate score of each file.
+                    s_file_prod = ''
+                    s_file_cont = ''
+                    t_file = ''
+                    total_file_score = 0
                     for file in files:
-                        signature_list.append(os.path.join(item[1], file))
-                print()
+                        file_path = item[1].replace('\\', '/') + '/' + file
+                        s1, s2, t1 = self.transform_path_sig(category, vendor, prod_name, prod_ver, file_path)
+                        s_file_prod += s1
+                        s_file_cont += s2
+                        t_file += t1
+                        total_file_score += self.return_score(file)
 
-                # Show graph.
-                # self.show_graph(target, graph)
+                    # Add item to signature or train data.
+                    if total_file_score / len(files) == 1.0:
+                        fout_product.write(s_file_prod)
+                        fout_default_content.write(s_path_cont)
+                        self.utility.print_message(OK, '{}/{} Create path signature: {}.'.format(idx + 1,
+                                                                                                 len(open_paths),
+                                                                                                 sig_path))
+                    else:
+                        fout_train.write(t_path + t_file)
+                        self.utility.print_message(OK, '{}/{} Create train data: {}'.format(idx + 1,
+                                                                                            len(open_paths),
+                                                                                            sig_path))
+                # Create train data.
+                elif item[2] >= self.threshold:
+                    train_path = item[1].replace('\\', '/')
+                    _, _, train_data = self.transform_path_sig(category, vendor, prod_name, prod_ver, train_path)
+                    fout_train.write(train_data)
+                    for file in files:
+                        train_file = item[1].replace('\\', '/') + '/' + file
+                        _, _, train_data = self.transform_path_sig(category, vendor, prod_name, prod_ver, train_file)
+                        fout_train.write(train_data)
+                    self.utility.print_message(OK, '{}/{} Create train data: {}'.format(idx + 1,
+                                                                                        len(open_paths),
+                                                                                        train_path))
+
+            fout_product.close()
+            fout_default_content.close()
+            fout_train.close()
+
+            # Show graph.
+            # self.show_graph(target, graph)
         except Exception as e:
-            print('{}'.format(e.args))
-
-
-if __name__ == '__main__':
-    # Create train data.
-    creator = Creator()
-    creator.extract_file_structure()
-    print('finish!!')
+            self.utility.print_exception(e, '{}'.format(e.args))
