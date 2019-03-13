@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import os
+import sys
 import codecs
 import time
 import random
@@ -23,6 +24,7 @@ from modules.Gyoi_SpiderControl import SpiderControl
 from modules.Gyoi_CveExplorerNVD import CveExplorerNVD
 from modules.Gyoi_Exploit import Exploit
 from modules.Gyoi_Censys import Censys
+from modules.Gyoi_Creator import Creator
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -82,7 +84,7 @@ def show_banner(utility):
 # Show credit.
 def show_credit(utility):
     credit = u"""
-       =[ GyoiThon v0.0.2-beta                               ]=
+       =[ GyoiThon v0.0.3-beta                               ]=
 + -- --=[ Author  : Gyoiler (@gyoithon)                      ]=--
 + -- --=[ Website : https://github.com/gyoisamurai/GyoiThon/ ]=--
     """
@@ -92,7 +94,7 @@ def show_credit(utility):
 # Define command option.
 __doc__ = """{f}
 usage:
-    {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l <log_path>]
+    {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [-d --category=<category> --vendor=<vendor> --package=<package>]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -102,27 +104,9 @@ options:
     -c   Optional : Discover open ports and wrong ssl server certification using Censys.
     -p   Optional : Execute exploit module using Metasploit.
     -l   Optional : Analyze log based HTTP response for identify product/version.
+    -d   Optional : Development of signature and train data.
     -h --help     Show this help message and exit.
 """.format(f=__file__)
-
-
-# Parse command arguments.
-def command_parse(utility):
-    utility.write_log(20, '[In] Parse command options [{}].'.format(os.path.basename(__file__)))
-
-    args = docopt(__doc__)
-    opt_cloud = args['-s']
-    opt_ml = args['-m']
-    opt_gcs = args['-g']
-    opt_explore = args['-e']
-    opt_censys = args['-c']
-    opt_exploit = args['-p']
-    opt_log = args['-l']
-    opt_log_path = args['<log_path>']
-
-    utility.write_log(20, '[Out] Parse command options [{}].'.format(os.path.basename(__file__)))
-    return opt_cloud, opt_ml, opt_gcs, opt_explore, opt_censys, opt_exploit, opt_log, opt_log_path
-
 
 # main.
 if __name__ == '__main__':
@@ -133,7 +117,19 @@ if __name__ == '__main__':
     utility.write_log(20, '[In] GyoiThon [{}].'.format(file_name))
 
     # Get command arguments.
-    opt_cloud, opt_ml, opt_gcs, opt_explore, opt_censys, opt_exploit, opt_log, opt_log_path = command_parse(utility)
+    args = docopt(__doc__)
+    opt_cloud = args['-s']
+    opt_ml = args['-m']
+    opt_gcs = args['-g']
+    opt_explore = args['-e']
+    opt_censys = args['-c']
+    opt_exploit = args['-p']
+    opt_log = args['-l']
+    opt_log_path = args['--log_path']
+    opt_develop = args['-d']
+    opt_develop_category = args['--category']
+    opt_develop_vendor = args['--vendor']
+    opt_develop_package = args['--package']
 
     # Read config.ini.
     config = configparser.ConfigParser()
@@ -165,6 +161,14 @@ if __name__ == '__main__':
 
     # Show banner.
     show_banner(utility)
+
+    # Create signature and train data.
+    if opt_develop:
+        creator = Creator(utility)
+        creator.extract_file_structure(opt_develop_category, opt_develop_vendor, opt_develop_package)
+        print(os.path.basename(__file__) + ' finish!!')
+        utility.write_log(20, '[Out] GyoiThon [{}].'.format(file_name))
+        sys.exit(0)
 
     # Create instances.
     cloud_checker = CloudChecker(utility)
