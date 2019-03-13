@@ -385,15 +385,15 @@ class Creator:
                     if total_file_score / len(files) == 1.0:
                         s_file.extend(s_file_tmp)
                         s_path.append(s_path_cont)
-                        self.utility.print_message(OK, '{}/{} Create signature: {} items.'.format(idx + 1,
-                                                                                                  len(open_paths),
-                                                                                                  s_path_cont))
+                        self.utility.print_message(OK, '{}/{} Create signature: {}.'.format(idx + 1,
+                                                                                            len(open_paths),
+                                                                                            sig_path))
                     else:
                         train.append(t_path)
                         train.extend(train_tmp)
-                        self.utility.print_message(OK, '{}/{} Create train data: {} items.'.format(idx + 1,
-                                                                                                   len(open_paths),
-                                                                                                   s_path_cont))
+                        self.utility.print_message(OK, '{}/{} Create train data: {}.'.format(idx + 1,
+                                                                                             len(open_paths),
+                                                                                             sig_path))
                 # Create train data.
                 elif item[2] >= self.threshold:
                     train_path = item[1].replace('\\', '/')
