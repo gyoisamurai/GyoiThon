@@ -357,6 +357,9 @@ class Creator:
             fout_product = codecs.open(self.tmp_sig_product.replace('*', target_name), 'a', encoding='utf-8')
             fout_default_content = codecs.open(self.tmp_sig_def_content.replace('*', target_name), 'a', encoding='utf-8')
             fout_train = codecs.open(self.tmp_train_in.replace('*', target_name), 'a', encoding='utf-8')
+            s_file = []
+            s_path = []
+            train = []
             for idx, item in enumerate(open_paths):
                 # Create signature.
                 files = graph.nodes[item[0]]['files']
@@ -365,46 +368,51 @@ class Creator:
                     sig_path = item[1].replace('\\', '/')
                     if sig_path.endswith('/') is False:
                         sig_path += '/'
-                    s_path_prod, s_path_cont, t_path = self.transform_path_sig(category, vendor, prod_name, prod_ver, sig_path)
+                    _, s_path_cont, t_path = self.transform_path_sig(category, vendor, prod_name, prod_ver, sig_path)
 
                     # Calculate score of each file.
-                    s_file_prod = ''
-                    s_file_cont = ''
-                    t_file = ''
+                    s_file_tmp = []
+                    train_tmp = []
                     total_file_score = 0
                     for file in files:
-                        file_path = item[1].replace('\\', '/') + '/' + file
-                        s1, s2, t1 = self.transform_path_sig(category, vendor, prod_name, prod_ver, file_path)
-                        s_file_prod += s1
-                        s_file_cont += s2
-                        t_file += t1
+                        file_path = sig_path + file
+                        s1, _, t1 = self.transform_path_sig(category, vendor, prod_name, prod_ver, file_path)
+                        s_file_tmp.append(s1)
+                        train_tmp.append(t1)
                         total_file_score += self.return_score(file)
 
                     # Add item to signature or train data.
                     if total_file_score / len(files) == 1.0:
-                        fout_product.write(s_file_prod)
-                        fout_default_content.write(s_path_cont)
-                        self.utility.print_message(OK, '{}/{} Create path signature: {}.'.format(idx + 1,
-                                                                                                 len(open_paths),
-                                                                                                 sig_path))
+                        s_file.extend(s_file_tmp)
+                        s_path.append(s_path_cont)
+                        self.utility.print_message(OK, '{}/{} Create signature: {} items.'.format(idx + 1,
+                                                                                                  len(open_paths),
+                                                                                                  s_path_cont))
                     else:
-                        fout_train.write(t_path + t_file)
-                        self.utility.print_message(OK, '{}/{} Create train data: {}'.format(idx + 1,
-                                                                                            len(open_paths),
-                                                                                            sig_path))
+                        train.append(t_path)
+                        train.extend(train_tmp)
+                        self.utility.print_message(OK, '{}/{} Create train data: {} items.'.format(idx + 1,
+                                                                                                   len(open_paths),
+                                                                                                   s_path_cont))
                 # Create train data.
                 elif item[2] >= self.threshold:
                     train_path = item[1].replace('\\', '/')
+                    if train_path.endswith('/') is False:
+                        train_path += '/'
                     _, _, train_data = self.transform_path_sig(category, vendor, prod_name, prod_ver, train_path)
-                    fout_train.write(train_data)
+                    train.append(train_data)
                     for file in files:
-                        train_file = item[1].replace('\\', '/') + '/' + file
+                        train_file = item[1].replace('\\', '/') + file
                         _, _, train_data = self.transform_path_sig(category, vendor, prod_name, prod_ver, train_file)
-                        fout_train.write(train_data)
-                    self.utility.print_message(OK, '{}/{} Create train data: {}'.format(idx + 1,
-                                                                                        len(open_paths),
-                                                                                        train_path))
+                        train.append(train_data)
 
+            # Write signature/train data to local files.
+            fout_default_content.writelines(list(set(s_path)))
+            self.utility.print_message(OK, 'Create Path signature: {} items.'.format(len(s_path)))
+            fout_product.writelines(list(set(s_file)))
+            self.utility.print_message(OK, 'Create File signature: {} items.'.format(len(s_file)))
+            fout_train.writelines(list(set(train)))
+            self.utility.print_message(OK, 'Create Train data: {} items.'.format(len(train)))
             fout_product.close()
             fout_default_content.close()
             fout_train.close()
