@@ -31,6 +31,15 @@ class Creator:
         self.root_path = os.path.join(self.full_path, '../')
         config.read(os.path.join(self.root_path, 'config.ini'))
 
+        # Define master signature file path.
+        master_sig_dir = os.path.join(self.root_path, config['Common']['signature_path'])
+        self.master_prod_sig = os.path.join(master_sig_dir, config['VersionChecker']['signature_file'])
+        self.master_cont_sig = os.path.join(master_sig_dir, config['ContentExplorer']['signature_file'])
+        self.pd_prod_sig = pd.read_csv(self.master_prod_sig, delimiter='@', header=None)
+        self.pd_cont_sig = pd.read_csv(self.master_cont_sig, delimiter='@', header=None)
+        self.delete_prod_row_index = []
+        self.delete_cont_row_index = []
+
         self.compress_dir = os.path.join(self.root_path, config['Creator']['compress_dir'])
         self.signature_dir = os.path.join(self.root_path, config['Creator']['signature_dir'])
         self.tmp_sig_product = os.path.join(self.signature_dir, config['Creator']['created_prd_sig'])
@@ -295,8 +304,41 @@ class Creator:
 
     # Exchange path to signature/train data.
     def transform_path_sig(self, category, vendor, name, version, target_path):
-        sig_product = category + '@' + vendor + '@' + name + '@' + version + '@(' + target_path + ')\n'
-        sig_cotent = category + '@' + vendor + '@' + name + '@' + version + '@' + target_path + '@*@*@0\n'
+        sig_product = ''
+        sig_cotent = ''
+
+        # Check existing signature.
+        # If existing signature and new signature are duplicate, both signatures are deleted.
+        df_extract_sig = self.pd_prod_sig[(self.pd_prod_sig[0] == category) &
+                                          (self.pd_prod_sig[1] == vendor) &
+                                          (self.pd_prod_sig[2] == name) &
+                                          (self.pd_prod_sig[3] == version) &
+                                          (self.pd_prod_sig[4] == ('(' + target_path + ')'))]
+        if len(df_extract_sig) != 0:
+            # Delete existing signature and does not add new signature.
+            for del_index in df_extract_sig.index:
+                self.delete_prod_row_index.append(del_index)
+        else:
+            # Make signature.
+            sig_product = category + '@' + vendor + '@' + name + '@' + version + '@(' + target_path + ')\n'
+
+        # Check existing signature.
+        # If existing signature and new signature are duplicate, both signatures are deleted.
+        df_extract_sig = self.pd_cont_sig[(self.pd_cont_sig[0] == category) &
+                                          (self.pd_cont_sig[1] == vendor) &
+                                          (self.pd_cont_sig[2] == name) &
+                                          (self.pd_cont_sig[3] == version) &
+                                          (self.pd_cont_sig[4] == target_path)]
+        if len(df_extract_sig) != 0:
+            # Delete existing signature and does not new signature.
+            for del_index in df_extract_sig.index:
+                self.delete_cont_row_index.append(del_index)
+        else:
+            # Make signature format data.
+            sig_cotent = category + '@' + vendor + '@' + name + '@' + version + '@' + target_path + '@*@*@0\n'
+
+        # If target is train data, does not check duplication.
+        # Make train data.
         train = category + '@' + vendor + '@' + name + '@' + version + '@(' + target_path + ')\n'
         return sig_product, sig_cotent, train
 
@@ -406,11 +448,20 @@ class Creator:
                         _, _, train_data = self.transform_path_sig(category, vendor, prod_name, prod_ver, train_file)
                         train.append(train_data)
 
+            # Delete duplication signature in master signature.
+            self.pd_prod_sig = self.pd_prod_sig.drop(self.delete_prod_row_index)
+            self.pd_prod_sig.to_csv(self.master_prod_sig, sep='@', encoding='utf-8', header=False, index=False)
+            self.pd_cont_sig = self.pd_cont_sig.drop(self.delete_cont_row_index)
+            self.pd_cont_sig.to_csv(self.master_cont_sig, sep='@', encoding='utf-8', header=False, index=False)
+
             # Write signature/train data to local files.
+            s_path.remove('')
             fout_default_content.writelines(list(set(s_path)))
             self.utility.print_message(OK, 'Create Path signature: {} items.'.format(len(s_path)))
+            s_file.remove('')
             fout_product.writelines(list(set(s_file)))
             self.utility.print_message(OK, 'Create File signature: {} items.'.format(len(s_file)))
+            train.remove('')
             fout_train.writelines(list(set(train)))
             self.utility.print_message(OK, 'Create Train data: {} items.'.format(len(train)))
             fout_product.close()
