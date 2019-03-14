@@ -118,8 +118,8 @@ class VersionCheckerML:
                 for line in lines:
                     words = line[:-2]
                     train_words = words.split('@')
-                    items.append(train_words[1])
-                    nb.train(train_words[3], train_words[0])
+                    items.append(train_words[2])
+                    nb.train(train_words[4], train_words[1])
 
             # Save learned data to pkl file.
             with open(out_file, 'wb') as f:
