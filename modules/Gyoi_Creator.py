@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import csv
 import zipfile
 import tarfile
-import codecs
 import configparser
 import collections
 import statistics
@@ -19,6 +19,12 @@ NOTE = 'note'     # [+]
 FAIL = 'fail'     # [-]
 WARNING = 'warn'  # [!]
 NONE = 'none'     # No label.
+
+# Type of train data.
+OS = 0
+WEB = 1
+FRAMEWORK = 2
+CMS = 3
 
 
 class Creator:
@@ -35,16 +41,43 @@ class Creator:
         master_sig_dir = os.path.join(self.root_path, config['Common']['signature_path'])
         self.master_prod_sig = os.path.join(master_sig_dir, config['VersionChecker']['signature_file'])
         self.master_cont_sig = os.path.join(master_sig_dir, config['ContentExplorer']['signature_file'])
-        self.pd_prod_sig = pd.read_csv(self.master_prod_sig, delimiter='@', header=None)
-        self.pd_cont_sig = pd.read_csv(self.master_cont_sig, delimiter='@', header=None)
+        self.pd_prod_sig = pd.read_csv(self.master_prod_sig,
+                                       delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+        self.pd_cont_sig = pd.read_csv(self.master_cont_sig,
+                                       delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
         self.delete_prod_row_index = []
         self.delete_cont_row_index = []
 
+        # Define master train data path.
+        self.train_categories = config['VersionCheckerML']['category'].split('@')
+        train_dir = os.path.join(self.full_path, config['VersionCheckerML']['train_path'])
+        self.train_os_in = os.path.join(train_dir, config['VersionCheckerML']['train_os_in'])
+        self.train_web_in = os.path.join(train_dir, config['VersionCheckerML']['train_web_in'])
+        self.train_framework_in = os.path.join(train_dir, config['VersionCheckerML']['train_framework_in'])
+        self.train_cms_in = os.path.join(train_dir, config['VersionCheckerML']['train_cms_in'])
+        for category in self.train_categories:
+            if category == 'OS':
+                self.pd_train_os = pd.read_csv(self.train_os_in,
+                                               delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+            elif category == 'WEB':
+                self.pd_train_web = pd.read_csv(self.train_web_in,
+                                                delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+            elif category == 'FRAMEWORK':
+                self.pd_train_fw = pd.read_csv(self.train_framework_in,
+                                               delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+            elif category == 'CMS':
+                self.pd_train_cms = pd.read_csv(self.train_cms_in,
+                                                delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+            else:
+                self.utility.print_message(FAIL, 'Choose category is not found.')
+                exit(1)
+        self.delete_train_os_row_index = []
+        self.delete_train_web_row_index = []
+        self.delete_train_fw_row_index = []
+        self.delete_train_cms_row_index = []
+
         self.compress_dir = os.path.join(self.root_path, config['Creator']['compress_dir'])
         self.signature_dir = os.path.join(self.root_path, config['Creator']['signature_dir'])
-        self.tmp_sig_product = os.path.join(self.signature_dir, config['Creator']['created_prd_sig'])
-        self.tmp_sig_def_content = os.path.join(self.signature_dir, config['Creator']['created_def_sig'])
-        self.tmp_train_in = os.path.join(self.signature_dir, config['Creator']['created_train'])
         self.prohibit_ext_list = config['Creator']['prohibit_ext'].split('@')
         self.save_file = config['Creator']['result_file'].replace('*', datetime.now().strftime('%Y%m%d%H%M%S'))
         self.save_path = os.path.join(self.signature_dir, self.save_file)
@@ -148,13 +181,14 @@ class Creator:
         return statistics.median(score_list)
 
     # Return score of extension.
-    def return_score(self, file_name):
-        _, ext = os.path.splitext(file_name)
-        pd_score = self.pd_score_table[self.pd_score_table['extension'] == ext[1:].lower()]
-        score = 0.0
-        if len(pd_score) > 0:
-            score = pd_score['probability'].values[0]
-        return score
+    def return_score(self, files):
+        total_file_score = 0.0
+        for file in files:
+            _, ext = os.path.splitext(file)
+            pd_score = self.pd_score_table[self.pd_score_table['extension'] == ext[1:].lower()]
+            if len(pd_score) > 0:
+                total_file_score += pd_score['probability'].values[0]
+        return total_file_score
 
     # Set node label.
     def set_node_label(self, score):
@@ -302,45 +336,85 @@ class Creator:
 
         return list(map(list, set(map(tuple, open_paths))))
 
-    # Exchange path to signature/train data.
-    def transform_path_sig(self, category, vendor, name, version, target_path):
-        sig_product = ''
-        sig_cotent = ''
-
-        # Check existing signature.
-        # If existing signature and new signature are duplicate, both signatures are deleted.
-        df_extract_sig = self.pd_prod_sig[(self.pd_prod_sig[0] == category) &
-                                          (self.pd_prod_sig[1] == vendor) &
-                                          (self.pd_prod_sig[2] == name) &
-                                          (self.pd_prod_sig[3] == version) &
-                                          (self.pd_prod_sig[4] == ('(' + target_path + ')'))]
+    # Check existing path signature.
+    def is_path_sig_existing(self, target):
+        # If existing regex and new regex are duplicate, both signatures are deleted.
+        ret = True
+        df_extract_sig = self.pd_prod_sig[self.pd_prod_sig[4] == target]
         if len(df_extract_sig) != 0:
             # Delete existing signature and does not add new signature.
             for del_index in df_extract_sig.index:
                 self.delete_prod_row_index.append(del_index)
         else:
-            # Make signature.
-            sig_product = category + '@' + vendor + '@' + name + '@' + version + '@(' + target_path + ')\n'
+            ret = False
+        return ret
 
-        # Check existing signature.
-        # If existing signature and new signature are duplicate, both signatures are deleted.
-        df_extract_sig = self.pd_cont_sig[(self.pd_cont_sig[0] == category) &
-                                          (self.pd_cont_sig[1] == vendor) &
-                                          (self.pd_cont_sig[2] == name) &
-                                          (self.pd_cont_sig[3] == version) &
-                                          (self.pd_cont_sig[4] == target_path)]
+    # Check existing file signature.
+    def is_file_sig_existing(self, target):
+        # If existing regex and new regex are duplicate, both signatures are deleted.
+        ret = True
+        df_extract_sig = self.pd_cont_sig[self.pd_cont_sig[4] == target]
         if len(df_extract_sig) != 0:
             # Delete existing signature and does not new signature.
             for del_index in df_extract_sig.index:
                 self.delete_cont_row_index.append(del_index)
         else:
-            # Make signature format data.
-            sig_cotent = category + '@' + vendor + '@' + name + '@' + version + '@' + target_path + '@*@*@0\n'
+            ret = False
+        return ret
 
-        # If target is train data, does not check duplication.
-        # Make train data.
-        train = category + '@' + vendor + '@' + name + '@' + version + '@(' + target_path + ')\n'
-        return sig_product, sig_cotent, train
+    # Check existing train data.
+    def is_train_data_existing(self, category, target):
+        # Check existing train data.
+        ret = False
+        if category == 'OS':
+            df_extract_train = self.pd_train_os[self.pd_train_os[4] == target]
+            for del_index in df_extract_train.index:
+                self.delete_train_os_row_index.append(del_index)
+                ret = True
+        elif category == 'WEB':
+            df_extract_train = self.pd_train_web[(self.pd_train_web[4] == target)]
+            for del_index in df_extract_train.index:
+                self.delete_train_web_row_index.append(del_index)
+                ret = True
+        elif category == 'FRAMEWORK':
+            df_extract_train = self.pd_train_fw[(self.pd_train_fw[4] == target)]
+            for del_index in df_extract_train.index:
+                self.delete_train_fw_row_index.append(del_index)
+                ret = True
+        elif category == 'CMS':
+            df_extract_train = self.pd_train_cms[(self.pd_train_cms[4] == target)]
+            for del_index in df_extract_train.index:
+                self.delete_train_cms_row_index.append(del_index)
+                ret = True
+        return ret
+
+    def add_train_data(self, category, vendor, prod_name, prod_ver, files, target_path):
+        category_list = []
+        vendor_list = []
+        prod_name_list = []
+        version_list = []
+        path_list = []
+        ret = self.is_train_data_existing(category, '(' + target_path + ')')
+
+        # Add train data info to temporally buffer.
+        if ret is False:
+            category_list.append(category)
+            vendor_list.append(vendor)
+            prod_name_list.append(prod_name)
+            version_list.append(prod_ver)
+            path_list.append('(' + target_path + ')')
+
+        # Add file path signature info to temporally buffer.
+        for file in files:
+            target_file = '(' + target_path + file + ')'
+            ret = self.is_train_data_existing(category, target_file)
+            if ret is False:
+                category_list.append(category)
+                vendor_list.append(vendor)
+                prod_name_list.append(prod_name)
+                version_list.append(prod_ver)
+                path_list.append(target_file)
+        return category_list, vendor_list, prod_name_list, version_list, path_list
 
     # Main control.
     def extract_file_structure(self, category, vendor, package):
@@ -396,77 +470,248 @@ class Creator:
 
             # Create signature.
             open_paths = list(map(list, set(map(tuple, open_paths))))
-            fout_product = codecs.open(self.tmp_sig_product.replace('*', target_name), 'a', encoding='utf-8')
-            fout_default_content = codecs.open(self.tmp_sig_def_content.replace('*', target_name), 'a', encoding='utf-8')
-            fout_train = codecs.open(self.tmp_train_in.replace('*', target_name), 'a', encoding='utf-8')
-            s_file = []
-            s_path = []
+
+            # Initialize temporally buffer.
+            sig_file = []
+            for _ in range(len(self.pd_prod_sig.columns)):
+                sig_file.append([])
+            sig_path = []
+            for _ in range(len(self.pd_cont_sig.columns)):
+                sig_path.append([])
             train = []
+            for _ in range(len(self.train_categories)):
+                temp = []
+                for _ in range(len(self.pd_train_os.columns)):
+                    temp.append([])
+                train.append(temp)
+
             for idx, item in enumerate(open_paths):
                 # Create signature.
                 files = graph.nodes[item[0]]['files']
                 if item[2] == 1.0 and len(files) > 0:
-                    # Create path type signature.
-                    sig_path = item[1].replace('\\', '/')
-                    if sig_path.endswith('/') is False:
-                        sig_path += '/'
-                    _, s_path_cont, t_path = self.transform_path_sig(category, vendor, prod_name, prod_ver, sig_path)
+                    # Create target path.
+                    target_path = item[1].replace('\\', '/')
+                    if target_path.endswith('/') is False:
+                        target_path += '/'
 
-                    # Calculate score of each file.
-                    s_file_tmp = []
-                    train_tmp = []
-                    total_file_score = 0
-                    for file in files:
-                        file_path = sig_path + file
-                        s1, _, t1 = self.transform_path_sig(category, vendor, prod_name, prod_ver, file_path)
-                        s_file_tmp.append(s1)
-                        train_tmp.append(t1)
-                        total_file_score += self.return_score(file)
-
-                    # Add item to signature or train data.
-                    if total_file_score / len(files) == 1.0:
-                        s_file.extend(s_file_tmp)
-                        s_path.append(s_path_cont)
-                        self.utility.print_message(OK, '{}/{} Create signature: {}.'.format(idx + 1,
-                                                                                            len(open_paths),
-                                                                                            sig_path))
+                    # Add signature to master signature file.
+                    if self.return_score(files) / len(files) == 1.0:
+                        # Add path signature info to temporally buffer.
+                        if self.is_path_sig_existing(target_path) is False:
+                            sig_path[0].append(category)
+                            sig_path[1].append(vendor)
+                            sig_path[2].append(prod_name)
+                            sig_path[3].append(prod_ver)
+                            sig_path[4].append(target_path)
+                            sig_path[5].append('*')
+                            sig_path[6].append('*')
+                            sig_path[7].append('0')
+                            self.utility.print_message(OK, '{}/{} Add path signature: {}.'.format(idx + 1,
+                                                                                                  len(open_paths),
+                                                                                                  target_path))
+                        # Add file path signature info to temporally buffer.
+                        for file in files:
+                            target_file = '(' + target_path + file + ')'
+                            if self.is_file_sig_existing(target_file) is False:
+                                sig_file[0].append(category)
+                                sig_file[1].append(vendor)
+                                sig_file[2].append(prod_name)
+                                sig_file[3].append(prod_ver)
+                                sig_file[4].append(target_file)
+                                self.utility.print_message(OK, '{}/{} Add file signature: {}.'.format(idx + 1,
+                                                                                                      len(open_paths),
+                                                                                                      target_file))
                     else:
-                        train.append(t_path)
-                        train.extend(train_tmp)
-                        self.utility.print_message(OK, '{}/{} Create train data: {}.'.format(idx + 1,
-                                                                                             len(open_paths),
-                                                                                             sig_path))
+                        # Add train data info to temporally buffer.
+                        categories, vendors, prods, versions, targets = self.add_train_data(category,
+                                                                                            vendor,
+                                                                                            prod_name,
+                                                                                            prod_ver,
+                                                                                            files,
+                                                                                            target_path)
+                        if len(categories) == 0:
+                            continue
+                        if category == 'OS':
+                            train[OS][0].extend(categories)
+                            train[OS][1].extend(vendors)
+                            train[OS][2].extend(prods)
+                            train[OS][3].extend(versions)
+                            train[OS][4].extend(targets)
+                        elif category == 'WEB':
+                            train[WEB][0].extend(categories)
+                            train[WEB][1].extend(vendors)
+                            train[WEB][2].extend(prods)
+                            train[WEB][3].extend(versions)
+                            train[WEB][4].extend(targets)
+                        elif category == 'FRAMEWORK':
+                            train[FRAMEWORK][0].extend(categories)
+                            train[FRAMEWORK][1].extend(vendors)
+                            train[FRAMEWORK][2].extend(prods)
+                            train[FRAMEWORK][3].extend(versions)
+                            train[FRAMEWORK][4].extend(targets)
+                        elif category == 'CMS':
+                            train[CMS][0].extend(categories)
+                            train[CMS][1].extend(vendors)
+                            train[CMS][2].extend(prods)
+                            train[CMS][3].extend(versions)
+                            train[CMS][4].extend(targets)
+                        self.utility.print_message(OK, '{}/{} Add train data: {}.'.format(idx + 1,
+                                                                                          len(open_paths),
+                                                                                          target_path))
                 # Create train data.
                 elif item[2] >= self.threshold:
-                    train_path = item[1].replace('\\', '/')
-                    if train_path.endswith('/') is False:
-                        train_path += '/'
-                    _, _, train_data = self.transform_path_sig(category, vendor, prod_name, prod_ver, train_path)
-                    train.append(train_data)
-                    for file in files:
-                        train_file = item[1].replace('\\', '/') + file
-                        _, _, train_data = self.transform_path_sig(category, vendor, prod_name, prod_ver, train_file)
-                        train.append(train_data)
+                    target_path = item[1].replace('\\', '/')
+                    if target_path.endswith('/') is False:
+                        target_path += '/'
+                    categories, vendors, prods, versions, targets = self.add_train_data(category,
+                                                                                        vendor,
+                                                                                        prod_name,
+                                                                                        prod_ver,
+                                                                                        files,
+                                                                                        target_path)
+                    if len(categories) == 0:
+                        continue
+                    if category == 'OS':
+                        train[OS][0].extend(categories)
+                        train[OS][1].extend(vendors)
+                        train[OS][2].extend(prods)
+                        train[OS][3].extend(versions)
+                        train[OS][4].extend(targets)
+                    elif category == 'WEB':
+                        train[WEB][0].extend(categories)
+                        train[WEB][1].extend(vendors)
+                        train[WEB][2].extend(prods)
+                        train[WEB][3].extend(versions)
+                        train[WEB][4].extend(targets)
+                    elif category == 'FRAMEWORK':
+                        train[FRAMEWORK][0].extend(categories)
+                        train[FRAMEWORK][1].extend(vendors)
+                        train[FRAMEWORK][2].extend(prods)
+                        train[FRAMEWORK][3].extend(versions)
+                        train[FRAMEWORK][4].extend(targets)
+                    elif category == 'CMS':
+                        train[CMS][0].extend(categories)
+                        train[CMS][1].extend(vendors)
+                        train[CMS][2].extend(prods)
+                        train[CMS][3].extend(versions)
+                        train[CMS][4].extend(targets)
+                    self.utility.print_message(OK, '{}/{} Add train data: {}.'.format(idx + 1,
+                                                                                      len(open_paths),
+                                                                                      target_path))
 
-            # Delete duplication signature in master signature.
-            self.pd_prod_sig = self.pd_prod_sig.drop(self.delete_prod_row_index)
-            self.pd_prod_sig.to_csv(self.master_prod_sig, sep='@', encoding='utf-8', header=False, index=False)
-            self.pd_cont_sig = self.pd_cont_sig.drop(self.delete_cont_row_index)
-            self.pd_cont_sig.to_csv(self.master_cont_sig, sep='@', encoding='utf-8', header=False, index=False)
+            # Write path signature to master signature file.
+            if len(sig_path[0]) != 0:
+                self.pd_cont_sig = self.pd_cont_sig.drop(self.delete_cont_row_index)
+                series_category = pd.Series(sig_path[0])
+                series_vendor = pd.Series(sig_path[1])
+                series_prod = pd.Series(sig_path[2])
+                series_version = pd.Series(sig_path[3])
+                series_signature = pd.Series(sig_path[4])
+                series_dummy1 = pd.Series(sig_path[5])
+                series_dummy2 = pd.Series(sig_path[6])
+                series_dummy3 = pd.Series(sig_path[7])
+                temp_df = pd.DataFrame({0: series_category,
+                                        1: series_vendor,
+                                        2: series_prod,
+                                        3: series_version,
+                                        4: series_signature,
+                                        5: series_dummy1,
+                                        6: series_dummy2,
+                                        7: series_dummy3}, columns=None)
+                self.pd_cont_sig = pd.concat([self.pd_cont_sig, temp_df])
+                self.pd_cont_sig.to_csv(self.master_cont_sig,
+                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
+                self.utility.print_message(OK, 'Add Path signature: {} items.'.format(len(sig_path)))
 
-            # Write signature/train data to local files.
-            s_path.remove('')
-            fout_default_content.writelines(list(set(s_path)))
-            self.utility.print_message(OK, 'Create Path signature: {} items.'.format(len(s_path)))
-            s_file.remove('')
-            fout_product.writelines(list(set(s_file)))
-            self.utility.print_message(OK, 'Create File signature: {} items.'.format(len(s_file)))
-            train.remove('')
-            fout_train.writelines(list(set(train)))
-            self.utility.print_message(OK, 'Create Train data: {} items.'.format(len(train)))
-            fout_product.close()
-            fout_default_content.close()
-            fout_train.close()
+            # Write file signature to master signature file.
+            if len(sig_file[0]) != 0:
+                self.pd_prod_sig = self.pd_prod_sig.drop(self.delete_prod_row_index)
+                series_category = pd.Series(sig_file[0])
+                series_vendor = pd.Series(sig_file[1])
+                series_prod = pd.Series(sig_file[2])
+                series_version = pd.Series(sig_file[3])
+                series_signature = pd.Series(sig_file[4])
+                temp_df = pd.DataFrame({0: series_category,
+                                        1: series_vendor,
+                                        2: series_prod,
+                                        3: series_version,
+                                        4: series_signature}, columns=None)
+                self.pd_prod_sig = pd.concat([self.pd_prod_sig, temp_df])
+                self.pd_prod_sig.to_csv(self.master_prod_sig,
+                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
+                self.utility.print_message(OK, 'Add File signature: {} items.'.format(len(sig_file)))
+
+            # Write OS train data to master train data.
+            if train[OS][0] != '':
+                self.pd_train_os = self.pd_train_os.drop(self.delete_train_os_row_index)
+                series_category = pd.Series(train[OS][0])
+                series_vendor = pd.Series(train[OS][1])
+                series_prod = pd.Series(train[OS][2])
+                series_version = pd.Series(train[OS][3])
+                series_signature = pd.Series(train[OS][4])
+                temp_df = pd.DataFrame({0: series_category,
+                                        1: series_vendor,
+                                        2: series_prod,
+                                        3: series_version,
+                                        4: series_signature}, columns=None)
+                self.pd_train_os = pd.concat([self.pd_train_os, temp_df])
+                self.pd_train_os.to_csv(self.train_os_in,
+                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
+                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[OS])))
+
+            # Write Web train data to master train data.
+            if train[WEB][0] != '':
+                self.pd_train_web = self.pd_train_web.drop(self.delete_train_web_row_index)
+                series_category = pd.Series(train[WEB][0])
+                series_vendor = pd.Series(train[WEB][1])
+                series_prod = pd.Series(train[WEB][2])
+                series_version = pd.Series(train[WEB][3])
+                series_signature = pd.Series(train[WEB][4])
+                temp_df = pd.DataFrame({0: series_category,
+                                        1: series_vendor,
+                                        2: series_prod,
+                                        3: series_version,
+                                        4: series_signature}, columns=None)
+                self.pd_train_web = pd.concat([self.pd_train_web, temp_df])
+                self.pd_train_web.to_csv(self.train_web_in,
+                                         sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
+                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[WEB])))
+
+            # Write Framework train data to master train data.
+            if train[FRAMEWORK] != '':
+                self.pd_train_fw = self.pd_train_fw.drop(self.delete_train_fw_row_index)
+                series_category = pd.Series(train[FRAMEWORK][0])
+                series_vendor = pd.Series(train[FRAMEWORK][1])
+                series_prod = pd.Series(train[FRAMEWORK][2])
+                series_version = pd.Series(train[FRAMEWORK][3])
+                series_signature = pd.Series(train[FRAMEWORK][4])
+                temp_df = pd.DataFrame({0: series_category,
+                                        1: series_vendor,
+                                        2: series_prod,
+                                        3: series_version,
+                                        4: series_signature}, columns=None)
+                self.pd_train_fw = pd.concat([self.pd_train_fw, temp_df])
+                self.pd_train_fw.to_csv(self.train_framework_in,
+                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
+                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[FRAMEWORK])))
+
+            # Write CMS train data to master train data.
+            if train[CMS][0] != '':
+                self.pd_train_cms = self.pd_train_cms.drop(self.delete_train_cms_row_index)
+                series_category = pd.Series(train[CMS][0])
+                series_vendor = pd.Series(train[CMS][1])
+                series_prod = pd.Series(train[CMS][2])
+                series_version = pd.Series(train[CMS][3])
+                series_signature = pd.Series(train[CMS][4])
+                temp_df = pd.DataFrame({0: series_category,
+                                        1: series_vendor,
+                                        2: series_prod,
+                                        3: series_version,
+                                        4: series_signature}, columns=None)
+                self.pd_train_cms = pd.concat([self.pd_train_cms, temp_df])
+                self.pd_train_cms.to_csv(self.train_cms_in,
+                                         sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
+                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[CMS])))
 
             # Show graph.
             # self.show_graph(target, graph)
