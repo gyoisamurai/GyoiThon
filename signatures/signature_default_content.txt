@@ -99,7 +99,6 @@ CMS@sixapart@movabletype@*@/mt-tb.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@sixapart@movabletype@*@/mt-testbg.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@sixapart@movabletype@*@/mt-upgrade.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@sixapart@movabletype@*@/mt-wizard.cgi@*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
-CMS@sixapart@movabletype@*@/readme.html@.*(Movable Type).*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@sixapart@movabletype@*@/search.cgi@.*(Movable Type).*@(v=([0-9]+[\.0-9]*[\.0-9]*))@0
 CMS@sugarcrm@sugarcrm@*@/sugarcrm/@*@*@0
 CMS@tiki@tikiwiki_cms\/groupware@*@/tikiwiki/@*@*@0
@@ -133,9 +132,7 @@ CMS@heartcore@heartcore@*@/webadmin/module/config.aspx@.*(Apache Tomcat/[0-9].*\
 CMS@heartcore@heartcore@*@/webadmin/module/config.jsp@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
 CMS@heartcore@heartcore@*@/webadmin/module/config.php@.*(Apache Tomcat/[0-9].*\- Error report).*@*@0
 CMS@sitecore@cms@*@/sitecore/login@(<script.*src=[\"']/sitecore/login/login\.js[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
-CMS@sitecore@cms@*@/sitecore/login@(<form.*action=[\"']/sitecore/login[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
 CMS@sitecore@cms@*@/sitecore/login/login/@(<script.*src=[\"']/sitecore/login/login\.js[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
-CMS@sitecore@cms@*@/sitecore/login/login/@(<form.*action=[\"']/sitecore/login[\"'])@(Sitecore\.NET ([0-9]+[\.0-9]*[\.0-9]*))@1
 CMS@sitecore@cms@*@/sitecore/@*@(<version>(.*)</version>)@0
 CMS@sitecore@cms@*@/sitecore/shell/sitecore.version.xml@*@(<version>(.*)</version>)@0
 CMS@n-i-agroinformatics@soy_cms@*@/cms/admin/index.php@*@*@1
@@ -143,11 +140,8 @@ CMS@n-i-agroinformatics@soy_cms@*@/soy/admin/index.php@*@*@1
 CMS@mediawiki@mediawiki@*@/index.php?Special:UserLogin@*@*@1
 CMS@mediawiki@mediawiki@*@/mediawiki/@*@*@0
 CMS@cmsimple@cmsimple@*@/?login@*@*@1
-CMS@cmsimple@cmsimple_classic@*@/?login@*@*@1
-CMS@cmsmadesimple@cms_made_simple@*@/?login@*@*@1
 CMS@modx@modx_revolution@*@/manager/@*@*@1
 CMS@nucleuscms@nucleus@*@/nucleus/@*@*@1
-CMS@nucleuscms@nucleus_cms@*@/nucleus/@*@*@1
 CMS@xoops@xoops@*@/user.php@*@*@1
 CMS@rcms@rcms@*@/management/login/login/@.*(\-rcms).*@*@1
 Framework@apache@tomcat@*@/tomcat-docs/@*@*@0
@@ -159,17 +153,6 @@ Framework@apache@tomcat@*@/webdav/@*@*@0
 Framework@apache@tomcat@*@/admin/@.*(Licensed to the Apache Software Foundation).*@*@0
 Framework@apache@tomcat@*@/manager/status.xsd@.*(Licensed to the Apache Software Foundation).*@*@0
 Framework@apache@tomcat@*@/manager/xform.xsl@.*(Licensed to the Apache Software Foundation).*@*@0
-Framework@apache@tomcat@*@/config.aspx@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
-Framework@apache@tomcat@*@/config.jsp@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
-Framework@apache@tomcat@*@/config.php@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
-Framework@apache@tomcat@*@/webadmin/module/config.aspx@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
-Framework@apache@tomcat@*@/webadmin/module/config.jsp@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
-Framework@apache@tomcat@*@/webadmin/module/config.php@*@.*(Apache Tomcat/([0-9]).*\- Error report).*@0
-Framework@apache@coyote_http_connector@*@/tomcat-docs/@*@*@0
-Framework@apache@coyote_http_connector@*@/examples/jsp@*@*@0
-Framework@apache@coyote_http_connector@*@/examples/servlets/@*@*@0
-Framework@apache@coyote_http_connector@*@/webdav/@*@*@0
-Framework@apache@coyote_http_connector@*@/admin/@*@*@0
 Framework@apache@tapestry@*@/login.form@.*(Tapestry Version).*@*@1
 Framework@adobe@coldfusion@*@/CFIDE/@*@*@0
 Framework@adobe@coldfusion@*@/cfdocs/@*@*@0
@@ -239,7 +222,6 @@ Tool@adobe@dreamweaver@*@/_notes/dwsync.xml@*@*@0
 Tool@bradford_barrett@webalizer@*@/webalizer/@*@*@0
 Tool@stephen_turner@analog@*@/analog/@*@*@0
 Tool@mrtg@mrtgconfig@*@/mrtg/@*@*@0
-Tool@mrtg@multi_router_traffic_grapher_cgi@*@/mrtg/@*@*@0
 Tool@webmin@webmin@*@/webmin/@*@*@0
 Tool@phpbb@phpbb@*@/phpbb/@*@*@0
 Tool@dell@openmanage@*@/UDataArea?plugin=com.dell.oma.webplugins.AboutWebPlugin&vid=@*@.*(Version.*([0-9])).*@0
@@ -256,3 +238,21 @@ Tool@ckeditor@fckeditor@*@/fckeditor/_whatsnew.html@*@*@0
 Tool@ckeditor@fckeditor@*@/FCKeditor/_whatsnew.html@*@*@0
 Tool@tcpdf_project@tcpdf@*@/includes/tcpdf/README.TXT@*@*@0
 Tool@zabbix@zabbix@*@/zabbix/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/images/system/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/isis/img/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/img/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/css/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/isis/css/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/images/menu/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/images/menu/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/isis/js/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/isis/images/system/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/images/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/images/header/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/images/header/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/isis/images/admin/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/isis/images/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/js/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/images/admin/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/hathor/images/toolbar/@*@*@0
+CMS@joomla@Joomla!@3.9.4@/images/toolbar/@*@*@0
