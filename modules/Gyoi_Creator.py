@@ -683,11 +683,17 @@ class Creator:
                                         5: series_dummy1,
                                         6: series_dummy2,
                                         7: series_dummy3}, columns=None)
+                origin_num = len(self.pd_cont_sig)
                 self.pd_cont_sig = pd.concat([self.pd_cont_sig, temp_df])
                 self.pd_cont_sig = self.pd_cont_sig.drop_duplicates(subset=4, keep=False)
-                self.pd_cont_sig.to_csv(self.master_cont_sig,
-                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
-                self.utility.print_message(OK, 'Add Path signature: {} items.'.format(len(sig_path)))
+                add_signature_num = len(self.pd_cont_sig) - origin_num
+                self.pd_cont_sig.sort_values(by=[0, 1, 2, 3, 4]).to_csv(self.master_cont_sig,
+                                                                        sep='@',
+                                                                        encoding='utf-8',
+                                                                        header=False,
+                                                                        index=False,
+                                                                        quoting=csv.QUOTE_NONE)
+                self.utility.print_message(NOTE, 'Add Path signature: {} items.'.format(add_signature_num))
 
             # Write file signature to master signature file.
             if len(sig_file[0]) != 0:
@@ -701,11 +707,17 @@ class Creator:
                                         2: series_prod,
                                         3: series_version,
                                         4: series_signature}, columns=None)
+                origin_num = len(self.pd_prod_sig)
                 self.pd_prod_sig = pd.concat([self.pd_prod_sig, temp_df])
                 self.pd_prod_sig = self.pd_prod_sig.drop_duplicates(subset=4, keep=False)
-                self.pd_prod_sig.to_csv(self.master_prod_sig,
-                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
-                self.utility.print_message(OK, 'Add File signature: {} items.'.format(len(sig_file)))
+                add_signature_num = len(self.pd_prod_sig) - origin_num
+                self.pd_prod_sig.sort_values(by=[0, 1, 2, 3, 4]).to_csv(self.master_prod_sig,
+                                                                        sep='@',
+                                                                        encoding='utf-8',
+                                                                        header=False,
+                                                                        index=False,
+                                                                        quoting=csv.QUOTE_NONE)
+                self.utility.print_message(NOTE, 'Add File signature: {} items.'.format(add_signature_num))
 
             # Write OS train data to master train data.
             if len(train[OS][0]) != 0:
@@ -719,11 +731,17 @@ class Creator:
                                         2: series_prod,
                                         3: series_version,
                                         4: series_signature}, columns=None)
+                origin_num = len(self.pd_train_os)
                 self.pd_train_os = pd.concat([self.pd_train_os, temp_df])
                 self.pd_train_os = self.pd_train_os.drop_duplicates(subset=[1, 2, 3, 4], keep=False)
-                self.pd_train_os.to_csv(self.train_os_in,
-                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
-                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[OS])))
+                add_signature_num = len(self.pd_train_os) - origin_num
+                self.pd_train_os.sort_values(by=[0, 1, 2, 3, 4]).to_csv(self.train_os_in,
+                                                                        sep='@',
+                                                                        encoding='utf-8',
+                                                                        header=False,
+                                                                        index=False,
+                                                                        quoting=csv.QUOTE_NONE)
+                self.utility.print_message(NOTE, 'Add OS train data: {} items.'.format(add_signature_num))
 
             # Write Web train data to master train data.
             if len(train[WEB][0]) != 0:
@@ -737,11 +755,17 @@ class Creator:
                                         2: series_prod,
                                         3: series_version,
                                         4: series_signature}, columns=None)
+                origin_num = len(self.pd_train_os)
                 self.pd_train_web = pd.concat([self.pd_train_web, temp_df])
                 self.pd_train_web = self.pd_train_web.drop_duplicates(subset=[1, 2, 3, 4], keep=False)
-                self.pd_train_web.to_csv(self.train_web_in,
-                                         sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
-                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[WEB])))
+                add_signature_num = len(self.pd_train_web) - origin_num
+                self.pd_train_web.sort_values(by=[0, 1, 2, 3, 4]).to_csv(self.train_web_in,
+                                                                         sep='@',
+                                                                         encoding='utf-8',
+                                                                         header=False,
+                                                                         index=False,
+                                                                         quoting=csv.QUOTE_NONE)
+                self.utility.print_message(NOTE, 'Add OS train data: {} items.'.format(add_signature_num))
 
             # Write Framework train data to master train data.
             if len(train[FRAMEWORK][0]) != 0:
@@ -755,11 +779,17 @@ class Creator:
                                         2: series_prod,
                                         3: series_version,
                                         4: series_signature}, columns=None)
+                origin_num = len(self.pd_train_fw)
                 self.pd_train_fw = pd.concat([self.pd_train_fw, temp_df])
                 self.pd_train_fw = self.pd_train_fw.drop_duplicates(subset=[1, 2, 3, 4], keep=False)
-                self.pd_train_fw.to_csv(self.train_framework_in,
-                                        sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
-                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[FRAMEWORK])))
+                add_signature_num = len(self.pd_train_fw) - origin_num
+                self.pd_train_fw.sort_values(by=[0, 1, 2, 3, 4]).to_csv(self.train_framework_in,
+                                                                        sep='@',
+                                                                        encoding='utf-8',
+                                                                        header=False,
+                                                                        index=False,
+                                                                        quoting=csv.QUOTE_NONE)
+                self.utility.print_message(NOTE, 'Add OS train data: {} items.'.format(add_signature_num))
 
             # Write CMS train data to master train data.
             if len(train[CMS][0]) != 0:
@@ -773,11 +803,17 @@ class Creator:
                                         2: series_prod,
                                         3: series_version,
                                         4: series_signature}, columns=None)
+                origin_num = len(self.pd_train_cms)
                 self.pd_train_cms = pd.concat([self.pd_train_cms, temp_df])
                 self.pd_train_cms = self.pd_train_cms.drop_duplicates(subset=[1, 2, 3, 4], keep=False)
-                self.pd_train_cms.to_csv(self.train_cms_in,
-                                         sep='@', encoding='utf-8', header=False, index=False, quoting=csv.QUOTE_NONE)
-                self.utility.print_message(OK, 'Add OS train data: {} items.'.format(len(train[CMS])))
+                add_signature_num = len(self.pd_train_cms) - origin_num
+                self.pd_train_cms.sort_values(by=[0, 1, 2, 3, 4]).to_csv(self.train_cms_in,
+                                                                         sep='@',
+                                                                         encoding='utf-8',
+                                                                         header=False,
+                                                                         index=False,
+                                                                         quoting=csv.QUOTE_NONE)
+                self.utility.print_message(NOTE, 'Add OS train data: {} items.'.format(add_signature_num))
 
             # Show graph.
             # self.show_graph(target, graph)
