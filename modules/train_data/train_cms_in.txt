@@ -1,6 +1,41 @@
-joomla@joomla\!@*@(Set-Cookie: [a-z0-9]{32}=.*);
-joomla@joomla\!@*@(Set-Cookie: .*=[a-z0-9]{26,32});
-heartcore@heartcore@*@(Set-Cookie:.*=[A-Z0-9]{32});.*
-heartcore@heartcore@*@(<meta name=["']author["'] content=["']{2}).*
-wordpress@wordpress@*@(X-Pingback):.*xmlrpc.php[\r\n]
-wordpress@wordpress@*@(<body class=["']home ).*
+CMS@joomla@joomla\!@*@(Set-Cookie: [a-z0-9]{32}=.*);
+CMS@joomla@joomla\!@*@(Set-Cookie: .*=[a-z0-9]{26,32});
+CMS@heartcore@heartcore@*@(Set-Cookie:.*=[A-Z0-9]{32});.*
+CMS@heartcore@heartcore@*@(<meta name=["']author["'] content=["']{2}).*
+CMS@wordpress@wordpress@*@(X-Pingback):.*xmlrpc.php[\r\n]
+CMS@wordpress@wordpress@*@(<body class=["']home ).*
+CMS@joomla@Joomla!@3.9.4@(/isis/)
+CMS@joomla@Joomla!@3.9.4@(/isis/favicon.ico)
+CMS@joomla@Joomla!@3.9.4@(/isis/login.php)
+CMS@joomla@Joomla!@3.9.4@(/isis/component.php)
+CMS@joomla@Joomla!@3.9.4@(/isis/template_thumbnail.png)
+CMS@joomla@Joomla!@3.9.4@(/isis/index.php)
+CMS@joomla@Joomla!@3.9.4@(/isis/template_preview.png)
+CMS@joomla@Joomla!@3.9.4@(/isis/error.php)
+CMS@joomla@Joomla!@3.9.4@(/isis/templateDetails.xml)
+CMS@joomla@Joomla!@3.9.4@(/isis/cpanel.php)
+CMS@joomla@Joomla!@3.9.4@(/hathor/)
+CMS@joomla@Joomla!@3.9.4@(/hathor/favicon.ico)
+CMS@joomla@Joomla!@3.9.4@(/hathor/login.php)
+CMS@joomla@Joomla!@3.9.4@(/hathor/LICENSE.txt)
+CMS@joomla@Joomla!@3.9.4@(/hathor/component.php)
+CMS@joomla@Joomla!@3.9.4@(/hathor/template_thumbnail.png)
+CMS@joomla@Joomla!@3.9.4@(/hathor/index.php)
+CMS@joomla@Joomla!@3.9.4@(/hathor/template_preview.png)
+CMS@joomla@Joomla!@3.9.4@(/hathor/error.php)
+CMS@joomla@Joomla!@3.9.4@(/hathor/templateDetails.xml)
+CMS@joomla@Joomla!@3.9.4@(/hathor/cpanel.php)
+CMS@joomla@Joomla!@3.9.4@(/logs/)
+CMS@joomla@Joomla!@3.9.4@(/logs/index.html)
+CMS@joomla@Joomla!@3.9.4@(/cache/)
+CMS@joomla@Joomla!@3.9.4@(/cache/index.html)
+CMS@joomla@Joomla!@3.9.4@(/overrides/)
+CMS@joomla@Joomla!@3.9.4@(/overrides/index.html)
+CMS@joomla@Joomla!@3.9.4@(/isis/html/)
+CMS@joomla@Joomla!@3.9.4@(/isis/html/editor_content.css)
+CMS@joomla@Joomla!@3.9.4@(/isis/html/pagination.php)
+CMS@joomla@Joomla!@3.9.4@(/isis/html/modules.php)
+CMS@joomla@Joomla!@3.9.4@(/html/)
+CMS@joomla@Joomla!@3.9.4@(/html/editor_content.css)
+CMS@joomla@Joomla!@3.9.4@(/html/pagination.php)
+CMS@joomla@Joomla!@3.9.4@(/html/modules.php)
