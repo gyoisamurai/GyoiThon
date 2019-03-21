@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import shutil
 import csv
 import zipfile
 import tarfile
@@ -42,9 +43,15 @@ class Creator:
         self.master_prod_sig = os.path.join(master_sig_dir, config['VersionChecker']['signature_file'])
         self.master_cont_sig = os.path.join(master_sig_dir, config['ContentExplorer']['signature_file'])
         self.pd_prod_sig = pd.read_csv(self.master_prod_sig,
-                                       delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+                                       delimiter='@',
+                                       encoding='utf-8',
+                                       header=None,
+                                       quoting=csv.QUOTE_NONE)
         self.pd_cont_sig = pd.read_csv(self.master_cont_sig,
-                                       delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+                                       delimiter='@',
+                                       encoding='utf-8',
+                                       header=None,
+                                       quoting=csv.QUOTE_NONE)
         self.delete_prod_row_index = []
         self.delete_cont_row_index = []
 
@@ -58,16 +65,28 @@ class Creator:
         for category in self.train_categories:
             if category == 'OS':
                 self.pd_train_os = pd.read_csv(self.train_os_in,
-                                               delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+                                               delimiter='@',
+                                               encoding='utf-8',
+                                               header=None,
+                                               quoting=csv.QUOTE_NONE)
             elif category == 'WEB':
                 self.pd_train_web = pd.read_csv(self.train_web_in,
-                                                delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+                                                delimiter='@',
+                                                encoding='utf-8',
+                                                header=None,
+                                                quoting=csv.QUOTE_NONE)
             elif category == 'FRAMEWORK':
                 self.pd_train_fw = pd.read_csv(self.train_framework_in,
-                                               delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+                                               delimiter='@',
+                                               encoding='utf-8',
+                                               header=None,
+                                               quoting=csv.QUOTE_NONE)
             elif category == 'CMS':
                 self.pd_train_cms = pd.read_csv(self.train_cms_in,
-                                                delimiter='@', encoding='utf-8', header=None, quoting=csv.QUOTE_NONE)
+                                                delimiter='@',
+                                                encoding='utf-8',
+                                                header=None,
+                                                quoting=csv.QUOTE_NONE)
             else:
                 self.utility.print_message(FAIL, 'Choose category is not found.')
                 exit(1)
@@ -346,41 +365,52 @@ class Creator:
         path_list = []
 
         # Add train data info to temporally buffer.
-        category_list.append(category)
-        vendor_list.append(vendor)
-        prod_name_list.append(prod_name)
-        version_list.append(prod_ver)
-        path_list.append('(' + target_path + ')')
-
-        # Add file path signature info to temporally buffer.
-        for file in files:
-            target_file = '(' + target_path + file + ')'
+        if '@' not in target_path:
             category_list.append(category)
             vendor_list.append(vendor)
             prod_name_list.append(prod_name)
             version_list.append(prod_ver)
-            path_list.append(target_file)
+            path_list.append('(' + target_path + ')')
+
+            # Add file path signature info to temporally buffer.
+            for file in files:
+                target_file = '(' + target_path + file + ')'
+                if '@' in target_file:
+                    continue
+                category_list.append(category)
+                vendor_list.append(vendor)
+                prod_name_list.append(prod_name)
+                version_list.append(prod_ver)
+                path_list.append(target_file)
+        else:
+            self.utility.print_message(WARNING, 'This path is included special character "@": {}'.format(target_path))
 
         return category_list, vendor_list, prod_name_list, version_list, path_list
 
     # Push path signature to temporally buffer.
     def push_path_sig(self, sig_path, category, vendor, prod, version, target_path):
-        sig_path[0].append(category)
-        sig_path[1].append(vendor)
-        sig_path[2].append(prod)
-        sig_path[3].append(version)
-        sig_path[4].append(target_path)
-        sig_path[5].append('*')
-        sig_path[6].append('*')
-        sig_path[7].append('0')
+        if '@' not in target_path:
+            sig_path[0].append(category)
+            sig_path[1].append(vendor)
+            sig_path[2].append(prod)
+            sig_path[3].append(version)
+            sig_path[4].append(target_path)
+            sig_path[5].append('*')
+            sig_path[6].append('*')
+            sig_path[7].append('0')
+        else:
+            self.utility.print_message(WARNING, 'This path is included special character "@": {}'.format(target_path))
 
     # Push file signature to temporally buffer.
     def push_file_sig(self, sig_file, category, vendor, prod, version, target_file):
-        sig_file[0].append(category)
-        sig_file[1].append(vendor)
-        sig_file[2].append(prod)
-        sig_file[3].append(version)
-        sig_file[4].append(target_file)
+        if '@' not in target_file:
+            sig_file[0].append(category)
+            sig_file[1].append(vendor)
+            sig_file[2].append(prod)
+            sig_file[3].append(version)
+            sig_file[4].append(target_file)
+        else:
+            self.utility.print_message(WARNING, 'This path is included special character "@": {}'.format(target_file))
 
     # Push train data to temporally buffer.
     def push_train_data(self, train, category, categories, vendors, prods, versions, targets):
@@ -475,6 +505,13 @@ class Creator:
         # Decompress compressed package file.
         extract_path = self.decompress_file(package_path)
 
+        # Create unique root directory.
+        root_dir = os.path.join(self.compress_dir, prod_name + '_' + prod_ver)
+        if os.path.exists(root_dir):
+            shutil.rmtree(root_dir)
+        os.mkdir(root_dir)
+        shutil.move(extract_path, root_dir)
+
         # Create report header.
         pd.DataFrame([], columns=self.header).to_csv(self.save_path, mode='w', index=False)
 
@@ -482,8 +519,8 @@ class Creator:
         try:
             # Extract file path each products.
             target_name = prod_name + ' ' + prod_ver
-            self.utility.print_message(NOTE, 'Extract package {}'.format(extract_path))
-            record = self.execute_grep(target_name, extract_path)
+            self.utility.print_message(NOTE, 'Extract package {}'.format(root_dir))
+            record = self.execute_grep(target_name, root_dir)
             graph = self.create_network(record)
 
             # Extract all paths to end node from root node.
@@ -815,7 +852,8 @@ class Creator:
                                                                          quoting=csv.QUOTE_NONE)
                 self.utility.print_message(NOTE, 'Add OS train data: {} items.'.format(add_signature_num))
 
-            # Show graph.
-            # self.show_graph(target, graph)
         except Exception as e:
             self.utility.print_exception(e, '{}'.format(e.args))
+
+        # Show graph.
+        # self.show_graph(target, graph)
