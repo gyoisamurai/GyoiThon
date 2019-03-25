@@ -26,6 +26,26 @@ Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
  * [https://gyoithon.slack.com](https://gyoithon.slack.com)  
  [Let's join GyoiThon Slack!!](https://docs.google.com/forms/d/e/1FAIpQLSeuT-HNF-geek1IM3qBWViTVJbLUr3GZR2Hzuow30734X70gw/viewform)  
 
+## New function!!
+The new GyoiThon \(version 0.0.3\) can **automatically generate signature/train data** for detecting web products operated on the target server. You can get signatures/train data just by executing the following command.  
+
+ * ex) Generating **Joomla!** signatures.  
+ ```
+ root@kali:~/GyoiThon# python3 gyoithon.py -d --category=CMS --vendor=joomla! --package=Joomla!@3.9.4@_origin.tar.zip
+ ```
+
+ Generated Joomla! signatures.  
+ ```
+ CMS@joomla!@Joomla!@3.9.4@(/js/application.js)
+ CMS@joomla!@Joomla!@3.9.4@(/js/classes.js)/
+ CMS@joomla!@Joomla!@3.9.4@(/jui/css/bootstrap-extended.css)
+ CMS@joomla!@Joomla!@3.9.4@(/jui/css/bootstrap-responsive.css)
+ CMS@joomla!@Joomla!@3.9.4@(/jui/css/bootstrap-responsive.min.css)
+ ...snip...
+ ```
+
+If you need more information, please refer to Usage.  
+
 ## Overview
 GyoiThon is **Intelligence Gathering tool** for Web Server.  
 
@@ -80,7 +100,7 @@ By using [default mode](https://github.com/gyoisamurai/GyoiThon/blob/master/READ
 
 ```
 usage:
-    gyoithon.py [-s] [-m] [-g] [-e] [-c] [-p] [-l <log_path>]
+    gyoithon.py [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [-d --category=<category> --vendor=<vendor> --package=<package>]
     gyoithon.py -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -90,6 +110,7 @@ options:
     -c   Optional : Discover open ports and wrong ssl server certification using Censys.
     -p   Optional : Execute exploit module using Metasploit.
     -l   Optional : Analyze log based HTTP response for identify product/version.
+    -d   Optional : Development of signature and train data.
     -h --help     Show this help message and exit.
 ```
 
