@@ -44,7 +44,7 @@ The new GyoiThon \(version 0.0.3\) can **automatically generate signature/train 
  ...snip...
  ```
 
-If you need more information, please refer to Usage.  
+If you need more information, please refer to [Usage](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#generating_sig).  
 
 ## Overview
 GyoiThon is **Intelligence Gathering tool** for Web Server.  
@@ -299,10 +299,32 @@ root@kali:~/GyoiThon# python3 gyoithon.py -s -g
 root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g
 ```
 
-#### All option.
+##### All option.
 ```
 root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g -e -c -p -l "Full path of stored logs"
 ```
+
+#### <a name='generating_sig'>10. Generating signature/train data mode</a>.  
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -d --category=CMS --vendor=joomla! --package=Joomla!@3.9.4@_origin.tar.zip
+```
+
+By add `-d` option, GyoiThon generates examines real vulnerabilities such as DoS and backdoor using Metasploit in addition to default mode.  
+Before execution, you must launch RPC server of Metasploit and set below parameters in `config.ini`.  
+
+|Category|Parameter|Description|
+|:----|:----|:----|
+|Creator|compress_dir|Placed path of compressed package file. |
+||signature_dir|Path of execution logs. |
+||prohibit_ext|File extension not include in the signature/train data. |
+||result_file|Log file name. |
+||header|Header of log file.|
+||score_table|Score table name.|
+||unknown_score|Score of undefined extension in the score table.|
+||threshold|Threshold of opened/closed.|
+||turn_inside_num|Allocated IP address to the RPC Server (`msgrpc`).|
+||try_othello_num|Allocated IP address to the RPC Server (`msgrpc`).|
+||del_open_root_dir|Allocated IP address to the RPC Server (`msgrpc`).|
 
 ### Check report.  
 After finished execution of GyoiThon, reports of each target are generated to the following path.    
