@@ -44,6 +44,12 @@ The new GyoiThon \(version 0.0.3\) can **automatically generate signature/train 
  ...snip...
  ```
 
+ * Slide  
+ [BlackHat ASIA 2019](https://github.com/gyoisamurai/GyoiThon/blob/master/handout/BHASIA2019_slide.pdf)  
+ 
+ * Demo movie  
+ [Demo](https://www.youtube.com/watch?v=X8tW4S7c6s0)  
+
 If you need more information, please refer to [Usage](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#generating_sig).  
 
 ## Overview
@@ -271,7 +277,7 @@ Before execution, you must launch RPC server of Metasploit and set below paramet
 
 #### 8. Stored logs based analysis mode.  
 ```
-root@kali:~/GyoiThon# python3 gyoithon.py -l "Full path of stored logs"
+root@kali:~/GyoiThon# python3 gyoithon.py -l --log_path="Full path of stored logs"
 ```
 
 By add `-l` option, GyoiThon executes various examination using stored HTTP responses without web crawling.  
@@ -301,7 +307,7 @@ root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g
 
 ##### All option.
 ```
-root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g -e -c -p -l "Full path of stored logs"
+root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g -e -c -p -l --log_path="Full path of stored logs"
 ```
 
 #### <a name='generating_sig'>10. Generating signature/train data mode</a>.  
