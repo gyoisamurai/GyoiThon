@@ -390,7 +390,7 @@ GyoiThon generates following two types report.
 | Because Censys needs several days to several weeks to survey the entire Internet, the information obtained from Censys may not be up-to-date.|
 
 ## <a name='Tips'>Tips</a>
-### 1. How to add new signature (string matching patterns).  
+### 1. How to manually add new signature (string matching patterns).  
 `signatures` path includes below files.  
 
 ```
@@ -560,7 +560,7 @@ Login@.*(login|log_in|logon|log_on|signin|sign_in).*
 |:---|
 |Above vendor name and product name must be match a name in [CPE format](https://en.wikipedia.org/wiki/Common_Platform_Enumeration).|
 
-### 2. How to add learning data.  
+### 2. How to manually add learning data.  
 `modules/train_data/` path includes two train data for Machine Learning.  
 
 ```
