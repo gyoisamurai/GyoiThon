@@ -315,22 +315,14 @@ root@kali:~/GyoiThon# python3 gyoithon.py -s -m -g -e -c -p -l --log_path="Full 
 root@kali:~/GyoiThon# python3 gyoithon.py -d --category=CMS --vendor=joomla! --package=Joomla!@3.9.4@_origin.tar.zip
 ```
 
-By add `-d` option, GyoiThon generates examines real vulnerabilities such as DoS and backdoor using Metasploit in addition to default mode.  
-Before execution, you must launch RPC server of Metasploit and set below parameters in `config.ini`.  
+By add `-d` option, GyoiThon generates signatures/train data for detecting Web products operated on the target Web Server.  
+The options is following.  
 
-|Category|Parameter|Description|
+|Option|Description|Example|
 |:----|:----|:----|
-|Creator|compress_dir|Placed path of compressed package file. |
-||signature_dir|Path of execution logs. |
-||prohibit_ext|File extension not include in the signature/train data. |
-||result_file|Log file name. |
-||header|Header of log file.|
-||score_table|Score table name.|
-||unknown_score|Score of undefined extension in the score table.|
-||threshold|Threshold of opened/closed.|
-||turn_inside_num|Allocated IP address to the RPC Server (`msgrpc`).|
-||try_othello_num|Allocated IP address to the RPC Server (`msgrpc`).|
-||del_open_root_dir|Allocated IP address to the RPC Server (`msgrpc`).|
+|--category|Product's category in signature/train data.|`OS` or `WEB` or `FRAMEWORK` or `CMS`. |
+|--vendor|Product's vendor name in signature/train data. |`wordpress`, `joomla!`, `drupal`.|
+|--package|Importing target package file name. You have to separate three fields that product name, version and extension using `@`.|`WordPress@4.9.8@.tar.gz`, `Joomla!@3.9.4@_origin.tar.zip`, `Drupal@8.6.3@.tar.gz`. |
 
 ### Check report.  
 After finished execution of GyoiThon, reports of each target are generated to the following path.    
