@@ -95,6 +95,7 @@ root@kali:~# apt-get install python3-pip
 ```
 root@kali:~# cd GyoiThon
 root@kali:~/GyoiThon# pip3 install -r requirements.txt
+root@kali:~/GyoiThon# apt install python3-tk
 ```
 
 4. Edit config.ini of GyoiThon.  
