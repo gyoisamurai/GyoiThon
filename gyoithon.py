@@ -94,7 +94,9 @@ def show_credit(utility):
 # Define command option.
 __doc__ = """{f}
 usage:
-    {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [-d --category=<category> --vendor=<vendor> --package=<package>]
+    {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
+    {f} [-d --category=<category> --vendor=<vendor> --package=<package>]
+    {f} [-i --scheme=<scheme> --fqdn=<fqdn> --port=<port> --path=<path> --keyword=<keyword>]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -105,6 +107,7 @@ options:
     -p   Optional : Execute exploit module using Metasploit.
     -l   Optional : Analyze log based HTTP response for identify product/version.
     -d   Optional : Development of signature and train data.
+    -i   Optional : Explore relevant FQDN with the target FQDN. 
     -h --help     Show this help message and exit.
 """.format(f=__file__)
 
@@ -130,6 +133,13 @@ if __name__ == '__main__':
     opt_develop_category = args['--category']
     opt_develop_vendor = args['--vendor']
     opt_develop_package = args['--package']
+    opt_invent = args['-i']
+    opt_invent_scheme = args['--scheme']
+    opt_invent_fqdn = args['--fqdn']
+    opt_invent_port = args['--port']
+    opt_invent_path = args['--path']
+    opt_invent_keyword = args['--keyword']
+    opt_no_update_vulndb = args['--no-update-vulndb']
 
     # Read config.ini.
     config = configparser.ConfigParser()
@@ -170,6 +180,42 @@ if __name__ == '__main__':
         utility.write_log(20, '[Out] GyoiThon [{}].'.format(file_name))
         sys.exit(0)
 
+    # Explore relevant FQDN with the target FQDN.
+    if opt_invent and utility.check_arg_value(opt_invent_scheme, opt_invent_fqdn, opt_invent_port, opt_invent_path):
+        spider = SpiderControl(utility)
+
+        # Check encoding.
+        test_url = ''
+        if int(opt_invent_port) in [80, 443]:
+            test_url = opt_invent_scheme + '://' + opt_invent_fqdn + opt_invent_path
+        else:
+            test_url = opt_invent_scheme + '://' + opt_invent_fqdn + ':' + opt_invent_port + opt_invent_path
+        _, server_header, res_header, res_body, encoding = utility.send_request('GET', test_url)
+
+        # Gather non target fqdn from target web site.
+        fqdn_list = []
+        spider.utility.encoding = encoding
+        _, url_list = spider.run_spider(opt_invent_scheme, opt_invent_fqdn, opt_invent_port, opt_invent_path)
+        for url in url_list:
+            parsed = util.parse_url(url)
+            fqdn_list.append(parsed.host)
+        fqdn_list = list(set(fqdn_list))
+
+        # Search relevant FQDN using Google Custom Search.
+        google_hack = GoogleCustomSearch(utility)
+        for del_idx, search_fqdn in enumerate(fqdn_list):
+            # Check reverse link to target FQDN.
+            if google_hack.search_relevant_fqdn(opt_invent_fqdn, search_fqdn) is False:
+                del fqdn_list[del_idx]
+
+        # Search related FQDN using Google Custom Search.
+        for url in google_hack.search_related_fqdn(opt_invent_fqdn, opt_invent_keyword):
+            parsed = util.parse_url(url)
+            fqdn_list.append(parsed.host)
+        fqdn_list = list(set(fqdn_list))
+
+        sys.exit(0)
+
     # Create instances.
     cloud_checker = CloudChecker(utility)
     version_checker = VersionChecker(utility)
@@ -181,7 +227,7 @@ if __name__ == '__main__':
     content_explorer = ContentExplorer(utility)
     spider = SpiderControl(utility)
     report = CreateReport(utility)
-    cve_explorer = CveExplorerNVD(utility)
+    cve_explorer = CveExplorerNVD(utility, opt_no_update_vulndb)
     censys = Censys(utility)
 
     # Get target information from "host.txt".
@@ -298,7 +344,7 @@ if __name__ == '__main__':
         else:
             # Gather target url using Spider.
             spider.utility.encoding = encoding
-            web_target_info = spider.run_spider(protocol_list[idx], fqdn_list[idx], port_list[idx], path_list[idx])
+            web_target_info, _ = spider.run_spider(protocol_list[idx], fqdn_list[idx], port_list[idx], path_list[idx])
 
             # Get HTTP responses.
             for target in web_target_info:
