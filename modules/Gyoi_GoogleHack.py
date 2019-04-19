@@ -184,6 +184,35 @@ class GoogleCustomSearch:
         self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
         return product_list
 
+    # Search relavant FQDN.
+    def search_relevant_fqdn(self, target_fqdn, search_fqdn):
+        self.utility.print_message(NOTE, 'Execute relevant FQDN Search.')
+        self.utility.write_log(20, '[In] Execute relevant FQDN Search [{}].'.format(self.file_name))
+
+        # Execute.
+        is_relevant = False
+        query = 'link:' + target_fqdn + ' site:' + search_fqdn
+        _, result_count = self.custom_search(query, self.start_index)
+
+        # Check result.
+        if result_count != 0:
+            is_relevant = True
+
+        self.utility.write_log(20, '[Out] Execute relevant FQDN Search [{}].'.format(self.file_name))
+        return is_relevant
+
+    # Search relavant FQDN.
+    def search_related_fqdn(self, target_fqdn, keyword):
+        self.utility.print_message(NOTE, 'Execute related FQDN Search.')
+        self.utility.write_log(20, '[In] Execute related FQDN Search [{}].'.format(self.file_name))
+
+        # Execute.
+        query = 'related:' + keyword + ' link:' + target_fqdn + ' -site:' + target_fqdn
+        urls, _ = self.custom_search(query, self.start_index)
+
+        self.utility.write_log(20, '[Out] Execute relevant FQDN Search [{}].'.format(self.file_name))
+        return urls
+
     # APIのアクセスはIPで制限
     # 制限の設定はGCP consoleで実施。
     def custom_search(self, query, start_index=1):

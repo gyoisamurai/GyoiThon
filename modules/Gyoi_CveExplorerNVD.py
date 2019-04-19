@@ -23,7 +23,7 @@ NONE = 'none'     # No label.
 
 
 class CveExplorerNVD:
-    def __init__(self, utility):
+    def __init__(self, utility, is_no_update):
         # Read config.ini.
         self.utility = utility
         config = configparser.ConfigParser()
@@ -58,7 +58,12 @@ class CveExplorerNVD:
         # Create/Get vulnerability data base.
         for idx, col_name in enumerate(self.nvd_db_header):
             self.db_colmns[idx] = col_name
-        self.df_vuln_db = self.initialize_vuln_db()
+        if is_no_update is True and os.path.exists(self.nvd_path):
+            self.utility.print_message(WARNING, 'Skip updating vulnerability DB.')
+            self.utility.print_message(WARNING, 'Load existing "{}".'.format(self.nvd_path))
+            self.df_vuln_db = pd.read_csv(self.nvd_path, sep=',', encoding='utf-8')
+        else:
+            self.df_vuln_db = self.initialize_vuln_db()
 
     # Extract vulnerability information from NVD.
     def extract_vuln_info(self, cve_items, cve_year, last_modified_date):
