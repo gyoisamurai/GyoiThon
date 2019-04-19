@@ -93,6 +93,7 @@ class SpiderControl:
         # Get crawling result.
         all_targets_log = []
         target_log = [target_url]
+        non_target_log = []
         dict_json = {}
         if os.path.exists(scrapy_log_path):
             with codecs.open(scrapy_log_path, 'r', encoding='utf-8') as fin:
@@ -109,6 +110,8 @@ class SpiderControl:
                 try:
                     if target_fqdn == util.parse_url(item).host:
                         target_log.append(item)
+                    else:
+                        non_target_log.append(item)
                 except Exception as e:
                     msg = 'Excepting allowed domain is failure : {}'.format(e)
                     self.utility.print_message(FAIL, msg)
@@ -117,4 +120,4 @@ class SpiderControl:
         self.utility.write_log(20, 'Get spider result.')
         all_targets_log.append([target_url, gyoithon_log_path, list(set(target_log))])
         self.utility.write_log(20, '[Out] Run spider [{}].'.format(self.file_name))
-        return all_targets_log
+        return all_targets_log, non_target_log
