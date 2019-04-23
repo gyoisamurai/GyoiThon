@@ -5,11 +5,13 @@ import sys
 import string
 import random
 import re
+import urllib
 import urllib3
 import cchardet
 import socket
 import ipaddress
 import configparser
+from urllib.parse import urlencode
 from datetime import datetime
 from logging import getLogger, FileHandler, Formatter
 
@@ -51,7 +53,7 @@ class Utilty:
             self.proxy = config['Common']['proxy']
             self.proxy_user = config['Common']['proxy_user']
             self.proxy_pass = config['Common']['proxy_pass']
-            self.ua = {'User-Agent': config['Common']['user-agent']}
+            self.ua = config['Common']['user-agent']
             self.encoding = config['Common']['default_charset']
             if config['Common']['redirect'] == '0':
                 self.redirect = False
@@ -68,6 +70,16 @@ class Utilty:
         self.logger.addHandler(file_handler)
         formatter = Formatter('%(levelname)s,%(message)s')
         file_handler.setFormatter(formatter)
+
+        # Set HTTP request header.
+        self.http_req_header = {'User-Agent': self.ua,
+                                'Connection': 'keep-alive',
+                                'Accept-Language': 'ja,en-US;q=0.7,en;q=0.3',
+                                'Accept-Encoding': 'gzip, deflate',
+                                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                                'Upgrade-Insecure-Requests': '1',
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'Cache-Control': 'no-cache'}
 
     # Print metasploit's symbol.
     def print_message(self, type, message):
@@ -177,14 +189,26 @@ class Utilty:
 
         return True
 
+    # Decode parameter (name and value).
+    def decode_parameter(self, params, enc):
+        parameter = {}
+        for item in params.items():
+            parameter[urllib.parse.quote(item[0], encoding=enc)] = urllib.parse.quote(item[1], encoding=enc)
+        return parameter
+
     # Send http request.
-    def send_request(self, method, target_url, preload_content=True):
+    def send_request(self, method, target_url, preload_content=True, query_param=None, body_param=None, enc='utf-8'):
         res_header = ''
         res_body = ''
         server_header = '-'
         res = None
-        encoding = ''
         content_type_value = ''
+
+        # Initialize empty parameter set.
+        if query_param is None:
+            query_param = {}
+        if body_param is None:
+            body_param = {}
 
         # Set proxy server.
         http = None
@@ -193,18 +217,29 @@ class Utilty:
             if self.proxy_user != '':
                 headers = urllib3.make_headers(proxy_basic_auth=self.proxy_user + ':' + self.proxy_pass)
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
-                                            headers=self.ua,
+                                            headers=self.http_req_header,
                                             proxy_url=self.proxy,
                                             proxy_headers=headers)
             else:
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
-                                            headers=self.ua,
+                                            headers=self.http_req_header,
                                             proxy_url=self.proxy)
         else:
-            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.ua)
+            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.http_req_header)
 
         try:
-            res = http.request(method, target_url, preload_content=preload_content, redirect=self.redirect)
+            if method.lower() == 'get':
+                res = http.request('GET',
+                                   target_url,
+                                   fields=query_param,
+                                   preload_content=preload_content,
+                                   redirect=self.redirect)
+            else:
+                encoded_args = urlencode(body_param, encoding=enc)
+                res = http.request('POST',
+                                   target_url + '?' + encoded_args,
+                                   preload_content=preload_content,
+                                   redirect=self.redirect)
 
             for header in res.headers.items():
                 res_header += header[0] + ': ' + header[1] + '\r\n'

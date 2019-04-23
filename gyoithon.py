@@ -25,6 +25,7 @@ from modules.Gyoi_CveExplorerNVD import CveExplorerNVD
 from modules.Gyoi_Exploit import Exploit
 from modules.Gyoi_Censys import Censys
 from modules.Gyoi_Creator import Creator
+from modules.Gyoi_Inventory import Inventory
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -182,39 +183,28 @@ if __name__ == '__main__':
 
     # Explore relevant FQDN with the target FQDN.
     if opt_invent and utility.check_arg_value(opt_invent_scheme, opt_invent_fqdn, opt_invent_port, opt_invent_path):
+        inventory = Inventory(utility)
         spider = SpiderControl(utility)
+        google_hack = GoogleCustomSearch(utility)
 
-        # Check encoding.
+        # Check target information and detect encoding.
         test_url = ''
         if int(opt_invent_port) in [80, 443]:
             test_url = opt_invent_scheme + '://' + opt_invent_fqdn + opt_invent_path
         else:
             test_url = opt_invent_scheme + '://' + opt_invent_fqdn + ':' + opt_invent_port + opt_invent_path
-        _, server_header, res_header, res_body, encoding = utility.send_request('GET', test_url)
+        _, _, _, _, encoding = utility.send_request('GET', test_url)
 
-        # Gather non target fqdn from target web site.
-        fqdn_list = []
-        spider.utility.encoding = encoding
-        _, url_list = spider.run_spider(opt_invent_scheme, opt_invent_fqdn, opt_invent_port, opt_invent_path)
-        for url in url_list:
-            parsed = util.parse_url(url)
-            fqdn_list.append(parsed.host)
-        fqdn_list = list(set(fqdn_list))
+        # Gather relevant FQDN using web crawl and Google Custom Search.
+        target_list, non_reverse_list = inventory.link_explorer(spider,
+                                                                google_hack,
+                                                                test_url,
+                                                                opt_invent_keyword,
+                                                                encoding)
 
-        # Search relevant FQDN using Google Custom Search.
-        google_hack = GoogleCustomSearch(utility)
-        for del_idx, search_fqdn in enumerate(fqdn_list):
-            # Check reverse link to target FQDN.
-            if google_hack.search_relevant_fqdn(opt_invent_fqdn, search_fqdn) is False:
-                del fqdn_list[del_idx]
-
-        # Search related FQDN using Google Custom Search.
-        for url in google_hack.search_related_fqdn(opt_invent_fqdn, opt_invent_keyword):
-            parsed = util.parse_url(url)
-            fqdn_list.append(parsed.host)
-        fqdn_list = list(set(fqdn_list))
-
-        sys.exit(0)
+        # Gather relevant FQDN using Whois service.
+        fqdn_list = inventory.domain_explore(google_hack, opt_invent_keyword)
+        exit(0)
 
     # Create instances.
     cloud_checker = CloudChecker(utility)
