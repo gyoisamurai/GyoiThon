@@ -105,7 +105,7 @@ class GoogleCustomSearch:
                     self.utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
 
                 # Execute.
-                urls, result_count = self.custom_search(query, self.start_index)
+                urls, result_count = self.custom_search(query)
 
                 msg = '{}/{} Execute query: {}'.format(idx + 1, len(signatures), query)
                 self.utility.print_message(OK, msg)
@@ -184,6 +184,18 @@ class GoogleCustomSearch:
         self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
         return product_list
 
+    # Search domain.
+    def search_domain(self, target_domain, max_search_num):
+        self.utility.print_message(NOTE, 'Execute Domain Search.')
+        self.utility.write_log(20, '[In] Execute Domain Search [{}].'.format(self.file_name))
+
+        # Execute.
+        query = 'site:' + target_domain
+        urls, _ = self.custom_search(query, max_search_num)
+
+        self.utility.write_log(20, '[Out] Execute Domain Search [{}].'.format(self.file_name))
+        return urls
+
     # Search relavant FQDN.
     def search_relevant_fqdn(self, target_fqdn, search_fqdn):
         self.utility.print_message(NOTE, 'Execute relevant FQDN Search.')
@@ -192,7 +204,7 @@ class GoogleCustomSearch:
         # Execute.
         is_relevant = False
         query = 'link:' + target_fqdn + ' site:' + search_fqdn
-        _, result_count = self.custom_search(query, self.start_index)
+        _, result_count = self.custom_search(query)
 
         # Check result.
         if result_count != 0:
@@ -202,20 +214,20 @@ class GoogleCustomSearch:
         return is_relevant
 
     # Search relavant FQDN.
-    def search_related_fqdn(self, target_fqdn, keyword):
+    def search_related_fqdn(self, target_fqdn, keyword, max_search_num):
         self.utility.print_message(NOTE, 'Execute related FQDN Search.')
         self.utility.write_log(20, '[In] Execute related FQDN Search [{}].'.format(self.file_name))
 
         # Execute.
         query = 'related:' + keyword + ' link:' + target_fqdn + ' -site:' + target_fqdn
-        urls, _ = self.custom_search(query, self.start_index)
+        urls, _ = self.custom_search(query, max_search_num)
 
         self.utility.write_log(20, '[Out] Execute relevant FQDN Search [{}].'.format(self.file_name))
         return urls
 
     # APIのアクセスはIPで制限
     # 制限の設定はGCP consoleで実施。
-    def custom_search(self, query, start_index=1):
+    def custom_search(self, query, max_page_count=1):
         # Google Custom Search API.
         self.utility.write_log(20, '[In] Execute Google custom search [{}].'.format(self.file_name))
 
@@ -224,7 +236,7 @@ class GoogleCustomSearch:
         if self.utility.proxy != '':
             # Set proxy.
             self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
-            parsed = util.parse_url(self.utility.proxy)
+            parsed = util.parse_url(self.utility.proxy_addr)
             proxy = None
             if self.utility.proxy_pass != '':
                 proxy = httplib2.ProxyInfo(proxy_type=socks.PROXY_TYPE_HTTP,
@@ -246,23 +258,33 @@ class GoogleCustomSearch:
         response = []
         urls = []
         result_count = 0
+        start_index = self.start_index
         try:
-            response.append(service.cse().list(
-                q=query,
-                cx=self.search_engine_id,
-                num=10,
-                start=self.start_index
-            ).execute())
+            search_count = 0
+            while search_count < max_page_count:
+                response.append(service.cse().list(
+                    q=query,
+                    cx=self.search_engine_id,
+                    num=10,
+                    start=start_index
+                ).execute())
 
-            # Get finding counts.
-            result_count = int(response[0].get('searchInformation').get('totalResults'))
+                # Get finding counts.
+                result_count = int(response[search_count].get('searchInformation').get('totalResults'))
 
-            # Get extracted link (url).
-            if result_count != 0:
-                items = response[0]['items']
-                for item in items:
-                    urls.append(item['link'])
+                # Get extracted link (url).
+                if result_count != 0:
+                    items = response[search_count]['items']
+                    for item in items:
+                        urls.append(item['link'])
 
+                # Set next start index.
+                if result_count <= 10:
+                    break
+                else:
+                    start_index = response[search_count].get('queries').get('nextPage')[0].get('startIndex')
+
+                search_count += 1
         except Exception as e:
             msg = 'Google custom search is failure : {}'.format(e)
             self.utility.print_exception(e, msg)
