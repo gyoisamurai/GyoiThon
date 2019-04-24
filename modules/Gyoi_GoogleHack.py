@@ -260,8 +260,8 @@ class GoogleCustomSearch:
         result_count = 0
         try:
             search_count = 0
-            self.utility.print_message(OK, 'Using query : {}'.format(query))
             while search_count < max_page_count:
+                self.utility.print_message(OK, 'Using query : {}'.format(query))
                 response.append(service.cse().list(
                     q=query,
                     cx=self.search_engine_id,
