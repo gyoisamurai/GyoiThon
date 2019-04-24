@@ -187,23 +187,15 @@ if __name__ == '__main__':
         spider = SpiderControl(utility)
         google_hack = GoogleCustomSearch(utility)
 
-        # Check target information and detect encoding.
-        test_url = ''
+        # Check encoding type of target site.
+        target_url = ''
         if int(opt_invent_port) in [80, 443]:
-            test_url = opt_invent_scheme + '://' + opt_invent_fqdn + opt_invent_path
+            target_url = opt_invent_scheme + '://' + opt_invent_fqdn + opt_invent_path
         else:
-            test_url = opt_invent_scheme + '://' + opt_invent_fqdn + ':' + opt_invent_port + opt_invent_path
-        _, _, _, _, encoding = utility.send_request('GET', test_url)
+            target_url = opt_invent_scheme + '://' + opt_invent_fqdn + ':' + opt_invent_port + opt_invent_path
 
-        # Gather relevant FQDN using web crawl and Google Custom Search.
-        target_list, non_reverse_list = inventory.link_explorer(spider,
-                                                                google_hack,
-                                                                test_url,
-                                                                opt_invent_keyword,
-                                                                encoding)
-
-        # Gather relevant FQDN using Whois service.
-        fqdn_list = inventory.domain_explore(google_hack, opt_invent_keyword)
+        # Gather relevant FQDN.
+        fqdn_list = inventory.fqdn_explore(spider, google_hack, target_url, opt_invent_keyword)
         exit(0)
 
     # Create instances.

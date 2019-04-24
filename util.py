@@ -11,6 +11,7 @@ import cchardet
 import socket
 import ipaddress
 import configparser
+from urllib3 import util
 from urllib.parse import urlencode
 from datetime import datetime
 from logging import getLogger, FileHandler, Formatter
@@ -188,6 +189,17 @@ class Utilty:
             return False
 
         return True
+
+    # Extract hostname from single URL.
+    def transform_url_hostname(self, target_url):
+        return util.parse_url(target_url).host
+
+    # Extract hostname from URL list.
+    def transform_url_hostname_list(self, target_url_list):
+        hostname_list = []
+        for target_url in target_url_list:
+            hostname_list.append(util.parse_url(target_url).host)
+        return list(set(hostname_list))
 
     # Decode parameter (name and value).
     def decode_parameter(self, params, enc):
