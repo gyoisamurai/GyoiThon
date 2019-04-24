@@ -1,9 +1,7 @@
-![Black Hat Arsenal](https://raw.githubusercontent.com/toolswatch/badges/master/arsenal/asia/2018.svg?sanitize=true)
-
-# **GyoiThon** ![gyoithon's logo](./img/gyoi_logo.png)  
-**Next generation penetration test tool**
-
+# **GyoiThon**: **Next generation penetration test tool**
 ---
+![Black Hat Arsenal](https://raw.githubusercontent.com/toolswatch/badges/master/arsenal/asia/2018.svg?sanitize=true)  
+<img src="./img/gyoithon_logo.png" width="600">  
 
 Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).  
 
