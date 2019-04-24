@@ -191,10 +191,10 @@ class GoogleCustomSearch:
 
         # Execute.
         query = 'site:' + target_domain
-        urls, _ = self.custom_search(query, max_search_num)
+        _, _, fqdn_list = self.custom_search(query, max_page_count=max_search_num, target_fqdn=target_domain)
 
         self.utility.write_log(20, '[Out] Execute Domain Search [{}].'.format(self.file_name))
-        return urls
+        return fqdn_list
 
     # Search relavant FQDN.
     def search_relevant_fqdn(self, target_fqdn, search_fqdn):
@@ -204,7 +204,7 @@ class GoogleCustomSearch:
         # Execute.
         is_relevant = False
         query = 'link:' + target_fqdn + ' site:' + search_fqdn
-        _, result_count = self.custom_search(query)
+        _, result_count, _ = self.custom_search(query)
 
         # Check result.
         if result_count != 0:
@@ -220,14 +220,13 @@ class GoogleCustomSearch:
 
         # Execute.
         query = 'related:' + keyword + ' link:' + target_fqdn + ' -site:' + target_fqdn
-        urls, _ = self.custom_search(query, max_search_num)
+        _, _, fqdn_list = self.custom_search(query, max_page_count=max_search_num)
 
         self.utility.write_log(20, '[Out] Execute relevant FQDN Search [{}].'.format(self.file_name))
-        return urls
+        return fqdn_list
 
-    # APIのアクセスはIPで制限
-    # 制限の設定はGCP consoleで実施。
-    def custom_search(self, query, max_page_count=1):
+    # Execute Google custom search.
+    def custom_search(self, query, max_page_count=1, target_fqdn=''):
         # Google Custom Search API.
         self.utility.write_log(20, '[In] Execute Google custom search [{}].'.format(self.file_name))
 
@@ -236,7 +235,7 @@ class GoogleCustomSearch:
         if self.utility.proxy != '':
             # Set proxy.
             self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
-            parsed = util.parse_url(self.utility.proxy_addr)
+            parsed = util.parse_url(self.utility.proxy)
             proxy = None
             if self.utility.proxy_pass != '':
                 proxy = httplib2.ProxyInfo(proxy_type=socks.PROXY_TYPE_HTTP,
@@ -257,16 +256,17 @@ class GoogleCustomSearch:
         # Execute search.
         response = []
         urls = []
+        fqdn_list = []
         result_count = 0
-        start_index = self.start_index
         try:
             search_count = 0
+            self.utility.print_message(OK, 'Using query : {}'.format(query))
             while search_count < max_page_count:
                 response.append(service.cse().list(
                     q=query,
                     cx=self.search_engine_id,
                     num=10,
-                    start=start_index
+                    start=self.start_index
                 ).execute())
 
                 # Get finding counts.
@@ -278,11 +278,17 @@ class GoogleCustomSearch:
                     for item in items:
                         urls.append(item['link'])
 
-                # Set next start index.
+                # Set new query.
                 if result_count <= 10:
+                    fqdn_list.extend(self.utility.transform_url_hostname_list(urls))
                     break
                 else:
-                    start_index = response[search_count].get('queries').get('nextPage')[0].get('startIndex')
+                    # Refine search range using "-site" option.
+                    tmp_list = self.utility.transform_url_hostname_list(urls)
+                    for fqdn in tmp_list:
+                        if target_fqdn != fqdn:
+                            query += ' -site:' + fqdn
+                    fqdn_list.extend(tmp_list)
 
                 search_count += 1
         except Exception as e:
@@ -290,7 +296,7 @@ class GoogleCustomSearch:
             self.utility.print_exception(e, msg)
             self.utility.write_log(30, msg)
             self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
-            return urls, result_count
+            return urls, result_count, fqdn_list
 
         self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
-        return urls, result_count
+        return urls, result_count, list(set(fqdn_list))

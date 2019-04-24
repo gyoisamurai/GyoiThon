@@ -3,7 +3,9 @@
 import os
 import sys
 import codecs
+import time
 import re
+import subprocess
 import configparser
 from urllib3 import util
 
@@ -37,9 +39,22 @@ class Inventory:
             self.max_search_num = int(config['Inventory']['max_search_num'])
             self.jprs_url = config['Inventory']['jprs_url']
             self.jprs_post = {'type': 'DOM-HOLDER', 'key': ''}
+            self.jprs_regex_multi = config['Inventory']['jprs_regex_multi']
+            self.jprs_regex_single = config['Inventory']['jprs_regex_single']
             self.jpnic_url = config['Inventory']['jpnic_url']
             self.jpnic_post = {'codecheck-sjis': 'にほんねっとわーくいんふぉめーしょんせんたー',
                                'key': '', 'submit': '検索', 'type': 'NET-HOLDER', 'rule': ''}
+            self.jpnic_regex_multi = config['Inventory']['jpnic_regex_multi']
+            self.jpnic_regex_single = config['Inventory']['jpnic_regex_single']
+            self.nslookup_delay_time = float(config['Inventory']['nslookup_delay_time'])
+            self.nslookup_cmd = config['Inventory']['nslookup_cmd']
+            self.nslookup_options = config['Inventory']['nslookup_options'].split('@')
+            self.cname_regex = config['Inventory']['cname_regex'].split('@')
+            self.mx_rec_regex = config['Inventory']['mx_rec_regex'].split('@')
+            self.mx_rec_regex_multi = config['Inventory']['mx_rec_regex_multi'].split('@')
+            self.ns_rec_regex = config['Inventory']['ns_rec_regex'].split('@')
+            self.soa_rec_regex = config['Inventory']['soa_rec_regex'].split('@')
+            self.txt_rec_regex = config['Inventory']['txt_rec_regex'].split('@')
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -55,20 +70,18 @@ class Inventory:
         return fqdn_list
 
     # Explore relevant link.
-    def link_explorer(self, spider, google_hack, target_url, keyword, encoding):
+    def link_explorer(self, spider, google_hack, target_url, keyword):
         self.utility.print_message(NOTE, 'Explore relevant FQDN.')
         self.utility.write_log(20, '[In] Explore relevant FQDN [{}].'.format(self.file_name))
 
-        parsed = util.parse_url(target_url)
+        # Send request for checking encoding type.
+        _, _, _, _, encoding = self.utility.send_request('GET', target_url)
 
         # Gather FQDN from link of target web site.
-        link_fqdn_list = []
         spider.utility.encoding = encoding
+        parsed = util.parse_url(target_url)
         _, url_list = spider.run_spider(parsed.scheme, parsed.host, parsed.port, parsed.path)
-        for url in url_list:
-            parsed = util.parse_url(url)
-            link_fqdn_list.append(parsed.host)
-        link_fqdn_list = self.check_black_list(list(set(link_fqdn_list)))
+        link_fqdn_list = self.check_black_list(self.utility.transform_url_hostname_list(url_list))
 
         # Search FQDN that include link to the target FQDN using Google Custom Search.
         non_reverse_link_fqdn = []
@@ -79,31 +92,27 @@ class Inventory:
                 del link_fqdn_list[del_idx]
 
         # Search related FQDN using Google Custom Search.
-        related_fqdn_list = []
-        for url in google_hack.search_related_fqdn(parsed.host, keyword, self.max_search_num):
-            parsed = util.parse_url(url)
-            related_fqdn_list.append(parsed.host)
-        related_fqdn_list = self.check_black_list(list(set(related_fqdn_list)))
+        searched_list = google_hack.search_related_fqdn(parsed.host, keyword, self.max_search_num)
+        related_fqdn_list = self.check_black_list(searched_list)
 
         self.utility.write_log(20, '[Out] Explore relevant FQDN [{}].'.format(self.file_name))
-        return list(set(link_fqdn_list.extend(related_fqdn_list))), non_reverse_link_fqdn
+        return list(set(link_fqdn_list.extend(related_fqdn_list))), list(set(non_reverse_link_fqdn))
 
-    # Explore Domain.
-    def domain_explore(self, google_hack, keyword):
-        self.utility.print_message(NOTE, 'Explore relevant domain.')
-        self.utility.write_log(20, '[In] Explore relevant domain [{}].'.format(self.file_name))
+    # Explore FQDN using JPRS.
+    def jprs_fqdn_explore(self, google_hack, keyword):
+        self.utility.print_message(NOTE, 'Explore FQDN using JPRS.')
+        self.utility.write_log(20, '[In] Explore FQDN using JPRS [{}].'.format(self.file_name))
 
-        # Explore domain using JPRS.
-        self.utility.print_message(OK, 'Explore domain from JPRS.')
+        # Send request for gathering domain.
         domain_list = []
         self.jprs_post['key'] = keyword
         res, _, _, res_body, _ = self.utility.send_request('POST',
                                                            self.jprs_url,
                                                            body_param=self.jprs_post)
         if res.status == 200:
-            domain_list = re.findall(r'{}.*\s*<a.*>(.*)</a>[\r\n]'.format(keyword), res_body)
+            domain_list = re.findall(self.jprs_regex_multi.format(keyword), res_body)
             if len(domain_list) == 0:
-                domain_list = re.findall(r'\[ドメイン名\]\s+([\w\Wa-zA-Z\.].*)[\r\n]', res_body)
+                domain_list = re.findall(self.jprs_regex_single, res_body)
                 if len(domain_list) != 0:
                     self.utility.print_message(NOTE, 'Gathered domain from JPRS. : {}'.format(domain_list))
                 else:
@@ -113,30 +122,117 @@ class Inventory:
 
         # Explore FQDN using gathered domain list.
         fqdn_list = []
-        # for domain in list(set(domain_list)):
-        #     fqdn_list.extend(google_hack.search_domain(domain.lower(), self.max_search_num))
+        for domain in list(set(domain_list)):
+            fqdn_list.extend(google_hack.search_domain(domain.lower(), self.max_search_num))
 
+        # Extract FQDN.
         fqdn_list = list(set(fqdn_list))
-        jprs_fqdn_list = []
-        for url in fqdn_list:
-            parsed = util.parse_url(url)
-            jprs_fqdn_list.append(parsed.host)
-        jprs_fqdn_list = list(set(jprs_fqdn_list))
+        jprs_fqdn_list = self.check_black_list(fqdn_list)
 
-        # Explore domain using JPNIC.
-        domain_list = []
+        self.utility.write_log(20, '[Out] Explore FQDN using JPRS [{}].'.format(self.file_name))
+        return jprs_fqdn_list
+
+    # Explore FQDN using JPNIC.
+    def jpnic_fqdn_explore(self, google_hack, keyword):
+        self.utility.print_message(NOTE, 'Explore FQDN using JPNIC.')
+        self.utility.write_log(20, '[In] Explore FQDN using JPNIC [{}].'.format(self.file_name))
+
+        # Send request for gathering IP range list.
+        ip_range_list = []
         self.jpnic_post['key'] = keyword
         res, _, _, res_body, _ = self.utility.send_request('POST',
                                                            self.jpnic_url,
                                                            body_param=self.jpnic_post,
                                                            enc='shift_jis')
         if res.status == 200:
-            domain_list = re.findall(r'{}.*\s.*<a.*>(.*)</a>[\r\n]'.format(keyword), res_body, flags=re.IGNORECASE)
+            ip_range_list = re.findall(self.jpnic_regex_multi.format(keyword), res_body, flags=re.IGNORECASE)
 
-        # Explore FQDN using gathered domain list.
+        self.utility.write_log(20, '[Out] Explore FQDN using JPNIC [{}].'.format(self.file_name))
+        return ip_range_list
+
+    # Execute nslookup command.
+    def execute_nslookup(self, target_fqdn, option, os_index, char_code):
+        self.utility.write_log(20, '[In] Execute nslookup command [{}].'.format(self.file_name))
+
+        # Execute nslookup command.
+        nslookup_result = ''
+        nslookup_cmd = self.nslookup_cmd + option + ' ' + target_fqdn
+        try:
+            self.utility.write_log(20, 'Execute : {}'.format(nslookup_cmd))
+            nslookup_result = subprocess.check_output(nslookup_cmd, shell=True)
+            self.utility.print_message(OK, 'Execute : {}'.format(nslookup_cmd))
+        except Exception as e:
+            msg = 'Executing {} is failure.'.format(nslookup_cmd)
+            self.utility.print_exception(e, msg)
+            self.utility.write_log(30, msg)
+
+        # Check nslookup result.
         fqdn_list = []
-        for domain in list(set(domain_list)):
-            fqdn_list.extend(google_hack.search_domain(domain.lower(), self.max_search_num))
+        nslookup_result = nslookup_result.decode(char_code)
+        if nslookup_result != '':
+            fqdn_list.extend(re.findall(self.cname_regex[os_index], nslookup_result))
+            fqdn_list.extend(re.findall(self.mx_rec_regex[os_index], nslookup_result))
+            fqdn_list.extend(re.findall(self.mx_rec_regex_multi[os_index], nslookup_result))
+            fqdn_list.extend(re.findall(self.ns_rec_regex[os_index], nslookup_result))
+            fqdn_list.extend(re.findall(self.soa_rec_regex[os_index], nslookup_result))
+            fqdn_list.extend(re.findall(self.txt_rec_regex[os_index], nslookup_result))
+        else:
+            self.utility.print_message(WARNING, 'Executing nslookup is failure : {}.'.format(nslookup_cmd))
+
+        if len(fqdn_list) != 0:
+            self.utility.print_message(OK, 'Gathered : {}'.format(fqdn_list))
+
+        self.utility.write_log(20, '[Out] Execute nslookup command [{}].'.format(self.file_name))
+        return fqdn_list
+
+    # Explore FQDN using DNS server.
+    def dns_explore(self, target_fqdn_list):
+        self.utility.print_message(NOTE, 'Explore FQDN using DNS server.')
+        self.utility.write_log(20, '[In] Explore FQDN using DNS server [{}].'.format(self.file_name))
+
+        # Set character code.
+        char_code = ''
+        os_index = 0
+        if os.name == 'nt':
+            char_code = 'shift-jis'
+        else:
+            char_code = 'utf-8'
+            os_index = 1
+
+        # Get Network addresses from each domain.
+        dns_fqdn_list = []
+        for target_fqdn in target_fqdn_list:
+            for option in self.nslookup_options:
+                dns_fqdn_list.extend(self.execute_nslookup(target_fqdn, option, os_index, char_code))
+                time.sleep(self.nslookup_delay_time)
+
+        self.utility.write_log(20, '[Out] Explore FQDN using DNS server [{}].'.format(self.file_name))
+        return list(set(dns_fqdn_list))
+
+    # Explore relevant domain.
+    def fqdn_explore(self, spider, google_hack, target_url, keyword):
+        self.utility.print_message(NOTE, 'Explore relevant domain.')
+        self.utility.write_log(20, '[In] Explore relevant domain [{}].'.format(self.file_name))
+        fqdn_list = []
+
+        # TODO: FQDNの取得元を併記する。
+
+        # Explore FQDN using Web Crawl and Google Custom Search.
+        link_fqdn_list, non_link_fqdn_list = self.link_explorer(spider, google_hack, target_url, keyword)
+
+        # Explore domain using JPRS.
+        jprs_fqdn_list = self.jprs_fqdn_explore(google_hack, keyword)
+
+        # Explore domain using JPNIC.
+        jpnic_fqdn_list = self.jpnic_fqdn_explore(google_hack, keyword)
+        # TODO: IPレンジの探索機能を実装する。
+
+        # Explore FQDN (DNS server, Mail server etc) using DNS server.
+        target_fqdn_list = []
+        target_fqdn_list.extend(link_fqdn_list)
+        target_fqdn_list.extend(jprs_fqdn_list)
+        target_fqdn_list.extend(jpnic_fqdn_list)
+        dns_fqdn_list = self.dns_explore(list(set(target_fqdn_list)))
 
         self.utility.write_log(20, '[Out] Explore relevant domain [{}].'.format(self.file_name))
         return list(set(fqdn_list))
