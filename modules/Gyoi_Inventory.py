@@ -5,6 +5,7 @@ import sys
 import codecs
 import time
 import re
+import tldextract
 import subprocess
 import configparser
 from urllib3 import util
@@ -25,7 +26,7 @@ class Inventory:
         self.file_name = os.path.basename(__file__)
         self.full_path = os.path.dirname(os.path.abspath(__file__))
         self.root_path = os.path.join(self.full_path, '../')
-        config.read(os.path.join(self.root_path, 'config.ini'))
+        config.read(os.path.join(self.root_path, 'config.ini'), encoding='utf-8')
 
         try:
             self.signature_dir = os.path.join(self.root_path, config['Common']['signature_path'])
@@ -63,7 +64,7 @@ class Inventory:
     # Check black list.
     def check_black_list(self, fqdn_list):
         for idx, fqdn in enumerate(fqdn_list):
-            for exclude_fqdn in enumerate(self.black_list):
+            for exclude_fqdn in self.black_list:
                 if fqdn == exclude_fqdn.replace('\n', '').replace('\r', ''):
                     del fqdn_list[idx]
                     self.utility.print_message(WARNING, '"{}" is include black list.'.format(fqdn))
@@ -80,7 +81,12 @@ class Inventory:
         # Gather FQDN from link of target web site.
         spider.utility.encoding = encoding
         parsed = util.parse_url(target_url)
-        _, url_list = spider.run_spider(parsed.scheme, parsed.host, parsed.port, parsed.path)
+        port = '0'
+        if parsed.port is None and parsed.scheme == 'https':
+            port = '443'
+        elif parsed.port is None and parsed.scheme == 'http':
+            port = '80'
+        _, url_list = spider.run_spider(parsed.scheme, parsed.host, port, parsed.path)
         link_fqdn_list = self.check_black_list(self.utility.transform_url_hostname_list(url_list))
 
         # Search FQDN that include link to the target FQDN using Google Custom Search.
@@ -92,7 +98,8 @@ class Inventory:
                 del link_fqdn_list[del_idx]
 
         # Search related FQDN using Google Custom Search.
-        searched_list = google_hack.search_related_fqdn(parsed.host, keyword, self.max_search_num)
+        searched_list = []
+        searched_list.extend(google_hack.search_related_fqdn(parsed.host, keyword, self.max_search_num))
         related_fqdn_list = self.check_black_list(searched_list)
 
         self.utility.write_log(20, '[Out] Explore relevant FQDN [{}].'.format(self.file_name))
@@ -112,7 +119,7 @@ class Inventory:
         if res.status == 200:
             domain_list = re.findall(self.jprs_regex_multi.format(keyword), res_body)
             if len(domain_list) == 0:
-                domain_list = re.findall(self.jprs_regex_single, res_body)
+                domain_list = re.findall(self.jprs_regex_single.format(keyword), res_body)
                 if len(domain_list) != 0:
                     self.utility.print_message(NOTE, 'Gathered domain from JPRS. : {}'.format(domain_list))
                 else:
@@ -131,6 +138,59 @@ class Inventory:
 
         self.utility.write_log(20, '[Out] Explore FQDN using JPRS [{}].'.format(self.file_name))
         return jprs_fqdn_list
+
+    # Explore FQDN using JPRS.
+    def mutated_fqdn_explore(self, google_hack, origin_fqdn_list):
+        self.utility.print_message(NOTE, 'Explore mutated FQDN using Google Hack.')
+        self.utility.write_log(20, '[In] Explore mutated FQDN using Google Hack [{}].'.format(self.file_name))
+
+        # Explore FQDN using gathered domain list.
+        used_domain_list = []
+        fqdn_list = []
+        for fqdn in origin_fqdn_list:
+            # Mutate "jp" suffix -> "foreign" suffix.
+            domain = ''
+            ext = tldextract.extract(fqdn)
+            suffix = ext.suffix
+            if suffix == 'co.jp':
+                domain = ext.domain + '.com'
+            elif suffix == 'ne.jp':
+                domain = ext.domain + '.net'
+            elif suffix == 'or.jp':
+                domain = ext.domain + '.org'
+            elif suffix == 'ed.jp':
+                domain = ext.domain + '.edu'
+            elif suffix == 'go.jp':
+                domain = ext.domain + '.gov'
+            elif suffix == 'jp':
+                domain = ext.domain + '.com'
+            elif suffix == 'com':
+                domain = ext.domain + '.co.jp'
+            elif suffix == 'net':
+                domain = ext.domain + '.ne.jp'
+            elif suffix == 'org':
+                domain = ext.domain + '.or.jp'
+            elif suffix == 'edu':
+                domain = ext.domain + '.ed.jp'
+            elif suffix == 'gov':
+                domain = ext.domain + '.go.jp'
+            else:
+                self.utility.print_message(WARNING, 'Don\'t define suffix : {}'.format(suffix))
+                continue
+
+            # Execute Google Custom Search.
+            if domain not in used_domain_list:
+                fqdn_list.extend(google_hack.search_domain(domain.lower(), self.max_search_num))
+            else:
+                self.utility.print_message(WARNING, 'Already searched domain : {}'.format(domain))
+            used_domain_list.append(domain)
+
+        # Extract FQDN.
+        fqdn_list = list(set(fqdn_list))
+        mutated_fqdn_list = self.check_black_list(fqdn_list)
+
+        self.utility.write_log(20, '[Out] Explore mutated FQDN using Google Hack [{}].'.format(self.file_name))
+        return mutated_fqdn_list
 
     # Explore FQDN using JPNIC.
     def jpnic_fqdn_explore(self, google_hack, keyword):
@@ -215,23 +275,24 @@ class Inventory:
         self.utility.write_log(20, '[In] Explore relevant domain [{}].'.format(self.file_name))
         fqdn_list = []
 
-        # TODO: FQDNの取得元を併記する。
-
         # Explore FQDN using Web Crawl and Google Custom Search.
         link_fqdn_list, non_link_fqdn_list = self.link_explorer(spider, google_hack, target_url, keyword)
 
         # Explore domain using JPRS.
         jprs_fqdn_list = self.jprs_fqdn_explore(google_hack, keyword)
 
+        # Explore mutated fqdn.
+        mutated_fqdn_list = self.mutated_fqdn_explore(google_hack, list(set(jprs_fqdn_list.extend(link_fqdn_list))))
+
         # Explore domain using JPNIC.
-        jpnic_fqdn_list = self.jpnic_fqdn_explore(google_hack, keyword)
+        # jpnic_fqdn_list = self.jpnic_fqdn_explore(google_hack, keyword)
         # TODO: IPレンジの探索機能を実装する。
 
         # Explore FQDN (DNS server, Mail server etc) using DNS server.
         target_fqdn_list = []
         target_fqdn_list.extend(link_fqdn_list)
         target_fqdn_list.extend(jprs_fqdn_list)
-        target_fqdn_list.extend(jpnic_fqdn_list)
+        # target_fqdn_list.extend(jpnic_fqdn_list)
         dns_fqdn_list = self.dns_explore(list(set(target_fqdn_list)))
 
         self.utility.write_log(20, '[Out] Explore relevant domain [{}].'.format(self.file_name))

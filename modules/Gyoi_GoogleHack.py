@@ -105,7 +105,7 @@ class GoogleCustomSearch:
                     self.utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
 
                 # Execute.
-                urls, result_count = self.custom_search(query)
+                urls, result_count, _ = self.custom_search(query)
 
                 msg = '{}/{} Execute query: {}'.format(idx + 1, len(signatures), query)
                 self.utility.print_message(OK, msg)
@@ -192,11 +192,13 @@ class GoogleCustomSearch:
         # Execute.
         query = 'site:' + target_domain
         _, _, fqdn_list = self.custom_search(query, max_page_count=max_search_num, target_fqdn=target_domain)
+        if len(fqdn_list) != 0:
+            self.utility.print_message(OK, 'Gathered FQDN : {}'.format(fqdn_list))
 
         self.utility.write_log(20, '[Out] Execute Domain Search [{}].'.format(self.file_name))
         return fqdn_list
 
-    # Search relavant FQDN.
+    # Search relevant FQDN.
     def search_relevant_fqdn(self, target_fqdn, search_fqdn):
         self.utility.print_message(NOTE, 'Execute relevant FQDN Search.')
         self.utility.write_log(20, '[In] Execute relevant FQDN Search [{}].'.format(self.file_name))
@@ -213,7 +215,7 @@ class GoogleCustomSearch:
         self.utility.write_log(20, '[Out] Execute relevant FQDN Search [{}].'.format(self.file_name))
         return is_relevant
 
-    # Search relavant FQDN.
+    # Search relevant FQDN.
     def search_related_fqdn(self, target_fqdn, keyword, max_search_num):
         self.utility.print_message(NOTE, 'Execute related FQDN Search.')
         self.utility.write_log(20, '[In] Execute related FQDN Search [{}].'.format(self.file_name))
@@ -254,41 +256,56 @@ class GoogleCustomSearch:
             service = build("customsearch", "v1", developerKey=self.api_key)
 
         # Execute search.
-        response = []
         urls = []
         fqdn_list = []
         result_count = 0
+        start_index = self.start_index
         try:
             search_count = 0
             while search_count < max_page_count:
                 self.utility.print_message(OK, 'Using query : {}'.format(query))
-                response.append(service.cse().list(
+                response = service.cse().list(
                     q=query,
                     cx=self.search_engine_id,
                     num=10,
-                    start=self.start_index
-                ).execute())
+                    start=start_index,
+                    filter='0',
+                    safe='off',
+                ).execute()
 
                 # Get finding counts.
-                result_count = int(response[search_count].get('searchInformation').get('totalResults'))
+                result_count = int(response.get('searchInformation').get('totalResults'))
+                is_new_query = False
 
                 # Get extracted link (url).
+                search_urls = []
                 if result_count != 0:
-                    items = response[search_count]['items']
+                    items = response['items']
                     for item in items:
                         urls.append(item['link'])
+                        search_urls.append(item['link'])
 
                 # Set new query.
-                if result_count <= 10:
-                    fqdn_list.extend(self.utility.transform_url_hostname_list(urls))
+                if result_count <= 10 or max_page_count == 1:
+                    fqdn_list.extend(self.utility.transform_url_hostname_list(search_urls))
                     break
                 else:
-                    # Refine search range using "-site" option.
-                    tmp_list = self.utility.transform_url_hostname_list(urls)
+                    # Refine search range using "-inurl" option.
+                    tmp_list = self.utility.transform_url_hostname_list(search_urls)
                     for fqdn in tmp_list:
-                        if target_fqdn != fqdn:
-                            query += ' -site:' + fqdn
-                    fqdn_list.extend(tmp_list)
+                        if fqdn not in fqdn_list:
+                            subdomain = self.utility.extract_subdomain(fqdn, target_fqdn)
+                            if subdomain == target_fqdn:
+                                query += ' -inurl:http://' + subdomain + ' -inurl:https://' + subdomain
+                                is_new_query = True
+                                search_count = -1
+                            elif subdomain != '':
+                                query += ' -inurl:' + subdomain
+                                is_new_query = True
+                                search_count = -1
+                            fqdn_list.append(fqdn)
+                    if is_new_query is False:
+                        start_index = response.get('queries').get('nextPage')[0].get('startIndex')
 
                 search_count += 1
         except Exception as e:
