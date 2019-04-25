@@ -201,6 +201,16 @@ class Utilty:
             hostname_list.append(util.parse_url(target_url).host)
         return list(set(hostname_list))
 
+    # Extract subdomain.
+    def extract_subdomain(self, target_fqdn, domain):
+        subdomain = ''
+        point = target_fqdn.find(domain)
+        if point > 0:
+            subdomain = target_fqdn[:point]
+        elif point == 0:
+            subdomain = domain
+        return subdomain
+
     # Decode parameter (name and value).
     def decode_parameter(self, params, enc):
         parameter = {}

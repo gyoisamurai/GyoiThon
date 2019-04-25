@@ -195,7 +195,7 @@ if __name__ == '__main__':
             target_url = opt_invent_scheme + '://' + opt_invent_fqdn + ':' + opt_invent_port + opt_invent_path
 
         # Gather relevant FQDN.
-        fqdn_list = inventory.fqdn_explore(spider, google_hack, target_url, opt_invent_keyword)
+        all_fqdn_list = inventory.fqdn_explore(spider, google_hack, target_url, opt_invent_keyword)
         exit(0)
 
     # Create instances.
