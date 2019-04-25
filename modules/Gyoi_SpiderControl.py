@@ -74,7 +74,7 @@ class SpiderControl:
         option = ' -a target_url=' + target_url + ' -a allow_domain=' + target_fqdn + \
                  ' -a concurrent=' + self.spider_concurrent_reqs + ' -a depth_limit=' + self.spider_depth_limit + \
                  ' -a delay=' + self.spider_delay_time + ' -a store_path=' + gyoithon_log_path + \
-                 ' -a proxy_server=' + proxy + ' -a user_agent="' + self.utility.ua['User-Agent'] + '"'\
+                 ' -a proxy_server=' + proxy + ' -a user_agent="' + self.utility.ua + '"'\
                  ' -a encoding=' + self.utility.encoding + ' -o ' + scrapy_log_path
         close_opton = ' -s CLOSESPIDER_TIMEOUT=' + self.spider_time_out + \
                       ' -s CLOSESPIDER_ITEMCOUNT=' + self.spider_item_count + \
