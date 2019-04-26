@@ -295,7 +295,7 @@ class GoogleCustomSearch:
                     for fqdn in tmp_list:
                         if fqdn not in fqdn_list:
                             subdomain = self.utility.extract_subdomain(fqdn, target_fqdn)
-                            if subdomain == target_fqdn:
+                            if target_fqdn != '' and subdomain == target_fqdn:
                                 query += ' -inurl:http://' + subdomain + ' -inurl:https://' + subdomain
                                 is_new_query = True
                                 search_count = -1

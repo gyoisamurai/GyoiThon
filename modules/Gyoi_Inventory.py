@@ -17,6 +17,11 @@ FAIL = 'fail'     # [-]
 WARNING = 'warn'  # [!]
 NONE = 'none'     # No label.
 
+# Confidential score.
+HIGH = 2
+MEDIUM = 1
+LOW = 0
+
 
 class Inventory:
     def __init__(self, utility):
@@ -65,10 +70,68 @@ class Inventory:
     def check_black_list(self, fqdn_list):
         for idx, fqdn in enumerate(fqdn_list):
             for exclude_fqdn in self.black_list:
-                if fqdn == exclude_fqdn.replace('\n', '').replace('\r', ''):
+                if fqdn == exclude_fqdn.replace('\n', '').replace('\r', '').replace('\t', ''):
                     del fqdn_list[idx]
                     self.utility.print_message(WARNING, '"{}" is include black list.'.format(fqdn))
         return fqdn_list
+
+    # Merge Web site information.
+    def merge_site_info(self, target_info1, target_info2):
+        merged_info = {'FQDN': [], 'Score': [], 'Comment': [], 'DNS info': []}
+        for idx1, fqdn1 in enumerate(target_info1['FQDN']):
+            is_match = False
+            for idx2, fqdn2 in enumerate(target_info2['FQDN']):
+                if fqdn1 == fqdn2:
+                    is_match = True
+                    if target_info1['Score'][idx1] == target_info2['Score'][idx2]:
+                        # Add merged target info (info1 + info2).
+                        merged_info['FQDN'].append(fqdn1)
+                        merged_info['Score'].append(target_info1['Score'][idx1])
+                        merged_info['Comment'].append(target_info1['Comment'][idx1] + ' | ' + target_info2['Comment'][idx2])
+                        merged_info['DNS info'].append([])
+                    elif target_info1['Score'][idx1] > target_info2['Score'][idx2]:
+                        # Add target info1.
+                        merged_info['FQDN'].append(fqdn1)
+                        merged_info['Score'].append(target_info1['Score'][idx1])
+                        merged_info['Comment'].append(target_info1['Comment'][idx1])
+                        merged_info['DNS info'].append([])
+                    else:
+                        # Add target info2.
+                        merged_info['FQDN'].append(fqdn2)
+                        merged_info['Score'].append(target_info2['Score'][idx2])
+                        merged_info['Comment'].append(target_info2['Comment'][idx2])
+                        merged_info['DNS info'].append([])
+
+                    # Delete merged information in target info2.
+                    del target_info2['FQDN'][idx2]
+                    del target_info2['Score'][idx2]
+                    del target_info2['Comment'][idx2]
+                    del target_info2['DNS info'][idx2]
+            if is_match is False:
+                # Add target info1.
+                merged_info['FQDN'].append(fqdn1)
+                merged_info['Score'].append(target_info1['Score'][idx1])
+                merged_info['Comment'].append(target_info1['Comment'][idx1])
+                merged_info['DNS info'].append([])
+
+        # Add target info2.
+        for idx, fqdn in enumerate(target_info2['FQDN']):
+            merged_info['FQDN'].append(fqdn)
+            merged_info['Score'].append(target_info2['Score'][idx])
+            merged_info['Comment'].append(target_info2['Comment'][idx])
+            merged_info['DNS info'].append([])
+
+        return merged_info
+
+    # Make Web site information.
+    def make_site_info(self, fqdn_list, score, comment):
+        site_info = {'FQDN': [], 'Score': [], 'Comment': [], 'DNS info': []}
+        for fqdn in fqdn_list:
+            site_info['FQDN'].append(fqdn)
+            site_info['Score'].append(score)
+            site_info['Comment'].append(comment)
+            site_info['DNS info'].append([])
+        return site_info
 
     # Explore relevant link.
     def link_explorer(self, spider, google_hack, target_url, keyword):
@@ -98,12 +161,15 @@ class Inventory:
                 del link_fqdn_list[del_idx]
 
         # Search related FQDN using Google Custom Search.
-        searched_list = []
-        searched_list.extend(google_hack.search_related_fqdn(parsed.host, keyword, self.max_search_num))
-        related_fqdn_list = self.check_black_list(searched_list)
+        searched_list = google_hack.search_related_fqdn(parsed.host, keyword, self.max_search_num)
+        link_fqdn_list.extend(self.check_black_list(searched_list))
+
+        # Make Web site information.
+        link_site_info = self.make_site_info(list(set(link_fqdn_list)), MEDIUM, 'Linked target Web site.')
+        non_link_site_info = self.make_site_info(list(set(non_reverse_link_fqdn)), LOW, 'Not linked target Web site.')
 
         self.utility.write_log(20, '[Out] Explore relevant FQDN [{}].'.format(self.file_name))
-        return list(set(link_fqdn_list.extend(related_fqdn_list))), list(set(non_reverse_link_fqdn))
+        return link_site_info, non_link_site_info
 
     # Explore FQDN using JPRS.
     def jprs_fqdn_explore(self, google_hack, keyword):
@@ -136,61 +202,66 @@ class Inventory:
         fqdn_list = list(set(fqdn_list))
         jprs_fqdn_list = self.check_black_list(fqdn_list)
 
+        # Make Web site information.
+        jprs_fqdn_info = self.make_site_info(jprs_fqdn_list, HIGH, 'Existing Domain.')
+
         self.utility.write_log(20, '[Out] Explore FQDN using JPRS [{}].'.format(self.file_name))
-        return jprs_fqdn_list
+        return jprs_fqdn_info
 
     # Explore FQDN using JPRS.
-    def mutated_fqdn_explore(self, google_hack, origin_fqdn_list):
+    def mutated_fqdn_explore(self, google_hack, fqdn_info):
         self.utility.print_message(NOTE, 'Explore mutated FQDN using Google Hack.')
         self.utility.write_log(20, '[In] Explore mutated FQDN using Google Hack [{}].'.format(self.file_name))
 
         # Explore FQDN using gathered domain list.
         used_domain_list = []
         fqdn_list = []
-        for fqdn in origin_fqdn_list:
-            # Mutate "jp" suffix -> "foreign" suffix.
-            domain = ''
-            ext = tldextract.extract(fqdn)
-            suffix = ext.suffix
-            if suffix == 'co.jp':
-                domain = ext.domain + '.com'
-            elif suffix == 'ne.jp':
-                domain = ext.domain + '.net'
-            elif suffix == 'or.jp':
-                domain = ext.domain + '.org'
-            elif suffix == 'ed.jp':
-                domain = ext.domain + '.edu'
-            elif suffix == 'go.jp':
-                domain = ext.domain + '.gov'
-            elif suffix == 'jp':
-                domain = ext.domain + '.com'
-            elif suffix == 'com':
-                domain = ext.domain + '.co.jp'
-            elif suffix == 'net':
-                domain = ext.domain + '.ne.jp'
-            elif suffix == 'org':
-                domain = ext.domain + '.or.jp'
-            elif suffix == 'edu':
-                domain = ext.domain + '.ed.jp'
-            elif suffix == 'gov':
-                domain = ext.domain + '.go.jp'
-            else:
-                self.utility.print_message(WARNING, 'Don\'t define suffix : {}'.format(suffix))
-                continue
+        for idx, fqdn in enumerate(fqdn_info['FQDN']):
+            if fqdn_info['Score'][idx] == HIGH:
+                # Mutate "jp" suffix -> "foreign" suffix.
+                domain = ''
+                ext = tldextract.extract(fqdn)
+                suffix = ext.suffix
+                if suffix == 'co.jp':
+                    domain = ext.domain + '.com'
+                elif suffix == 'ne.jp':
+                    domain = ext.domain + '.net'
+                elif suffix == 'or.jp':
+                    domain = ext.domain + '.org'
+                elif suffix == 'ed.jp':
+                    domain = ext.domain + '.edu'
+                elif suffix == 'go.jp':
+                    domain = ext.domain + '.gov'
+                elif suffix == 'jp':
+                    domain = ext.domain + '.com'
+                elif suffix == 'com':
+                    domain = ext.domain + '.co.jp'
+                elif suffix == 'net':
+                    domain = ext.domain + '.ne.jp'
+                elif suffix == 'org':
+                    domain = ext.domain + '.or.jp'
+                elif suffix == 'edu':
+                    domain = ext.domain + '.ed.jp'
+                elif suffix == 'gov':
+                    domain = ext.domain + '.go.jp'
+                else:
+                    self.utility.print_message(WARNING, 'Don\'t define suffix : {}'.format(suffix))
+                    continue
 
-            # Execute Google Custom Search.
-            if domain not in used_domain_list:
-                fqdn_list.extend(google_hack.search_domain(domain.lower(), self.max_search_num))
-            else:
-                self.utility.print_message(WARNING, 'Already searched domain : {}'.format(domain))
-            used_domain_list.append(domain)
+                # Execute Google Custom Search.
+                if domain not in used_domain_list:
+                    fqdn_list.extend(google_hack.search_domain(domain.lower(), self.max_search_num))
+                else:
+                    self.utility.print_message(WARNING, 'Already searched domain : {}'.format(domain))
+                used_domain_list.append(domain)
 
         # Extract FQDN.
         fqdn_list = list(set(fqdn_list))
         mutated_fqdn_list = self.check_black_list(fqdn_list)
+        mutated_fqdn_info = self.make_site_info(mutated_fqdn_list, HIGH, 'Existing Domain.')
 
         self.utility.write_log(20, '[Out] Explore mutated FQDN using Google Hack [{}].'.format(self.file_name))
-        return mutated_fqdn_list
+        return mutated_fqdn_info
 
     # Explore FQDN using JPNIC.
     def jpnic_fqdn_explore(self, google_hack, keyword):
@@ -246,7 +317,7 @@ class Inventory:
         return fqdn_list
 
     # Explore FQDN using DNS server.
-    def dns_explore(self, target_fqdn_list):
+    def dns_explore(self, target_fqdn_info):
         self.utility.print_message(NOTE, 'Explore FQDN using DNS server.')
         self.utility.write_log(20, '[In] Explore FQDN using DNS server [{}].'.format(self.file_name))
 
@@ -260,14 +331,20 @@ class Inventory:
             os_index = 1
 
         # Get Network addresses from each domain.
-        dns_fqdn_list = []
-        for target_fqdn in target_fqdn_list:
+        for idx, target_fqdn in enumerate(target_fqdn_info['FQDN']):
+            tmp_dns_fqdn_list = []
             for option in self.nslookup_options:
-                dns_fqdn_list.extend(self.execute_nslookup(target_fqdn, option, os_index, char_code))
+                tmp_dns_fqdn_list.extend(self.execute_nslookup(target_fqdn, option, os_index, char_code))
                 time.sleep(self.nslookup_delay_time)
 
+            # Make server information.
+            dns_fqdn_list = []
+            for fqdn in tmp_dns_fqdn_list:
+                dns_fqdn_list.append(fqdn.replace('\r', '').replace('\n', '').replace('\t', ''))
+            target_fqdn_info['DNS info'][idx].extend(list(set(dns_fqdn_list)))
+
         self.utility.write_log(20, '[Out] Explore FQDN using DNS server [{}].'.format(self.file_name))
-        return list(set(dns_fqdn_list))
+        return target_fqdn_info
 
     # Explore relevant domain.
     def fqdn_explore(self, spider, google_hack, target_url, keyword):
@@ -276,24 +353,37 @@ class Inventory:
         fqdn_list = []
 
         # Explore FQDN using Web Crawl and Google Custom Search.
-        link_fqdn_list, non_link_fqdn_list = self.link_explorer(spider, google_hack, target_url, keyword)
+        link_fqdn_info, non_link_fqdn_info = self.link_explorer(spider, google_hack, target_url, keyword)
+        crawled_fqdn_info = self.merge_site_info(link_fqdn_info, non_link_fqdn_info)
 
         # Explore domain using JPRS.
-        jprs_fqdn_list = self.jprs_fqdn_explore(google_hack, keyword)
+        jprs_fqdn_info = self.jprs_fqdn_explore(google_hack, keyword)
+        merged_fqdn_info = self.merge_site_info(crawled_fqdn_info, jprs_fqdn_info)
 
         # Explore mutated fqdn.
-        mutated_fqdn_list = self.mutated_fqdn_explore(google_hack, list(set(jprs_fqdn_list.extend(link_fqdn_list))))
+        mutated_fqdn_info = self.mutated_fqdn_explore(google_hack, merged_fqdn_info)
+        merged_fqdn_info = self.merge_site_info(merged_fqdn_info, mutated_fqdn_info)
 
         # Explore domain using JPNIC.
         # jpnic_fqdn_list = self.jpnic_fqdn_explore(google_hack, keyword)
         # TODO: IPレンジの探索機能を実装する。
 
         # Explore FQDN (DNS server, Mail server etc) using DNS server.
-        target_fqdn_list = []
-        target_fqdn_list.extend(link_fqdn_list)
-        target_fqdn_list.extend(jprs_fqdn_list)
-        # target_fqdn_list.extend(jpnic_fqdn_list)
-        dns_fqdn_list = self.dns_explore(list(set(target_fqdn_list)))
+        merged_fqdn_info = self.dns_explore(merged_fqdn_info)
+
+        # Report FQDN list.
+        self.utility.print_message(NOTE, 'Gathered FQDN List of {}.'.format(keyword))
+        print('='*50)
+        print('Idx\tFQDN\tConfidence\tComment\tDNS info')
+        print('='*50)
+        for idx, fqdn in enumerate(merged_fqdn_info['FQDN']):
+            print('{}\t{}\t{}\t{}\t{}'.format(idx,
+                                              fqdn,
+                                              merged_fqdn_info['Score'][idx],
+                                              merged_fqdn_info['Comment'][idx],
+                                              merged_fqdn_info['DNS info'][idx]))
+            print('-'*50)
+        print('='*50)
 
         self.utility.write_log(20, '[Out] Explore relevant domain [{}].'.format(self.file_name))
-        return list(set(fqdn_list))
+        return merged_fqdn_info
