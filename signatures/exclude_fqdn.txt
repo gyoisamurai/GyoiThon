@@ -2,6 +2,7 @@ www.facebook.com
 twitter.com
 www.youtube.com
 www.instagram.com
+www.salesforce.com
 www.adobe.com
 www.nikkei.com
 www.yomiuri.co.jp
@@ -59,6 +60,7 @@ travel.yahoo.co.jp
 www.expedia.co.jp
 rurubu.travel
 www.tripadvisor.jp
+next.rikunabi.com
 en.wikipedia.org
 goo.gl
 www.google.co.jp
