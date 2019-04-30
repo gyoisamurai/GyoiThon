@@ -237,8 +237,7 @@ class Utilty:
         http = None
         ctx = ssl.create_default_context()
         ctx.set_ciphers('DEFAULT')
-#        ctx.set_ciphers('DEFAULT@SECLEVEL=1')
-
+        # ctx.set_ciphers('DEFAULT@SECLEVEL=1')
         if self.proxy != '':
             self.print_message(WARNING, 'Set proxy server: {}'.format(self.proxy))
             if self.proxy_user != '':
@@ -256,9 +255,11 @@ class Utilty:
                                             ssl_version=ssl.PROTOCOL_TLS,
                                             ssl_context=ctx)
         else:
-            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.http_req_header,
+            http = urllib3.PoolManager(timeout=self.con_timeout,
+                                       headers=self.http_req_header,
                                        ssl_version=ssl.PROTOCOL_TLS,
                                        ssl_context=ctx)
+
         try:
             if method.lower() == 'get':
                 res = http.request('GET',
