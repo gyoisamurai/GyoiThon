@@ -8,6 +8,7 @@ import json
 import glob
 import zipfile
 import shutil
+import ssl
 import urllib3
 import configparser
 import pandas as pd
@@ -172,6 +173,14 @@ class CveExplorerNVD:
         self.utility.print_message(OK, 'Get {} CVE list from {}'.format(cve_year, target_url))
 
         http = None
+        ctx = ssl.create_default_context()
+        ctx.set_ciphers('DEFAULT')
+#        ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+        headerInfo = { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0',
+                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                       'Accept-Language': 'en-US,en;q=0.5',
+                       'Accept-Encoding': 'gzip, deflate'}
+
         if self.utility.proxy != '':
             self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
             if self.utility.proxy_user != '':
@@ -179,17 +188,24 @@ class CveExplorerNVD:
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
                                             headers=self.utility.ua,
                                             proxy_url=self.utility.proxy,
-                                            proxy_headers=headers)
+                                            proxy_headers=headers,
+                                            ssl_version=ssl.PROTOCOL_TLS,
+                                            ssl_context=ctx)
             else:
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
                                             headers=self.utility.ua,
-                                            proxy_url=self.utility.proxy)
+                                            proxy_url=self.utility.proxy,
+                                            ssl_version=ssl.PROTOCOL_TLS,
+                                            ssl_context=ctx)
         else:
-            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.utility.ua)
-
+            http = urllib3.PoolManager(timeout=self.con_timeout, headers=self.utility.ua,
+                                            ssl_version=ssl.PROTOCOL_TLS,
+                                            ssl_context=ctx)
         try:
-            with http.request('GET', target_url, preload_content=False) as res, open(tmp_file, 'wb') as fout:
-                shutil.copyfileobj(res, fout)
+            res = http.request('GET', target_url, headers=headerInfo, preload_content=False)
+            with open(tmp_file, 'wb') as fout:
+               shutil.copyfileobj(res, fout)
+
         except Exception as e:
             self.utility.print_exception(e, 'Access is failure : {}'.format(target_url))
             self.utility.write_log(30, 'Accessing is failure : {}'.format(target_url))
