@@ -245,15 +245,11 @@ class Utilty:
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
                                             headers=self.http_req_header,
                                             proxy_url=self.proxy,
-                                            proxy_headers=headers,
-                                            ssl_version=ssl.PROTOCOL_TLS,
-                                            ssl_context=ctx)
+                                            proxy_headers=headers)
             else:
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
                                             headers=self.http_req_header,
-                                            proxy_url=self.proxy,
-                                            ssl_version=ssl.PROTOCOL_TLS,
-                                            ssl_context=ctx)
+                                            proxy_url=self.proxy)
         else:
             http = urllib3.PoolManager(timeout=self.con_timeout,
                                        headers=self.http_req_header,
