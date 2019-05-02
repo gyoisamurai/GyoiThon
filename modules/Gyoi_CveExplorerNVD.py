@@ -185,8 +185,8 @@ class CveExplorerNVD:
 
         http = None
         ctx = ssl.create_default_context()
-        # ctx.set_ciphers('DEFAULT')
-        ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+        ctx.set_ciphers('DEFAULT')
+        # ctx.set_ciphers('DEFAULT@SECLEVEL=1')
         if self.utility.proxy != '':
             self.utility.print_message(WARNING, 'Set proxy server: {}'.format(self.utility.proxy))
             if self.utility.proxy_user != '':
@@ -194,15 +194,11 @@ class CveExplorerNVD:
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
                                             headers=self.http_req_header,
                                             proxy_url=self.utility.proxy,
-                                            proxy_headers=headers,
-                                            ssl_version=ssl.PROTOCOL_TLS,
-                                            ssl_context=ctx)
+                                            proxy_headers=headers)
             else:
                 http = urllib3.ProxyManager(timeout=self.con_timeout,
                                             headers=self.http_req_header,
-                                            proxy_url=self.utility.proxy,
-                                            ssl_version=ssl.PROTOCOL_TLS,
-                                            ssl_context=ctx)
+                                            proxy_url=self.utility.proxy)
         else:
             http = urllib3.PoolManager(timeout=self.con_timeout,
                                        headers=self.http_req_header,
