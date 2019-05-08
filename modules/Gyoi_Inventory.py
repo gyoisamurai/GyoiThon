@@ -8,6 +8,7 @@ import re
 import tldextract
 import subprocess
 import configparser
+import pandas as pd
 from urllib3 import util
 
 # Type of printing.
@@ -350,7 +351,6 @@ class Inventory:
     def fqdn_explore(self, spider, google_hack, target_url, keyword):
         self.utility.print_message(NOTE, 'Explore relevant domain.')
         self.utility.write_log(20, '[In] Explore relevant domain [{}].'.format(self.file_name))
-        fqdn_list = []
 
         # Explore FQDN using Web Crawl and Google Custom Search.
         link_fqdn_info, non_link_fqdn_info = self.link_explorer(spider, google_hack, target_url, keyword)
@@ -370,20 +370,6 @@ class Inventory:
 
         # Explore FQDN (DNS server, Mail server etc) using DNS server.
         merged_fqdn_info = self.dns_explore(merged_fqdn_info)
-
-        # Report FQDN list.
-        self.utility.print_message(NOTE, 'Gathered FQDN List of {}.'.format(keyword))
-        print('='*50)
-        print('Idx\tFQDN\tConfidence\tComment\tDNS info')
-        print('='*50)
-        for idx, fqdn in enumerate(merged_fqdn_info['FQDN']):
-            print('{}\t{}\t{}\t{}\t{}'.format(idx,
-                                              fqdn,
-                                              merged_fqdn_info['Score'][idx],
-                                              merged_fqdn_info['Comment'][idx],
-                                              merged_fqdn_info['DNS info'][idx]))
-            print('-'*50)
-        print('='*50)
 
         self.utility.write_log(20, '[Out] Explore relevant domain [{}].'.format(self.file_name))
         return merged_fqdn_info

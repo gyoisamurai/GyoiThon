@@ -30,14 +30,17 @@ class CreateReport:
         try:
             self.report_file_name = ''
             self.report_file_name_censys = ''
+            self.report_file_name_invent = ''
             self.report_dir = os.path.join(self.root_path, config['Report']['report_path'])
             self.report_path = os.path.join(self.report_dir, config['Report']['report_name'])
             self.report_path_censys = os.path.join(self.report_dir, config['Report']['report_name_censys'])
+            self.report_path_invent = os.path.join(self.report_dir, config['Report']['report_name_invent'])
             self.report_path_exploit = os.path.join(self.report_dir, config['Report']['report_name_exploit'])
             self.report_temp = config['Report']['report_temp']
             self.template = config['Report']['template']
             self.header = str(config['Report']['header']).split('@')
             self.header_censys = str(config['Report']['header_censys']).split('@')
+            self.header_invent = str(config['Report']['header_invent']).split('@')
 
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
@@ -173,6 +176,35 @@ class CreateReport:
         pd.DataFrame(report).to_csv(self.report_file_name_censys, mode='a', header=False, index=False)
 
         self.utility.write_log(20, '[Out] Create Censys report [{}].'.format(self.file_name))
+
+    # Create Inventory report.
+    def create_inventory_report(self, fqdn_list, target_fqdn, port, date):
+        self.utility.print_message(NOTE, 'Create Inventory report of {}.'.format(target_fqdn))
+        self.utility.write_log(20, '[In] Create Inventory report [{}].'.format(self.file_name))
+
+        self.report_file_name_invent = self.report_path_invent.replace('*', target_fqdn + '_' +
+                                                                       str(port) + '_' +
+                                                                       self.utility.get_random_token(10))
+        pd.DataFrame([], columns=self.header_invent).to_csv(self.report_file_name_invent, mode='w', index=False)
+
+        # Build base structure.
+        report = []
+        for idx, get_fqdn in enumerate(fqdn_list['FQDN']):
+            record = []
+            record.insert(0, get_fqdn)                     # FQDN.
+            record.insert(1, fqdn_list['Score'][idx])      # Score.
+            record.insert(2, fqdn_list['Comment'][idx])    # Category.
+            record.insert(3, fqdn_list['DNS info'][idx])   # Discover open_port.
+            record.insert(4, date)                         # Creating date.
+            report.append(record)
+
+        # Output report.
+        msg = 'Create Inventory report : {}'.format(self.report_file_name_invent)
+        self.utility.print_message(OK, msg)
+        self.utility.write_log(20, msg)
+        pd.DataFrame(report).to_csv(self.report_file_name_invent, mode='a', header=False, index=False)
+
+        self.utility.write_log(20, '[Out] Create Inventory report [{}].'.format(self.file_name))
 
     # Create exploit's report
     def create_exploit_report(self, fqdn, port):
