@@ -195,7 +195,13 @@ if __name__ == '__main__':
             target_url = opt_invent_scheme + '://' + opt_invent_fqdn + ':' + opt_invent_port + opt_invent_path
 
         # Gather relevant FQDN.
-        all_fqdn_list = inventory.fqdn_explore(spider, google_hack, target_url, opt_invent_keyword)
+        fqdn_list = inventory.fqdn_explore(spider, google_hack, target_url, opt_invent_keyword)
+
+        # Create report.
+        date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
+        print_date = utility.transform_date_string(utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
+        report = CreateReport(utility)
+        report.create_inventory_report(fqdn_list, opt_invent_fqdn, opt_invent_port, print_date)
         exit(0)
 
     # Create instances.
