@@ -61,8 +61,12 @@ www.expedia.co.jp
 rurubu.travel
 www.tripadvisor.jp
 next.rikunabi.com
+job.rikunabi.com
+job.mynavi.jp
 en.wikipedia.org
 goo.gl
+maps.google.co.jp
+maps.google.com
 www.google.co.jp
 www.google.com
 www.yahoo.co.jp
