@@ -197,6 +197,7 @@ class Inventory:
         # Explore FQDN using gathered domain list.
         fqdn_list = []
         for domain in list(set(domain_list)):
+            domain = domain.replace('\r', '').replace('\n', '').replace('\t', '')
             fqdn_list.extend(google_hack.search_domain(domain.lower(), self.max_search_num))
 
         # Extract FQDN.
