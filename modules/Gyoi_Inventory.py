@@ -47,7 +47,7 @@ class Inventory:
             self.jprs_url = config['Inventory']['jprs_url']
             self.jprs_post = {'type': 'DOM-HOLDER', 'key': ''}
             self.jprs_regex_multi = config['Inventory']['jprs_regex_multi']
-            self.jprs_regex_single = config['Inventory']['jprs_regex_single']
+            self.jprs_regex_single = config['Inventory']['jprs_regex_single'].split('@')
             self.jpnic_url = config['Inventory']['jpnic_url']
             self.jpnic_post = {'codecheck-sjis': 'にほんねっとわーくいんふぉめーしょんせんたー',
                                'key': '', 'submit': '検索', 'type': 'NET-HOLDER', 'rule': ''}
@@ -186,7 +186,8 @@ class Inventory:
         if res.status == 200:
             domain_list = re.findall(self.jprs_regex_multi.format(keyword), res_body)
             if len(domain_list) == 0:
-                domain_list = re.findall(self.jprs_regex_single.format(keyword), res_body)
+                for jprs_regex in self.jprs_regex_single:
+                    domain_list.extend(re.findall(jprs_regex.format(keyword), res_body))
                 if len(domain_list) != 0:
                     self.utility.print_message(NOTE, 'Gathered domain from JPRS. : {}'.format(domain_list))
                 else:
