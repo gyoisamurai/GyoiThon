@@ -305,7 +305,11 @@ class GoogleCustomSearch:
                                 search_count = -1
                             fqdn_list.append(fqdn)
                     if is_new_query is False:
-                        start_index = response.get('queries').get('nextPage')[0].get('startIndex')
+                        if 'nextPage' in response.get('queries').keys():
+                            start_index = response.get('queries').get('nextPage')[0].get('startIndex')
+                        else:
+                            self.utility.print_message(WARNING, 'There is not next page.')
+                            break
 
                 search_count += 1
         except Exception as e:
