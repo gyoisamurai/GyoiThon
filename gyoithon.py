@@ -97,7 +97,7 @@ __doc__ = """{f}
 usage:
     {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
     {f} [-d --category=<category> --vendor=<vendor> --package=<package>]
-    {f} [-i --scheme=<scheme> --fqdn=<fqdn> --port=<port> --path=<path> --keyword=<keyword>]
+    {f} [-i]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -135,11 +135,6 @@ if __name__ == '__main__':
     opt_develop_vendor = args['--vendor']
     opt_develop_package = args['--package']
     opt_invent = args['-i']
-    opt_invent_scheme = args['--scheme']
-    opt_invent_fqdn = args['--fqdn']
-    opt_invent_port = args['--port']
-    opt_invent_path = args['--path']
-    opt_invent_keyword = args['--keyword']
     opt_no_update_vulndb = args['--no-update-vulndb']
 
     # Read config.ini.
@@ -182,26 +177,64 @@ if __name__ == '__main__':
         sys.exit(0)
 
     # Explore relevant FQDN with the target FQDN.
-    if opt_invent and utility.check_arg_value(opt_invent_scheme, opt_invent_fqdn, opt_invent_port, opt_invent_path):
-        inventory = Inventory(utility)
-        spider = SpiderControl(utility)
-        google_hack = GoogleCustomSearch(utility)
+    if opt_invent:
+        inventory_list_path = os.path.join(full_path, 'inventory_list.txt')
+        if os.path.exists(inventory_list_path):
+            inventory = Inventory(utility)
+            spider = SpiderControl(utility)
+            google_hack = GoogleCustomSearch(utility)
 
-        # Check encoding type of target site.
-        target_url = ''
-        if int(opt_invent_port) in [80, 443]:
-            target_url = opt_invent_scheme + '://' + opt_invent_fqdn + opt_invent_path
+            # TODO:
+            report = CreateReport(utility)
+            report.create_all_inventory_report()
+
+            with codecs.open(inventory_list_path, 'r', 'utf-8') as fin:
+                targets = fin.readlines()
+                for target in targets:
+                    items = target.replace('\r', '').replace('\n', '').split('\t')
+                    if len(items) != 2:
+                        utility.print_message(FAIL, 'Invalid inventory target : {}'.format(target))
+                        continue
+
+                    # Check target URL.
+                    port_num = ''
+                    invent_url = ''
+                    keyword = ''
+                    try:
+                        invent_url = items[0]
+                        keyword = items[1]
+                        parsed = util.parse_url(invent_url)
+
+                        # Judge port number.
+                        if parsed.port is None and parsed.scheme == 'https':
+                            port_num = '443'
+                        elif parsed.port is None and parsed.scheme == 'http':
+                            port_num = '80'
+                        elif parsed.port is not None:
+                            port_num = str(parsed.port)
+                        else:
+                            utility.print_message(FAIL, 'Invalid URL : {}'.format(invent_url))
+                            utility.write_log(30, 'Invalid URL : {}'.format(invent_url))
+                            continue
+                    except Exception as e:
+                        utility.print_exception(e, 'Parsed error : {}'.format(invent_url))
+                        utility.write_log(30, 'Parsed error : {}'.format(invent_url))
+                        continue
+
+                    # Check target URL.
+                    if utility.check_arg_value(parsed.scheme, parsed.hostname, port_num, parsed.path) is False:
+                        continue
+
+                    # Gather relevant FQDN.
+                    fqdn_list = inventory.fqdn_explore(spider, google_hack, invent_url, keyword)
+
+                    # Create report.
+                    date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
+                    print_date = utility.transform_date_string(utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
+                    report = CreateReport(utility)
+                    report.create_inventory_report(fqdn_list, keyword, parsed.hostname, print_date)
         else:
-            target_url = opt_invent_scheme + '://' + opt_invent_fqdn + ':' + opt_invent_port + opt_invent_path
-
-        # Gather relevant FQDN.
-        fqdn_list = inventory.fqdn_explore(spider, google_hack, target_url, opt_invent_keyword)
-
-        # Create report.
-        date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
-        print_date = utility.transform_date_string(utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
-        report = CreateReport(utility)
-        report.create_inventory_report(fqdn_list, opt_invent_fqdn, opt_invent_port, print_date)
+            utility.print_message(FAIL, '"inventory_list.txt" is not found : {}'.format(inventory_list_path))
         exit(0)
 
     # Create instances.
