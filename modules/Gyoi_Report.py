@@ -209,6 +209,39 @@ class CreateReport:
         self.utility.write_log(20, '[Out] Create Inventory report [{}].'.format(self.file_name))
 
     # Create exploit's report
+    def create_all_inventory_report(self):
+        self.utility.print_message(NOTE, 'Create All Inventory report.')
+        self.utility.write_log(20, '[In] Create All Inventory report [{}].'.format(self.file_name))
+
+        # Gather reporting items.
+        csv_file_list = glob.glob(self.report_path_invent)
+
+        # Create DataFrame.
+        content_list = []
+        try:
+            for file in csv_file_list:
+                content_list.append(pd.read_csv(file,
+                                                names=self.header_invent,
+                                                sep=',',
+                                                encoding='utf-8',
+                                                engine='python'))
+            df_csv = pd.concat(content_list).drop_duplicates().sort_values(by=['confidence', 'company name'],
+                                                                           ascending=False).reset_index(drop=True,
+                                                                                                        col_level=1)
+
+            # Output report.
+            file_invent = self.report_path_invent.replace('*', 'all_' + self.utility.get_random_token(10))
+            msg = 'Create All Inventory report : {}'.format(file_invent)
+            self.utility.print_message(OK, msg)
+            self.utility.write_log(20, msg)
+            df_csv.to_csv(file_invent, mode='w', header=False, index=False)
+        except Exception as e:
+            self.utility.print_message(FAIL, 'Invalid file error: {}'.format(e.args))
+            return
+
+        self.utility.write_log(20, '[Out] Create All Inventory report [{}].'.format(self.file_name))
+
+    # Create exploit's report
     def create_exploit_report(self, fqdn, port):
         # Gather reporting items.
         log_path_fqdn = os.path.join(os.path.join(self.root_path, 'logs'), fqdn + '_' + str(port))
