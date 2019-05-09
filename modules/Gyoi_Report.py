@@ -178,12 +178,12 @@ class CreateReport:
         self.utility.write_log(20, '[Out] Create Censys report [{}].'.format(self.file_name))
 
     # Create Inventory report.
-    def create_inventory_report(self, fqdn_list, target_fqdn, port, date):
+    def create_inventory_report(self, fqdn_list, keyword, target_fqdn, date):
         self.utility.print_message(NOTE, 'Create Inventory report of {}.'.format(target_fqdn))
         self.utility.write_log(20, '[In] Create Inventory report [{}].'.format(self.file_name))
 
-        self.report_file_name_invent = self.report_path_invent.replace('*', target_fqdn + '_' +
-                                                                       str(port) + '_' +
+        self.report_file_name_invent = self.report_path_invent.replace('*', keyword + '_' +
+                                                                       target_fqdn + '_' +
                                                                        self.utility.get_random_token(10))
         pd.DataFrame([], columns=self.header_invent).to_csv(self.report_file_name_invent, mode='w', index=False)
 
@@ -191,11 +191,13 @@ class CreateReport:
         report = []
         for idx, get_fqdn in enumerate(fqdn_list['FQDN']):
             record = []
-            record.insert(0, get_fqdn)                     # FQDN.
-            record.insert(1, fqdn_list['Score'][idx])      # Score.
-            record.insert(2, fqdn_list['Comment'][idx])    # Category.
-            record.insert(3, fqdn_list['DNS info'][idx])   # Discover open_port.
-            record.insert(4, date)                         # Creating date.
+            record.insert(0, keyword)                      # Company name.
+            record.insert(1, target_fqdn)                  # Original FQDN.
+            record.insert(2, get_fqdn)                     # FQDN.
+            record.insert(3, fqdn_list['Score'][idx])      # Score.
+            record.insert(4, fqdn_list['Comment'][idx])    # Category.
+            record.insert(5, fqdn_list['DNS info'][idx])   # Discover open_port.
+            record.insert(6, date)                         # Creating date.
             report.append(record)
 
         # Output report.
