@@ -183,10 +183,7 @@ if __name__ == '__main__':
             inventory = Inventory(utility)
             spider = SpiderControl(utility)
             google_hack = GoogleCustomSearch(utility)
-
-            # TODO:
             report = CreateReport(utility)
-            report.create_all_inventory_report()
 
             with codecs.open(inventory_list_path, 'r', 'utf-8') as fin:
                 targets = fin.readlines()
@@ -233,6 +230,9 @@ if __name__ == '__main__':
                     print_date = utility.transform_date_string(utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
                     report = CreateReport(utility)
                     report.create_inventory_report(fqdn_list, keyword, parsed.hostname, print_date)
+
+                # Create merged report.
+                report.create_all_inventory_report()
         else:
             utility.print_message(FAIL, '"inventory_list.txt" is not found : {}'.format(inventory_list_path))
         exit(0)
