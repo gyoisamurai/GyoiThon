@@ -69,17 +69,23 @@ class Inventory:
 
     # Check black list.
     def check_black_list(self, fqdn_list):
+        del_list = []
         for idx, fqdn in enumerate(fqdn_list):
             for exclude_fqdn in self.black_list:
                 if fqdn == exclude_fqdn.replace('\n', '').replace('\r', '').replace('\t', ''):
-                    del fqdn_list[idx]
-                    self.utility.print_message(WARNING, '"{}" is include black list.'.format(fqdn))
+                    del_list.append(idx)
+
+        # Delete FQDN included in black list.
+        for idx in del_list[::-1]:
+            self.utility.print_message(WARNING, '"{}" is include black list.'.format(fqdn_list[idx]))
+            del fqdn_list[idx]
         return fqdn_list
 
     # Merge Web site information.
     def merge_site_info(self, target_info1, target_info2):
         merged_info = {'FQDN': [], 'Score': [], 'Comment': [], 'DNS info': []}
         for idx1, fqdn1 in enumerate(target_info1['FQDN']):
+            del_list = []
             is_match = False
             for idx2, fqdn2 in enumerate(target_info2['FQDN']):
                 if fqdn1 == fqdn2:
@@ -102,12 +108,15 @@ class Inventory:
                         merged_info['Score'].append(target_info2['Score'][idx2])
                         merged_info['Comment'].append(target_info2['Comment'][idx2])
                         merged_info['DNS info'].append([])
+                    del_list.append(idx2)
 
-                    # Delete merged information in target info2.
-                    del target_info2['FQDN'][idx2]
-                    del target_info2['Score'][idx2]
-                    del target_info2['Comment'][idx2]
-                    del target_info2['DNS info'][idx2]
+            # Delete merged information in target info2.
+            for del_idx in del_list[::-1]:
+                del target_info2['FQDN'][del_idx]
+                del target_info2['Score'][del_idx]
+                del target_info2['Comment'][del_idx]
+                del target_info2['DNS info'][del_idx]
+
             if is_match is False:
                 # Add target info1.
                 merged_info['FQDN'].append(fqdn1)
@@ -155,11 +164,14 @@ class Inventory:
 
         # Search FQDN that include link to the target FQDN using Google Custom Search.
         non_reverse_link_fqdn = []
-        for del_idx, search_fqdn in enumerate(link_fqdn_list):
+        del_list = []
+        for idx, search_fqdn in enumerate(link_fqdn_list):
             # Check reverse link to target FQDN.
             if google_hack.search_relevant_fqdn(parsed.host, search_fqdn) is False:
-                non_reverse_link_fqdn.append(link_fqdn_list[del_idx])
-                del link_fqdn_list[del_idx]
+                non_reverse_link_fqdn.append(link_fqdn_list[idx])
+                del_list.append(idx)
+        for idx in del_list[::-1]:
+            del link_fqdn_list[idx]
 
         # Search related FQDN using Google Custom Search.
         searched_list = google_hack.search_related_fqdn(parsed.host, keyword, self.max_search_num)
