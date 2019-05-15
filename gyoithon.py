@@ -147,6 +147,8 @@ if __name__ == '__main__':
     method_log = ''
     max_target_url = 0
     max_target_byte = 0
+    clipping_size = 0
+    clipping_buff = 0
     is_scramble = False
     try:
         log_dir = config['Common']['log_path']
@@ -155,6 +157,12 @@ if __name__ == '__main__':
         method_log = config['Common']['method_log']
         max_target_url = int(config['Common']['max_target_url'])
         max_target_byte = int(config['Common']['max_target_byte'])
+        clipping_size = int(config['Common']['clipping_size'])
+        if clipping_size <= 0:
+            clipping_size = 10000
+        clipping_buff = int(config['Common']['clipping_buff'])
+        if clipping_buff <= 0:
+            clipping_buff = 200
         if int(config['Common']['scramble']) == 1:
             is_scramble = True
 
@@ -269,14 +277,6 @@ if __name__ == '__main__':
         # Create report header.
         report.create_report_header(fqdn_list[idx], port_list[idx])
 
-        # Check encoding.
-        test_url = ''
-        if int(port_list[idx]) in [80, 443]:
-            test_url = protocol_list[idx] + '://' + fqdn_list[idx] + path_list[idx]
-        else:
-            test_url = protocol_list[idx] + '://' + fqdn_list[idx] + ':' + port_list[idx] + path_list[idx]
-        _, server_header, res_header, res_body, encoding = utility.send_request('GET', test_url)
-
         # Check cloud service.
         cloud_type = 'Unknown'
         if opt_cloud:
@@ -305,21 +305,46 @@ if __name__ == '__main__':
                 log_list = glob.glob(os.path.join(opt_log_path, '*.log'))
                 for log_idx, path in enumerate(log_list):
                     try:
-                        with codecs.open(path, 'r', 'utf-8') as fin:
-                            target_log = fin.read()
+                        target_logs = []
+                        read_data_size = 0
+                        clipping_idx = 0
+                        content_length = 0
+                        # Cutting response byte.
+                        if max_target_byte != 0 and (max_target_byte < os.path.getsize(path)):
+                            utility.print_message(WARNING, 'Cutting response byte {} to {}.'
+                                                  .format(os.path.getsize(path), max_target_byte))
+                            with codecs.open(path, 'r', 'utf-8') as fin:
+                                target_log = fin.read()
+                                target_logs.append(target_log[:max_target_byte])
+                        # Dividing response byte.
+                        else:
+                            content_length = os.path.getsize(path)
+                            while read_data_size < content_length:
+                                with codecs.open(path, 'r', 'utf-8') as fin:
+                                    if clipping_idx != 0:
+                                        # Add buffer size to reading pointer.
+                                        read_data_size -= clipping_buff
+                                    fin.seek(read_data_size)
+
+                                    # Read data from log file.
+                                    target_log = fin.read(clipping_size)
+                                    target_logs.append(target_log)
+
+                                    # Update reading pointer.
+                                    read_data_size += len(target_log)
+
+                                    clipping_idx += 1
+
+                        for log_idx2, target_log in enumerate(target_logs):
                             date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
                             print_date = utility.transform_date_string(
                                 utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
 
-                            msg = '{}/{} Checking : Log: {}'.format(log_idx + 1, len(log_list), path)
+                            msg = '{}/{}-{}/{} Checking : Log: {}'.format(log_idx + 1, len(log_list),
+                                                                          log_idx2 + 1, len(target_logs),
+                                                                          path)
                             utility.print_message(OK, msg)
                             utility.write_log(20, msg)
-
-                            # Cutting response byte.
-                            if max_target_byte != 0 and (max_target_byte < len(target_log)):
-                                utility.print_message(WARNING, 'Cutting response byte {} to {}.'
-                                                      .format(len(target_log), max_target_byte))
-                                target_log = target_log[:max_target_byte]
 
                             # Check product name/version using signature.
                             product_list = version_checker.get_product_name(target_log)
@@ -363,6 +388,14 @@ if __name__ == '__main__':
                         utility.print_exception(e, 'Not read log : {}'.format(path))
                         utility.write_log(30, 'Not read log : {}'.format(path))
         else:
+            # Check encoding.
+            test_url = ''
+            if int(port_list[idx]) in [80, 443]:
+                test_url = protocol_list[idx] + '://' + fqdn_list[idx] + path_list[idx]
+            else:
+                test_url = protocol_list[idx] + '://' + fqdn_list[idx] + ':' + port_list[idx] + path_list[idx]
+            _, server_header, res_header, res_body, encoding = utility.send_request('GET', test_url)
+
             # Gather target url using Spider.
             spider.utility.encoding = encoding
             web_target_info, _ = spider.run_spider(protocol_list[idx], fqdn_list[idx], port_list[idx], path_list[idx])
