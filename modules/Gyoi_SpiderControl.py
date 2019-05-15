@@ -110,7 +110,7 @@ class SpiderControl:
                 try:
                     if target_fqdn == util.parse_url(item).host:
                         target_log.append(item)
-                    else:
+                    elif util.parse_url(item).scheme in ['http', 'https']:
                         non_target_log.append(item)
                 except Exception as e:
                     msg = 'Excepting allowed domain is failure : {}'.format(e)
