@@ -253,7 +253,7 @@ class Utilty:
         else:
             http = urllib3.PoolManager(timeout=self.con_timeout,
                                        headers=self.http_req_header,
-                                       ssl_version=ssl.PROTOCOL_TLS,
+                                       ssl_version=ssl.PROTOCOL_TLSv1,
                                        ssl_context=ctx)
 
         try:
