@@ -306,6 +306,7 @@ if __name__ == '__main__':
                 for log_idx, path in enumerate(log_list):
                     try:
                         target_logs = []
+                        target_log = ''
                         read_data_size = 0
                         clipping_idx = 0
                         content_length = 0
@@ -327,12 +328,24 @@ if __name__ == '__main__':
                                     fin.seek(read_data_size)
 
                                     # Read data from log file.
-                                    target_log = fin.read(clipping_size)
+                                    try:
+                                        target_log = fin.read(clipping_size)
+                                    except UnicodeDecodeError as e:
+                                        utility.print_exception(e, e.reason)
+                                        read_data_size += clipping_size
+                                        msg = '{}. Skip this data range.'.format(clipping_idx + 1)
+                                        utility.print_message(WARNING, msg)
+                                        clipping_idx += 1
+                                        continue
+
+                                    # Add to log list.
                                     target_logs.append(target_log)
 
                                     # Update reading pointer.
                                     read_data_size += len(target_log)
 
+                                    msg = '{}. Divided log that size is {}'.format(clipping_idx + 1, len(target_log))
+                                    utility.print_message(OK, msg)
                                     clipping_idx += 1
 
                         for log_idx2, target_log in enumerate(target_logs):
@@ -385,8 +398,8 @@ if __name__ == '__main__':
                                                       path,
                                                       print_date)
                     except Exception as e:
-                        utility.print_exception(e, 'Not read log : {}'.format(path))
-                        utility.write_log(30, 'Not read log : {}'.format(path))
+                        utility.print_exception(e, 'Could not read the log : {}'.format(path))
+                        utility.write_log(30, 'Could not read the log : {}'.format(path))
         else:
             # Check encoding.
             test_url = ''
