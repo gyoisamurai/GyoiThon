@@ -195,7 +195,7 @@ class Inventory:
         res, _, _, res_body, _ = self.utility.send_request('POST',
                                                            self.jprs_url,
                                                            body_param=self.jprs_post)
-        if res.status == 200:
+        if res is not None and res.status == 200:
             domain_list = re.findall(self.jprs_regex_multi.format(keyword), res_body)
             if len(domain_list) == 0:
                 for jprs_regex in self.jprs_regex_single:
