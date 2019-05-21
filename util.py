@@ -61,6 +61,7 @@ class Utilty:
                 self.redirect = False
             else:
                 self.redirect = True
+            self.target_host = ''
         except Exception as e:
             self.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             sys.exit(1)
@@ -82,6 +83,13 @@ class Utilty:
                                 'Upgrade-Insecure-Requests': '1',
                                 'Content-Type': 'application/x-www-form-urlencoded',
                                 'Cache-Control': 'no-cache'}
+
+        # Type of log label.
+        self.log_in = 'In'
+        self.log_out = 'Out'
+        self.log_mid = '-'
+        self.log_dis = 'Discovery'
+        self.log_att = 'Attack'
 
     # Print metasploit's symbol.
     def print_message(self, type, message):
@@ -114,6 +122,22 @@ class Utilty:
         self.print_message(WARNING, 'args:{}'.format(e.args))
         self.print_message(WARNING, '{}'.format(e))
         self.print_message(WARNING, message)
+
+    # Create log message.
+    def make_log_msg(self, in_out, phase, basename, action='', note='', dest='', src='GyoiThon'):
+        if in_out not in ['In', 'Out', '-']:
+            in_out = 'Unknown'
+        if phase not in ['Discovery', 'Attack']:
+            phase = 'Unknown'
+        if action == '':
+            action = 'Unknown'
+        return '[{}] Phase:[{}], Action:[{}], Note:[{}], To:[{}], From:[{}] [{}]'.format(in_out,
+                                                                                         phase,
+                                                                                         action,
+                                                                                         note,
+                                                                                         dest,
+                                                                                         src,
+                                                                                         basename)
 
     # Write logs.
     def write_log(self, loglevel, message):

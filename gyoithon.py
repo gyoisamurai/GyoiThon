@@ -40,7 +40,8 @@ NONE = 'none'     # No label.
 
 # Get target information.
 def get_target_info(full_path, utility):
-    utility.write_log(20, '[In] Get target information [{}].'.format(os.path.basename(__file__)))
+    msg = utility.make_log_msg(utility.log_in, utility.log_dis, os.path.basename(__file__), note='Get target information')
+    utility.write_log(20, msg)
     protocol = []
     fqdn = []
     port = []
@@ -62,7 +63,8 @@ def get_target_info(full_path, utility):
         utility.print_message(FAIL, 'Invalid file: {}'.format(e))
         utility.write_log(30, 'Invalid file: {}'.format(e))
 
-    utility.write_log(20, '[Out] Get target information [{}].'.format(os.path.basename(__file__)))
+    msg = utility.make_log_msg(utility.log_out, utility.log_dis, os.path.basename(__file__), note='Get target information')
+    utility.write_log(20, msg)
     return protocol, fqdn, port, path
 
 
@@ -321,7 +323,11 @@ if __name__ == '__main__':
     # Start investigation.
     for idx in range(len(fqdn_list)):
         # Check parameters.
-        msg = 'investigation : {}, {}, {}, {}'.format(protocol_list[idx], fqdn_list[idx], port_list[idx], path_list[idx])
+        utility.target_host = fqdn_list[idx]
+        msg = 'investigation : {}, {}, {}, {}'.format(protocol_list[idx],
+                                                      fqdn_list[idx],
+                                                      port_list[idx],
+                                                      path_list[idx])
         utility.write_log(20, 'Start ' + msg)
         if utility.check_arg_value(protocol_list[idx], fqdn_list[idx], port_list[idx], path_list[idx]) is False:
             msg = 'Invalid parameter : {}, {}, {}, {}'.format(protocol_list[idx], fqdn_list[idx],
