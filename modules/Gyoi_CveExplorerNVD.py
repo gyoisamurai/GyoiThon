@@ -52,6 +52,7 @@ class CveExplorerNVD:
             self.nvd_date_format = config['CveExplorerNVD']['nvd_date_format']
             self.headers = urllib3.make_headers(proxy_basic_auth=self.utility.proxy_user + ':' + self.utility.proxy_pass)
             self.db_colmns = {}
+            self.action_name = 'CVE Explorer'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -304,7 +305,13 @@ class CveExplorerNVD:
 
     # Explore CVE information.
     def cve_explorer(self, product_list):
-        self.utility.write_log(20, '[In] Explore CVE information [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Explore CVE information',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         for prod_idx, product in enumerate(product_list):
             self.utility.print_message(NOTE, 'Explore CVE of {}/{} from NVD.'.format(product[1], product[2]))
 
@@ -325,6 +332,12 @@ class CveExplorerNVD:
             for cve_idx, cve_id in enumerate(df_selected_cve['id'].drop_duplicates()):
                 msg = 'Find {} for {}/{} {}.'.format(cve_id, product[1], product[2], product[3])
                 self.utility.print_message(WARNING, msg)
+                msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                self.utility.log_dis,
+                                                self.file_name,
+                                                action=self.action_name,
+                                                note=msg,
+                                                dest=self.utility.target_host)
                 self.utility.write_log(30, msg)
                 cve_info += cve_id + '\n'
                 if cve_idx == (self.max_cve_count - 1):
@@ -334,5 +347,11 @@ class CveExplorerNVD:
                 cve_info = 'Cannot search.'
             product_list[prod_idx].insert(len(product), cve_info)
 
-        self.utility.write_log(20, '[Out] Explore CVE information [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Explore CVE information',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return product_list

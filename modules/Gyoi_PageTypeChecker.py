@@ -33,6 +33,7 @@ class PageChecker:
             self.trained_file = os.path.join(self.trained_path, config['PageChecker']['trained_page'])
             self.signatures_dir = os.path.join(self.root_path, config['Common']['signature_path'])
             self.signature_file = os.path.join(self.signatures_dir, config['PageChecker']['signature_file'])
+            self.action_name = 'Page Type Checker'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -41,14 +42,26 @@ class PageChecker:
     # Judge page type.
     def judge_page_type(self, target_url, response):
         self.utility.print_message(NOTE, 'Judge page type.')
-        self.utility.write_log(20, '[In] Judge page type [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Judge page type',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         # page_type = {'ml': {'type': 'unknown', 'reason': '-'}, 'url': {'type': 'unknown', 'reason': '-'}}
         page_type = {'ml': {'prob': '-', 'reason': '-'}, 'url': {'prob': '-', 'reason': '-'}}
 
         # Learning.
         nb = self.train(self.train_file, self.trained_file)
         if nb is None:
-            self.utility.write_log(20, '[Out] Judge page type [{}].'.format(self.file_name))
+            msg = self.utility.make_log_msg(self.utility.log_out,
+                                            self.utility.log_dis,
+                                            self.file_name,
+                                            action=self.action_name,
+                                            note='Judge page type',
+                                            dest=self.utility.target_host)
+            self.utility.write_log(20, msg)
             return 'unknown'
 
         # Predict page type using Naive Bayes.
@@ -63,6 +76,12 @@ class PageChecker:
                                                            round(prob*100, 2),
                                                            page_type['ml']['reason'])
             self.utility.print_message(OK, msg)
+            msg = self.utility.make_log_msg(self.utility.log_mid,
+                                            self.utility.log_dis,
+                                            self.file_name,
+                                            action=self.action_name,
+                                            note=msg,
+                                            dest=self.utility.target_host)
             self.utility.write_log(20, msg)
 
         # Predict Basic Authenticate.
@@ -71,6 +90,12 @@ class PageChecker:
                                                         page_type['url']['prob'],
                                                         page_type['url']['reason'])
         self.utility.print_message(OK, msg)
+        msg = self.utility.make_log_msg(self.utility.log_mid,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note=msg,
+                                        dest=self.utility.target_host)
         self.utility.write_log(20, msg)
 
         if page_type['url']['prob'] != '100.0':
@@ -80,9 +105,21 @@ class PageChecker:
                                                             page_type['url']['prob'],
                                                             page_type['url']['reason'])
             self.utility.print_message(OK, msg)
+            msg = self.utility.make_log_msg(self.utility.log_mid,
+                                            self.utility.log_dis,
+                                            self.file_name,
+                                            action=self.action_name,
+                                            note=msg,
+                                            dest=self.utility.target_host)
             self.utility.write_log(20, msg)
 
-        self.utility.write_log(20, '[Out] Judge page type [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Judge page type',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return page_type
 
     # Predict page type using URL.
@@ -102,6 +139,12 @@ class PageChecker:
                     if obj_match is not None:
                         msg = 'Identify page type : page type={}/100%, url={}'.format(page_type, target_url)
                         self.utility.print_message(OK, msg)
+                        msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                        self.utility.log_dis,
+                                                        self.file_name,
+                                                        action=self.action_name,
+                                                        note=msg,
+                                                        dest=self.utility.target_host)
                         self.utility.write_log(20, msg)
                         self.utility.write_log(20, '[Out] Predict page type [{}].'.format(self.file_name))
                         return page_type, '100.0', obj_match.group(1)
@@ -125,6 +168,12 @@ class PageChecker:
             reason = obj_match.group(1)
             msg = 'Identify page type : page type={}/100%, reason={}'.format('Login', reason)
             self.utility.print_message(OK, msg)
+            msg = self.utility.make_log_msg(self.utility.log_mid,
+                                            self.utility.log_dis,
+                                            self.file_name,
+                                            action=self.action_name,
+                                            note=msg,
+                                            dest=self.utility.target_host)
             self.utility.write_log(20, msg)
             self.utility.write_log(20, '[Out] Predict page type [{}].'.format(self.file_name))
             return 'Login', '100.0', reason

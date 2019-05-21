@@ -62,6 +62,7 @@ class Inventory:
             self.ns_rec_regex = config['Inventory']['ns_rec_regex'].split('@')
             self.soa_rec_regex = config['Inventory']['soa_rec_regex'].split('@')
             self.txt_rec_regex = config['Inventory']['txt_rec_regex'].split('@')
+            self.action_name = 'Search FQDN'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -364,7 +365,13 @@ class Inventory:
     # Explore relevant domain.
     def fqdn_explore(self, spider, google_hack, target_url, keyword):
         self.utility.print_message(NOTE, 'Explore relevant domain.')
-        self.utility.write_log(20, '[In] Explore relevant domain [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Explore relevant domain',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Explore FQDN using Web Crawl and Google Custom Search.
         link_fqdn_info, non_link_fqdn_info = self.link_explorer(spider, google_hack, target_url, keyword)
@@ -385,5 +392,11 @@ class Inventory:
         # Explore FQDN (DNS server, Mail server etc) using DNS server.
         merged_fqdn_info = self.dns_explore(merged_fqdn_info)
 
-        self.utility.write_log(20, '[Out] Explore relevant domain [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Explore relevant domain',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return merged_fqdn_info
