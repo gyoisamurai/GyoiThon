@@ -41,11 +41,18 @@ class VersionCheckerML:
         self.train_framework_out = os.path.join(self.trained_path, config['VersionCheckerML']['train_framework_out'])
         self.train_cms_in = os.path.join(self.train_path, config['VersionCheckerML']['train_cms_in'])
         self.train_cms_out = os.path.join(self.trained_path, config['VersionCheckerML']['train_cms_out'])
+        self.action_name = 'Product Explorer ML'
         return
 
         # Identify product name using ML.
     def identify_product(self, response):
-        self.utility.write_log(20, '[In] Identify product [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Identify product',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         product_list = []
 
         try:
@@ -75,6 +82,12 @@ class VersionCheckerML:
                     product_list.append([category, '*', product, '*', ','.join(keyword_list)])
                     msg = 'Predict product={}/{}%, verson={}, trigger={}'.format(product, prob, '*', keyword_list)
                     self.utility.print_message(OK, msg)
+                    msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                    self.utility.log_dis,
+                                                    self.file_name,
+                                                    action=self.action_name,
+                                                    note=msg,
+                                                    dest=self.utility.target_host)
                     self.utility.write_log(20, msg)
                     self.utility.print_message(NOTE, 'category : {}'.format(category))
         except Exception as e:
@@ -82,7 +95,13 @@ class VersionCheckerML:
             self.utility.print_exception(e, msg)
             self.utility.write_log(30, msg)
 
-        self.utility.write_log(20, '[Out] Identify product [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Identify product',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return list(map(list, set(map(tuple, product_list))))
 
     # Classifier product name using Machine Learning.

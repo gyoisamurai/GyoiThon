@@ -30,6 +30,7 @@ class ContentExplorer:
             self.method_name = config['Common']['method_direct']
             self.signature_file = config['ContentExplorer']['signature_file']
             self.delay_time = float(config['ContentExplorer']['delay_time'])
+            self.action_name = 'Content Explorer'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -68,7 +69,13 @@ class ContentExplorer:
     # Explore unnecessary contents.
     def content_explorer(self, cve_explorer, protocol, fqdn, port, path, report, max_target_byte):
         self.utility.print_message(NOTE, 'Explore unnecessary contents.')
-        self.utility.write_log(20, '[In] Explore contents [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Explore unnecessary contents',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Open signature file.
         target_base = protocol + '://' + fqdn + ':' + str(port) + path
@@ -129,6 +136,12 @@ class ContentExplorer:
                         product_list.extend(product)
                         msg = 'Find product={}/{}, verson={}, trigger={}'.format(vendor, product_name, default_ver, path)
                         self.utility.print_message(OK, msg)
+                        msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                        self.utility.log_dis,
+                                                        self.file_name,
+                                                        action=self.action_name,
+                                                        note=msg,
+                                                        dest=self.utility.target_host)
                         self.utility.write_log(20, msg)
 
                         # Create report.
@@ -139,5 +152,12 @@ class ContentExplorer:
                                                   page_type, [], [], server_header, log_file, print_date)
 
                 time.sleep(self.delay_time)
-        self.utility.write_log(20, '[Out] Explore contents [{}].'.format(self.file_name))
+
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Explore unnecessary contents',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return product_list

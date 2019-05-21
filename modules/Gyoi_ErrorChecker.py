@@ -28,6 +28,7 @@ class ErrorChecker:
             self.signature_dir = os.path.join(self.root_path, config['Common']['signature_path'])
             self.signature_file = config['ErrorChecker']['signature_file']
             self.signature_path = os.path.join(self.signature_dir, self.signature_file)
+            self.action_name = 'Error Checker'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -36,7 +37,13 @@ class ErrorChecker:
     # Check unnecessary error message.
     def get_error_message(self, response):
         self.utility.print_message(NOTE, 'Check unnecessary error message.')
-        self.utility.write_log(20, '[In] Check unnecessary error message [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Check unnecessary error message',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Check comment.
         error_list = []
@@ -55,6 +62,12 @@ class ErrorChecker:
                             error_list.append(trigger)
                             msg = 'Detect unnecessary message: {}'.format(trigger)
                             self.utility.print_message(OK, msg)
+                            msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                            self.utility.log_dis,
+                                                            self.file_name,
+                                                            action=self.action_name,
+                                                            note=msg,
+                                                            dest=self.utility.target_host)
                             self.utility.write_log(20, msg)
                     except Exception as e:
                         self.utility.print_exception(e, 'Invalid signature: {}, {}'.format(signature, e))
@@ -63,7 +76,14 @@ class ErrorChecker:
             msg = 'Getting error message is failure : {}.'.format(e)
             self.utility.print_exception(e, msg)
             self.utility.write_log(30, msg)
-        self.utility.write_log(20, '[Out] Check unnecessary error message [{}].'.format(self.file_name))
+
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Check unnecessary error message',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         if len(error_list) == 0:
             self.utility.print_message(OK, 'Unnecessary error message not found.')
         return list(set(error_list))

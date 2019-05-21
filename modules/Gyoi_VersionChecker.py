@@ -27,6 +27,7 @@ class VersionChecker:
         try:
             self.signatures_dir = os.path.join(self.root_path, config['Common']['signature_path'])
             self.signature_file = os.path.join(self.signatures_dir, config['VersionChecker']['signature_file'])
+            self.action_name = 'Product Explorer'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -34,7 +35,13 @@ class VersionChecker:
 
     # Identify product name using signature.
     def identify_product(self, response):
-        self.utility.write_log(20, '[In] Identify product [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Identify product',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         product_list = []
 
         try:
@@ -65,13 +72,25 @@ class VersionChecker:
                         product_list.append([category, vendor, product, version, trigger])
                         msg = 'Find product={}/{}, verson={}, trigger={}'.format(vendor, product, version, trigger)
                         self.utility.print_message(WARNING, msg)
+                        msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                        self.utility.log_dis,
+                                                        self.file_name,
+                                                        action=self.action_name,
+                                                        note=msg,
+                                                        dest=self.utility.target_host)
                         self.utility.write_log(20, msg)
         except Exception as e:
             msg = 'Identifying product is failure : {}'.format(e)
             self.utility.print_exception(e, msg)
             self.utility.write_log(30, msg)
 
-        self.utility.write_log(20, '[Out] Identify product [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Identify product',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return list(map(list, set(map(tuple, product_list))))
 
     # Classifier product name using signatures.

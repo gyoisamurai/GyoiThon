@@ -38,6 +38,7 @@ class CloudChecker:
             self.gcp_content_ip = config['CloudChecker']['gcp_content_ip']
             self.gcp_get_domain_regex = config['CloudChecker']['gcp_get_domain_regex']
             self.gcp_get_nwaddr_regex = config['CloudChecker']['gcp_get_nwaddr_regex']
+            self.action_name = 'Cloud Checker'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -46,7 +47,13 @@ class CloudChecker:
     # Check AWS.
     def check_aws(self, ip_addr):
         self.utility.print_message(NOTE, 'Check AWS IP range.')
-        self.utility.write_log(20, '[In] Check AWS IP range [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Check AWS IP range.',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Get IP range list.
         self.utility.write_log(20, 'Accessing : {}'.format(self.aws_ip_range))
@@ -62,19 +69,44 @@ class CloudChecker:
                                                                                              aws_nw_addr['region'],
                                                                                              aws_nw_addr['service'])
                 self.utility.print_message(OK, msg)
+                msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                self.utility.log_dis,
+                                                self.file_name,
+                                                action=self.action_name,
+                                                note=msg,
+                                                dest=self.utility.target_host)
                 self.utility.write_log(20, msg)
-                self.utility.write_log(20, '[Out] Check AWS IP range [{}].'.format(self.file_name))
+                msg = self.utility.make_log_msg(self.utility.log_out,
+                                                self.utility.log_dis,
+                                                self.file_name,
+                                                action=self.action_name,
+                                                note='[Out] Check AWS IP range.',
+                                                dest=self.utility.target_host)
+                self.utility.write_log(20, msg)
                 return True
             else:
                 self.utility.print_message(FAIL, 'Not include : service=AWS target={} prefix={}'
                                            .format(target_ip, aws_nw_addr['ip_prefix']))
-        self.utility.write_log(20, '[Out] Check AWS IP range [{}].'.format(self.file_name))
+
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='[Out] Check AWS IP range.',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return False
 
     # Check Azure.
     def check_azure(self, ip_addr):
         self.utility.print_message(NOTE, 'Check Azure IP range.')
-        self.utility.write_log(20, '[In] Check Azure IP range [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Check Azure IP range.',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Get IP range list.
         self.utility.write_log(20, 'Accessing : {}'.format(self.azure_ip_range))
@@ -95,25 +127,56 @@ class CloudChecker:
                 if target_ip in ipaddress.ip_network(azure_nw_addr):
                     msg = 'Detect : service=Azure target={} prefix={} region={}'.format(target_ip, azure_nw_addr, region_name)
                     self.utility.print_message(OK, msg)
+                    msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                    self.utility.log_dis,
+                                                    self.file_name,
+                                                    action=self.action_name,
+                                                    note=msg,
+                                                    dest=self.utility.target_host)
                     self.utility.write_log(20, msg)
-                    self.utility.write_log(20, '[Out] Check Azure IP range [{}].'.format(self.file_name))
+                    msg = self.utility.make_log_msg(self.utility.log_out,
+                                                    self.utility.log_dis,
+                                                    self.file_name,
+                                                    action=self.action_name,
+                                                    note='Check Azure IP range',
+                                                    dest=self.utility.target_host)
+                    self.utility.write_log(20, msg)
                     return True
                 else:
                     self.utility.print_message(FAIL, 'Not include : service=Azure target={} prefix={}'
                                                .format(target_ip, azure_nw_addr))
-        self.utility.write_log(20, '[Out] Check Azure IP range [{}].'.format(self.file_name))
+
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Check Azure IP range',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return False
 
     # Check GCP.
     def check_gcp(self, ip_addr):
         self.utility.print_message(NOTE, 'Check GCP IP range.')
-        self.utility.write_log(20, '[In] Check GCP IP range [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Check GCP IP range',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Get Domain in SPF record using nslookup command.
         raw_domains = ''
         nslookup_cmd = self.gcp_nslookup_cmd + ' ' + self.gcp_content_srv + ' ' + self.gcp_content_ip
         try:
-            self.utility.write_log(20, 'Execute : {}'.format(nslookup_cmd))
+            msg = self.utility.make_log_msg(self.utility.log_mid,
+                                            self.utility.log_dis,
+                                            self.file_name,
+                                            action=self.action_name,
+                                            note='Execute : {}'.format(nslookup_cmd),
+                                            dest=self.utility.target_host)
+            self.utility.write_log(20, msg)
             raw_domains = subprocess.check_output(nslookup_cmd, shell=True)
         except Exception as e:
             msg = 'Executing {} is failure.'.format(nslookup_cmd)
@@ -135,7 +198,13 @@ class CloudChecker:
         for gcp_domain in gcp_domain_list:
             nslookup_cmd = self.gcp_nslookup_cmd + ' ' + gcp_domain + ' ' + self.gcp_content_ip
             try:
-                self.utility.write_log(20, 'Execute : {}'.format(nslookup_cmd))
+                msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                self.utility.log_dis,
+                                                self.file_name,
+                                                action=self.action_name,
+                                                note='Execute : {}'.format(nslookup_cmd),
+                                                dest=self.utility.target_host)
+                self.utility.write_log(20, msg)
                 raw_ip = subprocess.check_output(nslookup_cmd, shell=True)
             except Exception as e:
                 msg = 'Executing {} is failure.'.format(nslookup_cmd)
@@ -153,31 +222,62 @@ class CloudChecker:
             if target_ip in ipaddress.ip_network(gcp_nw_addr):
                 msg = 'Detect : service=GCP target={} prefix={}'.format(target_ip, gcp_nw_addr)
                 self.utility.print_message(OK, msg)
+                msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                self.utility.log_dis,
+                                                self.file_name,
+                                                action=self.action_name,
+                                                note=msg,
+                                                dest=self.utility.target_host)
                 self.utility.write_log(20, msg)
-                self.utility.write_log(20, '[Out] Check GCP IP range [{}].'.format(self.file_name))
+                msg = self.utility.make_log_msg(self.utility.log_out,
+                                                self.utility.log_dis,
+                                                self.file_name,
+                                                action=self.action_name,
+                                                note='Check GCP IP range',
+                                                dest=self.utility.target_host)
+                self.utility.write_log(20, msg)
                 return True
             else:
                 self.utility.print_message(FAIL, 'Not include : service=GCP target={} prefix={}'
                                            .format(target_ip, gcp_nw_addr))
-        self.utility.write_log(20, '[Out] Check GCP IP range [{}].'.format(self.file_name))
+
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Check GCP IP range.',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return False
 
     # Identify cloud service name.
     def get_cloud_service(self, fqdn):
         self.utility.print_message(NOTE, 'Analyze cloud service.')
-        self.utility.write_log(20, '[In] Analyze cloud service [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Analyze cloud service.',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         target_ip = self.utility.forward_lookup(fqdn)
 
         # Check cloud service name.
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Analyze cloud service.',
+                                        dest=self.utility.target_host)
         if self.check_aws(target_ip) is True:
-            self.utility.write_log(20, '[Out] Analyze cloud service [{}].'.format(self.file_name))
+            self.utility.write_log(20, msg)
             return self.aws_srv_name
         elif self.check_azure(target_ip) is True:
-            self.utility.write_log(20, '[Out] Analyze cloud service [{}].'.format(self.file_name))
+            self.utility.write_log(20, msg)
             return self.azure_srv_name
         elif self.check_gcp(target_ip) is True:
-            self.utility.write_log(20, '[Out] Analyze cloud service [{}].'.format(self.file_name))
+            self.utility.write_log(20, msg)
             return self.gcp_srv_name
         else:
-            self.utility.write_log(20, '[Out] Analyze cloud service [{}].'.format(self.file_name))
+            self.utility.write_log(20, msg)
             return 'Unknown'

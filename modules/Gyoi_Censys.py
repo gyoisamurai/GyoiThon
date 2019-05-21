@@ -22,6 +22,7 @@ class Censys:
         self.file_name = os.path.basename(__file__)
         self.full_path = os.path.dirname(os.path.abspath(__file__))
         self.root_path = os.path.join(self.full_path, '../')
+        self.action_name = 'Censys'
         config.read(os.path.join(self.root_path, 'config.ini'))
 
         try:
@@ -35,7 +36,13 @@ class Censys:
     # Control censys.
     def search_censys(self, ip_addr, fqdn):
         self.utility.print_message(NOTE, 'Search Censys.')
-        self.utility.write_log(20, '[In] Search Censys [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Search Censys',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         server_info = []
         cert_info = []
@@ -95,5 +102,11 @@ class Censys:
             self.utility.print_message(FAIL, 'Censys execution is failure : {}'.format(e))
             self.utility.write_log(30, 'Censys execution is failure : {}'.format(e))
 
-        self.utility.write_log(20, '[Out] Search Censys [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Search Censys',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return server_info, cert_info

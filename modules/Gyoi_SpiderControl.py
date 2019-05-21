@@ -35,6 +35,7 @@ class SpiderControl:
             self.spider_item_count = config['Spider']['item_count']
             self.spider_page_count = config['Spider']['page_count']
             self.spider_error_count = config['Spider']['error_count']
+            self.action_name = 'Web Crawling'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -42,7 +43,13 @@ class SpiderControl:
 
     # Running spider.
     def run_spider(self, protocol, target_fqdn, target_port, target_path):
-        self.utility.write_log(20, '[In] Run spider [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Run spider',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Original log of GyoiThon.
         now_time = self.utility.get_current_date('%Y%m%d%H%M%S')
@@ -84,6 +91,12 @@ class SpiderControl:
         command = 'scrapy runspider' + close_opton + spider_path + option
         msg = 'Execute spider : {}.'.format(command)
         self.utility.print_message(OK, msg)
+        msg = self.utility.make_log_msg(self.utility.log_mid,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note=msg,
+                                        dest=self.utility.target_host)
         self.utility.write_log(20, msg)
 
         # Execute Scrapy.
@@ -119,5 +132,12 @@ class SpiderControl:
 
         self.utility.write_log(20, 'Get spider result.')
         all_targets_log.append([target_url, gyoithon_log_path, list(set(target_log))])
-        self.utility.write_log(20, '[Out] Run spider [{}].'.format(self.file_name))
+
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Run spider',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return all_targets_log, non_target_log

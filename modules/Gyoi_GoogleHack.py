@@ -40,6 +40,7 @@ class GoogleCustomSearch:
             self.start_index = int(config['GoogleHack']['start_index'])
             self.delay_time = float(config['GoogleHack']['delay_time'])
             self.delay_time_direct_access = float(config['ContentExplorer']['delay_time'])
+            self.action_name = 'Google Hacking'
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
             self.utility.write_log(40, 'Reading config.ini is failure : {}'.format(e))
@@ -77,7 +78,13 @@ class GoogleCustomSearch:
 
     def execute_google_hack(self, cve_explorer, fqdn, port, report, max_target_byte):
         self.utility.print_message(NOTE, 'Execute Google hack.')
-        self.utility.write_log(20, '[In] Execute Google hack [{}].'.format(self.file_name))
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Execute Google hack',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
 
         # Open signature file.
         signature_file = os.path.join(self.signature_dir, self.signature_file)
@@ -109,6 +116,12 @@ class GoogleCustomSearch:
 
                 msg = '{}/{} Execute query: {}'.format(idx + 1, len(signatures), query)
                 self.utility.print_message(OK, msg)
+                msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                self.utility.log_dis,
+                                                self.file_name,
+                                                action=self.action_name,
+                                                note=msg,
+                                                dest=self.utility.target_host)
                 self.utility.write_log(20, msg)
 
                 if result_count != 0:
@@ -153,6 +166,12 @@ class GoogleCustomSearch:
                                 msg = 'Find product={}/{}, verson={}, trigger={}'.format(vendor, product_name,
                                                                                          default_ver, target_url)
                                 self.utility.print_message(OK, msg)
+                                msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                                self.utility.log_dis,
+                                                                self.file_name,
+                                                                action=self.action_name,
+                                                                note=msg,
+                                                                dest=self.utility.target_host)
                                 self.utility.write_log(20, msg)
 
                                 # Create report.
@@ -171,6 +190,12 @@ class GoogleCustomSearch:
                         product_list.append(product)
                         msg = 'Detected default content: {}/{}'.format(vendor, product_name)
                         self.utility.print_message(OK, msg)
+                        msg = self.utility.make_log_msg(self.utility.log_mid,
+                                                        self.utility.log_dis,
+                                                        self.file_name,
+                                                        action=self.action_name,
+                                                        note=msg,
+                                                        dest=self.utility.target_host)
                         self.utility.write_log(20, msg)
 
                         page_type = {}
@@ -181,7 +206,14 @@ class GoogleCustomSearch:
                                                   page_type, [], [], '*', '*', print_date)
 
                 time.sleep(self.delay_time)
-        self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
+
+        msg = self.utility.make_log_msg(self.utility.log_out,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Execute Google hack',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
         return product_list
 
     # Search domain.
