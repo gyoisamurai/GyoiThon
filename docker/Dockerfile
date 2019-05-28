@@ -1,24 +1,47 @@
-FROM kalilinux/kali-linux-docker
+# 
+# Gyoithon Dockerfile!
+#
+# Author: Isaac Thiessen May 2019 
+# 
+# How to run:
+# 	0. build image ( ./build.sh )
+# 	1. edit host file
+#	2. run Gyoithon ( ./run.sh )
+#
+# Tested on Ubuntu 19.10
 
-RUN apt-get update && apt-get install -y metasploit-framework tmux python3-pandas python3-docopt python3-msgpack python3-jinja2 && apt-get clean && rm -rf /var/lib/apt/lists/*
+FROM ubuntu:latest
 
-##Setup MSF
-RUN curl -sSL https://github.com/gyoisamurai/GyoiThon/raw/master/docker/msf_setup/db.sql --output /tmp/db.sql
-RUN /etc/init.d/postgresql start && su postgres -c "psql -f /tmp/db.sql"
-RUN curl -sSL https://github.com/gyoisamurai/GyoiThon/raw/master/docker/msf_setup/database.yml --output /usr/share/metasploit-framework/config/database.yml
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
 
-#Setup Gyoithon
-RUN git clone https://github.com/gyoisamurai/GyoiThon /opt/gyiothon
-RUN curl -sSL https://github.com/gyoisamurai/GyoiThon/raw/master/docker/msf_setup/meterpreter.rc --output /tmp/meterpreter.rc
-RUN curl -sSL https://github.com/gyoisamurai/GyoiThon/raw/master/docker/gyoithon_setup/config.ini --output /opt/gyiothon/classifier4gyoithon/config.ini
+ARG DIR=/opt/GyoiThon
 
-##Clean up a few things broken in the code due to suboptimal development
-RUN find /opt/gyiothon -name "*.py" -type f | xargs sed -i -e '/OKGREEN + banner + ENDC/d'
+WORKDIR $DIR
 
-WORKDIR "/opt/gyiothon/"
+# preventing one of the installs from requesting user input
+COPY ./timezonefix.sh /tmp/timezonefix.sh
 
-CMD /etc/init.d/postgresql start; tmux new-session -d -s cool 'msfconsole -r /tmp/meterpreter.rc'; sleep 180; curl localhost:55553; python3 /opt/gyiothon/gyoithon.py
+# Procedure
+#    1. updating package lists
+#    2. fixing timezone issue
+#    3. installing dependancies   
+#    4/5. cleaning up
+#    6. Downloading gyoithon
+#    7. Installing python requirements
+RUN apt-get update && \
+	bash /tmp/timezonefix.sh && \
+	apt-get install -y tmux git python3-pip python3-pandas \
+		 python3-docopt python3-msgpack python3-jinja2 && \ 
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* && \
+	git clone https://github.com/gyoisamurai/GyoiThon.git /opt/GyoiThon && \
+	pip3 install -r $DIR/requirements.txt 
 
-########How to run
-#Prepopulate your host file with the targets (IE testaspnet.vulnweb.com 80 / )
-#docker run -v $PWD/host.txt:/opt/gyiothon/host.txt <container name>
+# updating cve database
+# this just saves time everytime you run the image
+COPY ./download_cves.py $DIR/download_cves.py
+RUN python3 $DIR/download_cves.py
+
+CMD ["python3", "gyoithon.py", "-m", "-e", "-c", "-s"]
+
