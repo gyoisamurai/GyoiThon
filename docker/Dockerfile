@@ -1,8 +1,14 @@
 # 
-# SST API Gyoithon Dockerfile!
+# Gyoithon Dockerfile!
 #
 # Author: Isaac Thiessen May 2019 
 # 
+# How to run:
+# 	0. build image ( ./build.sh )
+# 	1. edit host file
+#	2. run Gyoithon ( ./run.sh )
+#
+# Tested on Ubuntu 19.10
 
 FROM ubuntu:latest
 
@@ -38,3 +44,4 @@ COPY ./download_cves.py $DIR/download_cves.py
 RUN python3 $DIR/download_cves.py
 
 CMD ["python3", "gyoithon.py", "-m", "-e", "-c", "-s"]
+
