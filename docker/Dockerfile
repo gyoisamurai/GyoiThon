@@ -43,5 +43,5 @@ RUN apt-get update && \
 COPY ./download_cves.py $DIR/download_cves.py
 RUN python3 $DIR/download_cves.py
 
-CMD ["python3", "gyoithon.py", "-m", "-e", "-c", "-s"]
+CMD ["python3", "gyoithon.py", "-m", "-e", "-s"]
 
