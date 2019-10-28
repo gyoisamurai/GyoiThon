@@ -78,7 +78,10 @@ class ContentExplorer:
         self.utility.write_log(20, msg)
 
         # Open signature file.
-        target_base = protocol + '://' + fqdn + ':' + str(port) + path
+        origin_path = os.path.split(path)[0]
+        if origin_path.endswith('/') is False:
+            origin_path += '/'
+        target_base = protocol + '://' + fqdn + ':' + str(port) + origin_path
         signature_file = os.path.join(self.signature_dir, self.signature_file)
         product_list = []
         with codecs.open(signature_file, 'r', encoding='utf-8') as fin:
