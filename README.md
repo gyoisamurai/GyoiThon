@@ -104,8 +104,10 @@ By using [default mode](https://github.com/gyoisamurai/GyoiThon/blob/master/READ
 
 ```
 usage:
-    gyoithon.py [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [-d --category=<category> --vendor=<vendor> --package=<package>]
-    gyoithon.py -h | --help
+    .\gyoithon.py [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
+    .\gyoithon.py [-d --category=<category> --vendor=<vendor> --package=<package>]
+    .\gyoithon.py [-i]
+    .\gyoithon.py -h | --help
 options:
     -s   Optional : Examine cloud service.
     -m   Optional : Analyze HTTP response for identify product/version using Machine Learning.
@@ -115,6 +117,7 @@ options:
     -p   Optional : Execute exploit module using Metasploit.
     -l   Optional : Analyze log based HTTP response for identify product/version.
     -d   Optional : Development of signature and train data.
+    -i   Optional : Explore relevant FQDN with the target FQDN.
     -h --help     Show this help message and exit.
 ```
 
