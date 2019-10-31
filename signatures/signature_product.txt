@@ -134,6 +134,8 @@ Tool@phpmyadmin@phpmyadmin@*@.*<title>(phpMyAdmin.*[0-9])</title>.*
 Tool@phpmyadmin@phpmyadmin@*@.*(phpmyadmin.svn.sourceforge.net/svnroot/phpmyadmin/trunk/phpMyAdmin/ChangeLog).*
 Tool@phpmyadmin@phpmyadmin@*@.*(phpMyAdmin - ChangeLog).*
 Tool@squirrelmail@squirrelmail@*@.*(SquirrelMail version ([0-9]+))
+Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]\-Beta\d{1,3}))
+Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]\-Beta\d{1,3}))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]))
 Tool@mod_ssl@mod_ssl@*@Server:.*(mod_ssl/([0-9]+\.[0-9]+\.[0-9]+))
