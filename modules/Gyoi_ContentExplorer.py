@@ -100,7 +100,7 @@ class ContentExplorer:
                 if path.startswith('/') is True:
                     target_url = target_base + path[1:]
                 else:
-                    target_url = target_base + path[4]
+                    target_url = target_base + path
 
                 # Get HTTP response (header + body).
                 date = self.utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
