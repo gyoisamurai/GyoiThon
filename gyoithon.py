@@ -482,6 +482,9 @@ if __name__ == '__main__':
             spider.utility.encoding = encoding
             web_target_info, _ = spider.run_spider(protocol_list[idx], fqdn_list[idx], port_list[idx], path_list[idx])
 
+            # Add favicon.ico to target list.
+            web_target_info[0][2].insert(0, protocol_list[idx] + '://' + fqdn_list[idx] + '/favicon.ico')
+
             # Get HTTP responses.
             for target in web_target_info:
                 # Scramble and Cutting loop count.
