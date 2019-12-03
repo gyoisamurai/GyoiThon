@@ -27,12 +27,12 @@ class MergeReport:
         config.read(os.path.join(self.full_path, 'config.ini'))
 
         # Define report header.
-        self.header = ['No', 'Region', 'Company/Organization name', 'Category',
-                       'FQDN (URL)', 'Top URL (URL)', 'Source (URL)', 'FQDN (IP Address)', 'Top URL (IP Address)',
-                       'Form (Auth)', 'Basic (Auth)', 'Type (Env)', 'Cloud (Env)', 'Product Name (CMS)',
-                       'Admin page (CMS)', 'Unnecessary Content', 'Directory Index', 'Error message', 'Wrong Comment',
-                       'Apache (Prod)', 'PHP (Prod)', 'OpenSSL (Prod)', 'nginx (Prod)', 'IIS (Prod)', '.NET (Prod)',
-                       'MVC (Prod)', 'WordPress (Prod)', 'Other (Prod)', 'Note']
+        self.header = ['No', '海外/国内', '会社名/組織名', 'カテゴリ', 'FQDN (URL)', 'リダイレクト/トップURL (URL)',
+                       'ソース (URL)', 'FQDN (IPアドレス)', 'トップURL (IPアドレス)', 'フォーム (認証)', 'Basic (認証)',
+                       '開発/本番 (環境)', 'クラウド (環境)', '製品 (CMS)', '管理画面 (CMS)', '不要なコンテンツ',
+                       'ディレクトリ一覧の表示', 'エラーメッセージ', '不適切なコメント', 'Apache (製品)', 'PHP (製品)',
+                       'OpenSSL (製品)', 'nginx (製品)', 'IIS (製品)', '.NET (製品)',
+                       'MVC (製品)', 'WordPress (製品)', 'その他 (製品)', '備考']
 
         # Must product name.
         self.require_prduct = ['apache@http_server', 'php@php', 'openssl@openssl', 'nginx@nginx',
@@ -55,7 +55,7 @@ class MergeReport:
 
         # Create report header.
         if os.path.exists(self.out_report) is False:
-            pd.DataFrame([], columns=self.header).to_csv(self.out_report, mode='w', index=False)
+            pd.DataFrame([], columns=self.header).to_csv(self.out_report, mode='w', index=False, encoding='Shift_JIS')
 
         self.utility.write_log(20, '[Out] Create report header [{}].'.format(self.out_report))
 
