@@ -76,7 +76,7 @@ class MergeReport:
             for report_idx, file in enumerate(csv_file_list):
                 record = []
                 df_local = pd.read_csv(file, names=self.local_header, header=0, sep=',')
-                record.append(self.extract_report_element(report_idx, df_local))
+                record.append(self.extract_report_element(report_idx+1, df_local))
 
                 # Add record.
                 pd.DataFrame(record).to_csv(self.out_report, mode='a', header=False, index=False, encoding='Shift_JIS')
@@ -87,15 +87,15 @@ class MergeReport:
     # Extract report's element from local reports.
     def extract_report_element(self, report_idx, df_local):
         record = []
-        record.insert(0, report_idx)            # No.
-        record.insert(1, '-')                   # 海外/国内
-        record.insert(2, '-')                   # 会社名/組織名
-        record.insert(3, '-')                   # カテゴリ
-        record.insert(4, df_local['fqdn'][0])   # FQDN.
-        record.insert(5, '-')                   # TODO:リダイレクトトップURL
-        record.insert(6, '-')                   # ソース
-        record.insert(7, df_local['fqdn'][0])   # FQDN.
-        record.insert(8, '-')                   # TODO:リダイレクトトップURL.
+        record.insert(0, report_idx)                  # No.
+        record.insert(1, '-')                         # 海外/国内
+        record.insert(2, '-')                         # 会社名/組織名
+        record.insert(3, '-')                         # カテゴリ
+        record.insert(4, df_local['fqdn'][0])         # FQDN.
+        record.insert(5, df_local['origin_url'][0])   # トップURL
+        record.insert(6, '-')                         # ソース
+        record.insert(7, df_local['fqdn'][0])         # FQDN.
+        record.insert(8, df_local['origin_url'][0])   # トップURL.
 
         # Check login form.
         if self.check_login_form(df_local):

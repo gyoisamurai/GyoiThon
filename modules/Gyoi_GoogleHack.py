@@ -203,7 +203,7 @@ class GoogleCustomSearch:
                             page_type = {'ml': {'prob': '-', 'reason': '-'},
                                          'url': {'prob': '100%', 'reason': search_option}}
                         report.create_report_body('-', fqdn, port, '*', self.method_name, product,
-                                                  page_type, [], [], '*', '*', print_date)
+                                                  page_type, [], [], '*', '*', print_date, '-')
 
                 time.sleep(self.delay_time)
 

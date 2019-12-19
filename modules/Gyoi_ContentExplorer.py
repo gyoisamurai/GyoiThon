@@ -107,6 +107,8 @@ class ContentExplorer:
                 print_date = self.utility.transform_date_string(
                     self.utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
                 res, server_header, res_header, res_body, _ = self.utility.send_request('GET', target_url)
+                if res is None:
+                    continue
                 msg = '{}/{} Accessing : Status: {}, Url: {}'.format(idx + 1, len(signatures), res.status, target_url)
                 self.utility.print_message(OK, msg)
                 self.utility.write_log(20, msg)
@@ -152,7 +154,7 @@ class ContentExplorer:
                         if is_login == '1':
                             page_type = {'ml': {'prob': '-', 'reason': '-'}, 'url': {'prob': '100%', 'reason': path}}
                         report.create_report_body(target_url, fqdn, port, '*', self.method_name, product,
-                                                  page_type, [], [], server_header, log_file, print_date)
+                                                  page_type, [], [], server_header, log_file, print_date, '-')
 
                 time.sleep(self.delay_time)
 

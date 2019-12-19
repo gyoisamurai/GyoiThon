@@ -41,6 +41,7 @@ class CreateReport:
             self.header = str(config['Report']['header']).split('@')
             self.header_censys = str(config['Report']['header_censys']).split('@')
             self.header_invent = str(config['Report']['header_invent']).split('@')
+            self.header_exploit = str(config['Report']['header_exploit']).split('@')
 
         except Exception as e:
             self.utility.print_message(FAIL, 'Reading config.ini is failure : {}'.format(e))
@@ -57,7 +58,7 @@ class CreateReport:
         self.utility.write_log(20, '[Out] Create report header [{}].'.format(self.file_name))
 
     # Create report's body.
-    def create_report_body(self, url, fqdn, port, cloud, method, products, type, comments, errors, srv_header, log_file, date):
+    def create_report_body(self, url, fqdn, port, cloud, method, products, type, comments, errors, srv_header, log_file, date, test_url):
         self.utility.print_message(NOTE, 'Create {}:{} report\'s body.'.format(fqdn, port))
         self.utility.write_log(20, '[In] Create report body [{}].'.format(self.file_name))
 
@@ -77,43 +78,44 @@ class CreateReport:
         record.insert(2, str(port))      # Port number.
         record.insert(3, cloud)          # Cloud service type.
         record.insert(4, method)         # Using method.
-        record.insert(5, url)            # Target URL.
-        record.insert(6, '-')            # Vendor name.
-        record.insert(7, '-')            # Product name.
-        record.insert(8, '-')            # Product version.
-        record.insert(9, '-')            # Trigger of identified product.
-        record.insert(10, '-')           # Product category.
-        record.insert(11, '-')           # CVE number of product.
-        record.insert(12, login_prob)    # Login probability.
-        record.insert(13, login_reason)  # Trigger of login page.
-        record.insert(14, '-')           # Unnecessary comments.
-        record.insert(15, '-')           # Unnecessary Error messages.
-        record.insert(16, srv_header)    # Server header.
-        record.insert(17, log_file)      # Path of log file.
-        record.insert(18, date)          # Creating date.
+        record.insert(5, test_url)       # Origin URL.
+        record.insert(6, url)            # Target URL.
+        record.insert(7, '-')            # Vendor name.
+        record.insert(8, '-')            # Product name.
+        record.insert(9, '-')            # Product version.
+        record.insert(10, '-')           # Trigger of identified product.
+        record.insert(11, '-')           # Product category.
+        record.insert(12, '-')           # CVE number of product.
+        record.insert(13, login_prob)    # Login probability.
+        record.insert(14, login_reason)  # Trigger of login page.
+        record.insert(15, '-')           # Unnecessary comments.
+        record.insert(16, '-')           # Unnecessary Error messages.
+        record.insert(17, srv_header)    # Server header.
+        record.insert(18, log_file)      # Path of log file.
+        record.insert(19, date)          # Creating date.
         report.append(record)
 
         # Build prduct record.
         for product in products:
             product_record = copy.deepcopy(record)
-            product_record[6] = product[1]
-            product_record[7] = product[2]
-            product_record[8] = product[3]
-            product_record[9] = product[4]
-            product_record[10] = product[0]
-            product_record[11] = product[5]
+            product_record[7] = product[1]
+            product_record[8] = product[2]
+            product_record[9] = product[3]
+            product_record[10] = product[4]
+            product_record[11] = product[0]
+            product_record[12] = product[5]
             report.append(product_record)
 
         # Build comment record.
         for comment in comments:
             comment_record = copy.deepcopy(record)
-            comment_record[14] = comment
+            comment_record[15] = comment
             report.append(comment_record)
 
         # Build error message record.
         for error in errors:
             error_record = copy.deepcopy(record)
-            error_record[15] = error
+            error_record[16] = error
             report.append(error_record)
 
         # Output report.
@@ -253,7 +255,7 @@ class CreateReport:
         content_list = []
         try:
             for file in csv_file_list:
-                content_list.append(pd.read_csv(file, names=self.header, sep=','))
+                content_list.append(pd.read_csv(file, names=self.header_exploit, sep=','))
             df_csv = pd.concat(content_list).drop_duplicates().sort_values(by=['ip', 'port'], ascending=True).reset_index(drop=True, col_level=1)
         except Exception as e:
             self.utility.print_message(FAIL, 'Invalid file error: {}'.format(e))

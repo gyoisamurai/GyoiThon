@@ -138,6 +138,8 @@ Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]\-Beta\d{1,3
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]\-Beta\d{1,3}))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]))
 Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]))
+Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9][a-z]\-fips))
+Tool@openssl@openssl@*@Server:.*(OpenSSL/([0-9]+\.[0-9]+\.[0-9]\-fips))
 Tool@mod_ssl@mod_ssl@*@Server:.*(mod_ssl/([0-9]+\.[0-9]+\.[0-9]+))
 Tool@adobe@dreamweaver@*@.*(dwsync)
 Tool@gnu@mailman@*@.*Delivered by (Mailman.*[0-9])</td>.*

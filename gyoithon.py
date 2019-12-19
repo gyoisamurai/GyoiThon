@@ -583,7 +583,8 @@ if __name__ == '__main__':
                                                   errors,
                                                   server_header,
                                                   log_file,
-                                                  print_date)
+                                                  print_date,
+                                                  test_url)
 
         # Check unnecessary contents using Google Hack.
         if opt_gcs:
