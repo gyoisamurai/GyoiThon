@@ -71,7 +71,7 @@ class PageChecker:
             self.utility.print_message(OK, 'Page type is unknown.')
         else:
             page_type['ml']['prob'] = str(round(prob*100, 2))
-            page_type['ml']['reason'] = ','.join(keywords)
+            page_type['ml']['reason'] = '@'.join(keywords)
             msg = 'ML: Page type={}/{}%, reason={}'.format(predict_result,
                                                            round(prob*100, 2),
                                                            page_type['ml']['reason'])

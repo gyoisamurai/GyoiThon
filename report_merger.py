@@ -1,7 +1,8 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
-import sys
 import os
+import sys
+import traceback
 import re
 import codecs
 import glob
@@ -74,6 +75,7 @@ class MergeReport:
         # Create DataFrame.
         try:
             for report_idx, file in enumerate(csv_file_list):
+                self.utility.print_message(OK, '{}/{} Processing: {}'.format(report_idx+1, len(csv_file_list), file))
                 record = []
                 df_local = pd.read_csv(file, names=self.local_header, header=0, sep=',')
                 record.append(self.extract_report_element(report_idx+1, df_local))
@@ -81,7 +83,10 @@ class MergeReport:
                 # Add record.
                 pd.DataFrame(record).to_csv(self.out_report, mode='a', header=False, index=False, encoding='Shift_JIS')
         except Exception as e:
+            t, v, tb = sys.exc_info()
             self.utility.print_message(FAIL, 'Invalid file error: {}'.format(e))
+            self.utility.print_message(FAIL, traceback.format_exception(t, v, tb))
+            self.utility.print_message(FAIL, traceback.format_tb(e.__traceback__))
             return
 
     # Extract report's element from local reports.
@@ -94,7 +99,7 @@ class MergeReport:
         record.insert(4, df_local['fqdn'][0])         # FQDN.
         record.insert(5, df_local['origin_url'][0])   # トップURL
         record.insert(6, '-')                         # ソース
-        record.insert(7, df_local['fqdn'][0])         # FQDN.
+        record.insert(7, df_local['ip_addr'][0])      # FQDN.
         record.insert(8, df_local['origin_url'][0])   # トップURL.
 
         # Check login form.
@@ -276,4 +281,4 @@ if __name__ == '__main__':
     # Merge report.
     merge.get_target_report()
 
-    print(2)
+    print('finish!!')
