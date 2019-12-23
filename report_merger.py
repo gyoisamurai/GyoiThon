@@ -100,7 +100,8 @@ class MergeReport:
         record.insert(5, df_local['origin_url'][0])   # トップURL
         record.insert(6, '-')                         # ソース
         record.insert(7, df_local['ip_addr'][0])      # FQDN.
-        record.insert(8, df_local['origin_url'][0])   # トップURL.
+        origin_url_ip = (df_local['origin_url'][0]).replace(df_local['fqdn'][0], df_local['ip_addr'][0], 1)
+        record.insert(8, origin_url_ip)               # トップURL.
 
         # Check login form.
         if self.check_login_form(df_local):
@@ -251,7 +252,7 @@ class MergeReport:
                 require_list[idx][0] = True
                 for pd_idx, record in df_selected_record.iterrows():
                     if record['prod_version'] != '*':
-                        version_list.append(record['prod_version'])
+                        version_list.append('"' + str(record['prod_version']) + '"')
                 require_list[idx][1].extend(list(set(version_list)))
 
         # Check other products.
