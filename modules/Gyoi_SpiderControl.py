@@ -78,7 +78,7 @@ class SpiderControl:
                 proxy = parsed.scheme + '://' + parsed.netloc
 
         # Assemble Scrapy command.
-        option = ' -a target_url=' + target_url + ' -a allow_domain=' + target_fqdn + \
+        option = ' -a target_url=' + '"' + target_url + '"' + ' -a allow_domain=' + target_fqdn + \
                  ' -a concurrent=' + self.spider_concurrent_reqs + ' -a depth_limit=' + self.spider_depth_limit + \
                  ' -a delay=' + self.spider_delay_time + ' -a store_path=' + gyoithon_log_path + \
                  ' -a proxy_server=' + proxy + ' -a user_agent="' + self.utility.ua + '"'\

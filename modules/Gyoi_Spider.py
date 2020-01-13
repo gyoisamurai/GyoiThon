@@ -11,15 +11,15 @@ class SimpleSpider(scrapy.Spider):
 
     def __init__(self, category=None, *args, **kwargs):
         super(SimpleSpider, self).__init__(*args, **kwargs)
-        self.start_urls = getattr(self, 'target_url', None)
-        self.allowed_domains = [getattr(self, 'allow_domain', None)]
-        self.concurrent = int(getattr(self, 'concurrent', None))
-        self.depth_limit = int(getattr(self, 'depth_limit', None))
-        self.delay_time = float(getattr(self, 'delay', None))
-        self.store_path = getattr(self, 'store_path', None)
-        self.proxy_server = getattr(self, 'proxy_server', None)
-        self.user_agent = getattr(self, 'user_agent', None)
-        self.encoding = getattr(self, 'encoding', None)
+        self.start_urls = getattr(self, 'target_url')
+        self.allowed_domains = [getattr(self, 'allow_domain')]
+        self.concurrent = int(getattr(self, 'concurrent'))
+        self.depth_limit = int(getattr(self, 'depth_limit'))
+        self.delay_time = float(getattr(self, 'delay'))
+        self.store_path = getattr(self, 'store_path')
+        self.proxy_server = getattr(self, 'proxy_server')
+        self.user_agent = getattr(self, 'user_agent')
+        self.encoding = getattr(self, 'encoding')
 
         # HTTP headers.
         self.http_req_header = {'User-Agent': self.user_agent,
