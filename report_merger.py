@@ -63,7 +63,7 @@ class MergeReport:
 
         # Create report header.
         if os.path.exists(self.out_report) is False:
-            pd.DataFrame([], columns=self.header).to_csv(self.out_report, mode='w', index=False, encoding='Shift_JIS')
+            pd.DataFrame([], columns=self.header).to_csv(self.out_report, mode='w', index=False, encoding='utf_8_sig')
 
         self.utility.write_log(20, '[Out] Create report header [{}].'.format(self.out_report))
 
@@ -77,11 +77,11 @@ class MergeReport:
             for report_idx, file in enumerate(csv_file_list):
                 self.utility.print_message(OK, '{}/{} Processing: {}'.format(report_idx+1, len(csv_file_list), file))
                 record = []
-                df_local = pd.read_csv(file, names=self.local_header, header=0, sep=',')
+                df_local = pd.read_csv(file, names=self.local_header, header=0, sep=',', encoding='utf-8')
                 record.append(self.extract_report_element(report_idx+1, df_local))
 
                 # Add record.
-                pd.DataFrame(record).to_csv(self.out_report, mode='a', header=False, index=False, encoding='Shift_JIS')
+                pd.DataFrame(record).to_csv(self.out_report, mode='a', header=False, index=False, encoding='utf_8_sig')
         except Exception as e:
             t, v, tb = sys.exc_info()
             self.utility.print_message(FAIL, 'Invalid file error: {}'.format(e))
@@ -176,7 +176,7 @@ class MergeReport:
     # Set requirement product.
     def set_require_prod(self, prod_idx, rec_idx, require_list, record):
         if require_list[prod_idx][0]:
-            if require_list[prod_idx][1] != '*':
+            if len(require_list[prod_idx][1]) != 0:
                 record.insert(rec_idx, '\n'.join(require_list[prod_idx][1]))
             else:
                 record.insert(rec_idx, '○')

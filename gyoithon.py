@@ -465,7 +465,8 @@ if __name__ == '__main__':
                                                           errors,
                                                           '-',
                                                           path,
-                                                          print_date)
+                                                          print_date,
+                                                          '-')
                     except Exception as e:
                         utility.print_exception(e, 'Could not read the log : {}'.format(path))
                         utility.write_log(30, 'Could not read the log : {}'.format(path))

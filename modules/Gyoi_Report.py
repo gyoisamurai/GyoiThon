@@ -54,7 +54,7 @@ class CreateReport:
         self.utility.write_log(20, '[In] Create report header [{}].'.format(self.file_name))
 
         self.report_file_name = self.report_path.replace('*', fqdn + '_' + str(port) + '_' + self.utility.get_random_token(10))
-        pd.DataFrame([], columns=self.header).to_csv(self.report_file_name, mode='w', index=False)
+        pd.DataFrame([], columns=self.header).to_csv(self.report_file_name, mode='w', index=False, encoding='utf-8')
         self.utility.write_log(20, '[Out] Create report header [{}].'.format(self.file_name))
 
     # Create report's body.
@@ -109,20 +109,20 @@ class CreateReport:
         # Build comment record.
         for comment in comments:
             comment_record = copy.deepcopy(record)
-            comment_record[15] = comment
+            comment_record[15] = '"' + str(comment) + '"'
             report.append(comment_record)
 
         # Build error message record.
         for error in errors:
             error_record = copy.deepcopy(record)
-            error_record[16] = error
+            error_record[16] = '"' + str(error) + '"'
             report.append(error_record)
 
         # Output report.
         msg = 'Create report : {}'.format(self.report_file_name)
         self.utility.print_message(OK, msg)
         self.utility.write_log(20, msg)
-        pd.DataFrame(report).to_csv(self.report_file_name, mode='a', header=False, index=False)
+        pd.DataFrame(report).to_csv(self.report_file_name, mode='a', header=False, index=False, encoding='utf-8')
 
         self.utility.write_log(20, '[Out] Create report body [{}].'.format(self.file_name))
 
