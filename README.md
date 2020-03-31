@@ -1,5 +1,5 @@
 # **GyoiThon**: **Next generation penetration test tool**
-![Black Hat Arsenal](https://raw.githubusercontent.com/toolswatch/badges/master/arsenal/asia/2018.svg?sanitize=true)  
+![Black Hat ASIA Arsenal 2018](https://raw.githubusercontent.com/toolswatch/badges/master/arsenal/asia/2018.svg?sanitize=true) ![Black Hat ASIA Arsenal 2019](https://raw.githubusercontent.com/toolswatch/badges/master/arsenal/asia/2019.svg?sanitize=true)  
 <img src="./img/gyoithon_logo.png" width="600">  
 
 Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).  
@@ -43,7 +43,7 @@ The new GyoiThon \(version 0.0.3\) can **automatically generate signature/train 
 
  * Slide  
  [BlackHat ASIA 2019](https://github.com/gyoisamurai/GyoiThon/blob/master/handout/BHASIA2019_slide.pdf)  
- 
+
  * Demo movie  
  [Demo](https://www.youtube.com/watch?v=X8tW4S7c6s0)  
 
@@ -166,7 +166,7 @@ The default mode gathers following minimum information.
  * Crawling setting  
  GyoiThon uses `Scrapy` that Python's library.  
  By change the parameters in `config.ini`, you can change setting of Scrapy.  
- 
+
  |Category|Parameter|Description|
  |:----|:----|:----|
  |Spider|depth_limit|Maximum depth of crawling. Default value is `2` layer. |
@@ -179,13 +179,13 @@ The default mode gathers following minimum information.
  * Examination speed setting  
  The examination number and HTTP response size greatly affect examination times.   
  By change the parameters in `config.ini`, you can adjust examination speed.  
- 
+
  |Category|Parameter|Description|
  |:----|:----|:----|
  |Common|max_target_url|Maximum examination URL number. If the URL number gathered by Web Crawling exceeds this parameter value, excess URL number is discarded. Default value is `100`. `0` is unlimited.|
  ||max_target_byte|Maximum examination response size. If the response size exceeds this parameter value, excess response size is discarded. Default value is `10000` byte. `0` is unlimited.|
  ||scramble|The URL list gathered by Web crawling is randomly ordered. Default value is `1` (validity). `0` is invalid.|
- 
+
  | Note |
  |:-----|
  | The examination speed and accuracy are trade-off. |
@@ -407,7 +407,7 @@ signature_page_type_from_url.txt
 #### `signature_product.txt`  
 This is string matching patterns for identification of product in <a name='default_mode'>default mode</a>.  
 If you want to add new string matching pattern, you have to write it such following format.   
- 
+
 ```
 Format: field1@field2@field3@field4@field5
 ```
@@ -421,7 +421,7 @@ Format: field1@field2@field3@field4@field5
 |Required|5|Regex of identifying product.|`.*(X-Generator: Drupal 8).*`|
 
 If you don't need optional field, you must set `*` to this field.  
- 
+
 * Example  
 ```
 CMS@wordpress@wordpress@*@.*(WordPress ([0-9]+[\.0-9]*[\.0-9]*)).*
