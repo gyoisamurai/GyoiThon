@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+   <polygon points="5 20, 20 5, 35 20, 20 35" stroke="black" fill="#fff" stroke-width="2" />
+   <animate onbegin="alert(1)" attributeName="x" dur="1s" />
+   <path><animateMotion onend="alert(2)" dur="1s" repeatCount="1" /></path>
+   <animatetransform onend="alert(3)" attributeName="transform" dur="1s" />
+   <set onend="alert(4)" attributename="x" dur="1s" />
+</svg>
