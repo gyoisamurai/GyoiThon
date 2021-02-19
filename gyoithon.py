@@ -27,6 +27,7 @@ from modules.Gyoi_Exploit import Exploit
 from modules.Gyoi_Censys import Censys
 from modules.Gyoi_Creator import Creator
 from modules.Gyoi_Inventory import Inventory
+from modules.Gyoi_DomainTools import DomainTools
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -151,7 +152,7 @@ __doc__ = """{f}
 usage:
     {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
     {f} [-d --category=<category> --vendor=<vendor> --package=<package>]
-    {f} [-i]
+    {f} [-i] [--web_crawl]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -189,6 +190,7 @@ if __name__ == '__main__':
     opt_develop_vendor = args['--vendor']
     opt_develop_package = args['--package']
     opt_invent = args['-i']
+    opt_invent_web_crawl = args['--web_crawl']
     opt_no_update_vulndb = args['--no-update-vulndb']
 
     # Read config.ini.
@@ -249,6 +251,7 @@ if __name__ == '__main__':
             inventory = Inventory(utility)
             spider = SpiderControl(utility)
             google_hack = GoogleCustomSearch(utility)
+            dt = DomainTools(utility)
             report = CreateReport(utility)
 
             with codecs.open(inventory_list_path, 'r', 'utf-8') as fin:
@@ -258,38 +261,20 @@ if __name__ == '__main__':
                     if len(items) != 2:
                         utility.print_message(FAIL, 'Invalid inventory target : {}'.format(target))
                         continue
+                    search_word = items[0]
+                    search_type = items[1]
 
                     # Check target URL.
-                    port_num = ''
-                    invent_url = ''
-                    keyword = ''
-                    try:
-                        invent_url = items[0]
-                        keyword = items[1]
-                        parsed = util.parse_url(invent_url)
-
-                        # Judge port number.
-                        if parsed.port is None and parsed.scheme == 'https':
-                            port_num = '443'
-                        elif parsed.port is None and parsed.scheme == 'http':
-                            port_num = '80'
-                        elif parsed.port is not None:
-                            port_num = str(parsed.port)
-                        else:
-                            utility.print_message(FAIL, 'Invalid URL : {}'.format(invent_url))
-                            utility.write_log(30, 'Invalid URL : {}'.format(invent_url))
-                            continue
-                    except Exception as e:
-                        utility.print_exception(e, 'Parsed error : {}'.format(invent_url))
-                        utility.write_log(30, 'Parsed error : {}'.format(invent_url))
+                    if search_type not in ['Organization', 'Email', 'NS']:
+                        utility.print_message(FAIL, 'Invalid search type : {}'.format(search_type))
                         continue
 
-                    # Check target URL.
-                    if utility.check_arg_value(parsed.scheme, parsed.hostname, port_num, parsed.path) is False:
-                        continue
+                    # Search domain.
+                    domain_info_dict_tmp = inventory.domain_explore(dt, search_word, search_type)
+                    # TODO: いったんjson形式で保存するか？
 
-                    # Gather relevant FQDN.
-                    fqdn_list = inventory.fqdn_explore(spider, google_hack, invent_url, keyword)
+                    # Search sub-domain.
+                    domain_info_dict = inventory.sub_domain_explore(domain_info_dict_tmp, google_hack)
 
                     # Create report.
                     date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]

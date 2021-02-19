@@ -222,13 +222,13 @@ class GoogleCustomSearch:
         self.utility.write_log(20, '[In] Execute Domain Search [{}].'.format(self.file_name))
 
         # Execute.
-        query = 'site:' + target_domain
-        _, _, fqdn_list = self.custom_search(query, max_page_count=max_search_num, target_fqdn=target_domain)
-        if len(fqdn_list) != 0:
-            self.utility.print_message(OK, 'Gathered FQDN : {}'.format(fqdn_list))
+        query = 'site:' + target_domain + ' -inurl:http://' + target_domain + ' -inurl:https://' + target_domain
+        _, _, sub_domain_list = self.custom_search(query, max_page_count=max_search_num, target_domain=target_domain)
+        if len(sub_domain_list) != 0:
+            self.utility.print_message(OK, 'Gathered FQDN : {}'.format(sub_domain_list))
 
         self.utility.write_log(20, '[Out] Execute Domain Search [{}].'.format(self.file_name))
-        return fqdn_list
+        return sub_domain_list
 
     # Search relevant FQDN.
     def search_relevant_fqdn(self, target_fqdn, search_fqdn):
@@ -247,7 +247,7 @@ class GoogleCustomSearch:
         self.utility.write_log(20, '[Out] Execute relevant FQDN Search [{}].'.format(self.file_name))
         return is_relevant
 
-    # Search relevant FQDN.
+    # Search related FQDN.
     def search_related_fqdn(self, target_fqdn, keyword, max_search_num):
         self.utility.print_message(NOTE, 'Execute related FQDN Search.')
         self.utility.write_log(20, '[In] Execute related FQDN Search [{}].'.format(self.file_name))
@@ -260,7 +260,7 @@ class GoogleCustomSearch:
         return fqdn_list
 
     # Execute Google custom search.
-    def custom_search(self, query, max_page_count=1, target_fqdn=''):
+    def custom_search(self, query, max_page_count=1, target_domain=''):
         # Google Custom Search API.
         self.utility.write_log(20, '[In] Execute Google custom search [{}].'.format(self.file_name))
 
@@ -289,11 +289,12 @@ class GoogleCustomSearch:
 
         # Execute search.
         urls = []
-        fqdn_list = []
+        sub_domain_list = []
         result_count = 0
         start_index = self.start_index
         try:
             search_count = 0
+            search_urls = []
             while search_count < max_page_count:
                 self.utility.print_message(OK, 'Using query : {}'.format(query))
                 response = service.cse().list(
@@ -307,10 +308,8 @@ class GoogleCustomSearch:
 
                 # Get finding counts.
                 result_count = int(response.get('searchInformation').get('totalResults'))
-                is_new_query = False
 
                 # Get extracted link (url).
-                search_urls = []
                 if result_count != 0:
                     items = response['items']
                     for item in items:
@@ -319,37 +318,23 @@ class GoogleCustomSearch:
 
                 # Set new query.
                 if result_count <= 10 or max_page_count == 1:
-                    fqdn_list.extend(self.utility.transform_url_hostname_list(search_urls))
+                    sub_domain_list.extend(self.utility.transform_url_hostname_list(search_urls))
                     break
                 else:
-                    # Refine search range using "-inurl" option.
-                    tmp_list = self.utility.transform_url_hostname_list(search_urls)
-                    for fqdn in tmp_list:
-                        if fqdn not in fqdn_list:
-                            subdomain = self.utility.extract_subdomain(fqdn, target_fqdn)
-                            if target_fqdn != '' and subdomain == target_fqdn:
-                                query += ' -inurl:http://' + subdomain + ' -inurl:https://' + subdomain
-                                is_new_query = True
-                                search_count = -1
-                            elif subdomain != '':
-                                query += ' -inurl:' + subdomain
-                                is_new_query = True
-                                search_count = -1
-                            fqdn_list.append(fqdn)
-                    if is_new_query is False:
-                        if 'nextPage' in response.get('queries').keys():
-                            start_index = response.get('queries').get('nextPage')[0].get('startIndex')
-                        else:
-                            self.utility.print_message(WARNING, 'There is not next page.')
-                            break
-
+                    # Refine search range using "-site" option.
+                    tmp_sub_domain_list = self.utility.transform_url_hostname_list(search_urls)
+                    for sub_domain in tmp_sub_domain_list:
+                        if target_domain != sub_domain and sub_domain not in sub_domain_list:
+                            query += ' -site:' + sub_domain
+                        sub_domain_list.append(sub_domain)
                 search_count += 1
+                time.sleep(self.delay_time)
         except Exception as e:
             msg = 'Google custom search is failure : {}'.format(e)
             self.utility.print_exception(e, msg)
             self.utility.write_log(30, msg)
             self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
-            return urls, result_count, fqdn_list
+            return urls, result_count, sub_domain_list
 
         self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
-        return urls, result_count, list(set(fqdn_list))
+        return urls, result_count, list(set(sub_domain_list))
