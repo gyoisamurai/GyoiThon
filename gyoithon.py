@@ -152,7 +152,7 @@ __doc__ = """{f}
 usage:
     {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
     {f} [-d --category=<category> --vendor=<vendor> --package=<package>]
-    {f} [-i] [--web_crawl]
+    {f} [-i --org_list --domain_list]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -190,7 +190,8 @@ if __name__ == '__main__':
     opt_develop_vendor = args['--vendor']
     opt_develop_package = args['--package']
     opt_invent = args['-i']
-    opt_invent_web_crawl = args['--web_crawl']
+    opt_invent_org_list = args['--org_list']
+    opt_invent_domain_list = args['--domain_list']
     opt_no_update_vulndb = args['--no-update-vulndb']
 
     # Read config.ini.
@@ -246,15 +247,32 @@ if __name__ == '__main__':
 
     # Explore relevant FQDN with the target FQDN.
     if opt_invent:
-        inventory_list_path = os.path.join(full_path, 'inventory_list.txt')
-        if os.path.exists(inventory_list_path):
+        org_list_path = os.path.join(full_path, 'organization_list.csv')
+        domain_list_path = os.path.join(full_path, 'domain_list.csv')
+        if opt_invent_domain_list is not None and os.path.exists(domain_list_path):
             inventory = Inventory(utility)
-            spider = SpiderControl(utility)
+            google_hack = GoogleCustomSearch(utility)
+            report = CreateReport(utility)
+
+            # Get import path of domain list.
+            # Search domain.
+            domain_info_dict_tmp = inventory.domain_explore(import_list=domain_list_path)
+            # TODO: いったんjson形式で保存するか？
+
+            # Search sub-domain.
+            domain_info_dict = inventory.sub_domain_explore(domain_info_dict_tmp, google_hack)
+
+            # Create report.
+            report = CreateReport(utility)
+            report.create_inventory_report(domain_info_dict, search_word='', search_type='List')
+
+        elif opt_invent_org_list is not None and os.path.exists(org_list_path):
+            inventory = Inventory(utility)
             google_hack = GoogleCustomSearch(utility)
             dt = DomainTools(utility)
             report = CreateReport(utility)
 
-            with codecs.open(inventory_list_path, 'r', 'utf-8') as fin:
+            with codecs.open(org_list_path, 'r', 'utf-8') as fin:
                 targets = fin.readlines()
                 for target in targets:
                     items = target.replace('\r', '').replace('\n', '').split('\t')
@@ -264,28 +282,24 @@ if __name__ == '__main__':
                     search_word = items[0]
                     search_type = items[1]
 
-                    # Check target URL.
+                    # Check arguments.
                     if search_type not in ['Organization', 'Email', 'NS']:
                         utility.print_message(FAIL, 'Invalid search type : {}'.format(search_type))
                         continue
 
                     # Search domain.
-                    domain_info_dict_tmp = inventory.domain_explore(dt, search_word, search_type)
-                    # TODO: いったんjson形式で保存するか？
+                    domain_info_dict_tmp = inventory.domain_explore(dt,
+                                                                    search_word=search_word,
+                                                                    search_type=search_type)
 
                     # Search sub-domain.
                     domain_info_dict = inventory.sub_domain_explore(domain_info_dict_tmp, google_hack)
 
                     # Create report.
-                    date = utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
-                    print_date = utility.transform_date_string(utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
                     report = CreateReport(utility)
-                    report.create_inventory_report(fqdn_list, keyword, parsed.hostname, print_date)
-
-                # Create merged report.
-                report.create_all_inventory_report()
+                    report.create_inventory_report(domain_info_dict, search_word, search_type)
         else:
-            utility.print_message(FAIL, '"inventory_list.txt" is not found : {}'.format(inventory_list_path))
+            utility.print_message(FAIL, 'Required lists are not found : {}.')
         exit(0)
 
     # Create instances.

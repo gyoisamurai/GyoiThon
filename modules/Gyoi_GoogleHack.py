@@ -223,12 +223,14 @@ class GoogleCustomSearch:
 
         # Execute.
         query = 'site:' + target_domain + ' -inurl:http://' + target_domain + ' -inurl:https://' + target_domain
-        _, _, sub_domain_list = self.custom_search(query, max_page_count=max_search_num, target_domain=target_domain)
+        _, _, query, sub_domain_list = self.custom_search(query,
+                                                          max_page_count=max_search_num,
+                                                          target_domain=target_domain)
         if len(sub_domain_list) != 0:
             self.utility.print_message(OK, 'Gathered FQDN : {}'.format(sub_domain_list))
 
         self.utility.write_log(20, '[Out] Execute Domain Search [{}].'.format(self.file_name))
-        return sub_domain_list
+        return sub_domain_list, query
 
     # Search relevant FQDN.
     def search_relevant_fqdn(self, target_fqdn, search_fqdn):
@@ -318,7 +320,12 @@ class GoogleCustomSearch:
 
                 # Set new query.
                 if result_count <= 10 or max_page_count == 1:
-                    sub_domain_list.extend(self.utility.transform_url_hostname_list(search_urls))
+                    tmp_sub_domain_list = self.utility.transform_url_hostname_list(search_urls)
+                    # Update query for report.
+                    for sub_domain in tmp_sub_domain_list:
+                        if target_domain != sub_domain and sub_domain not in sub_domain_list:
+                            query += ' -site:' + sub_domain
+                    sub_domain_list.extend(tmp_sub_domain_list)
                     break
                 else:
                     # Refine search range using "-site" option.
@@ -334,7 +341,7 @@ class GoogleCustomSearch:
             self.utility.print_exception(e, msg)
             self.utility.write_log(30, msg)
             self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
-            return urls, result_count, sub_domain_list
+            return urls, result_count, query, sub_domain_list
 
         self.utility.write_log(20, '[Out] Execute Google custom search [{}].'.format(self.file_name))
-        return urls, result_count, list(set(sub_domain_list))
+        return urls, result_count, query, list(set(sub_domain_list))

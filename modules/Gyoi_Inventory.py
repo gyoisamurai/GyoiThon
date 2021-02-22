@@ -4,14 +4,12 @@ import os
 import sys
 import codecs
 import time
+import copy
 import re
 import tldextract
 import subprocess
 import configparser
 import pandas as pd
-from urllib3 import util
-from modules.Gyoi_GoogleHack import GoogleCustomSearch
-from util import Utilty
 
 # Type of printing.
 OK = 'ok'         # [*]
@@ -108,16 +106,18 @@ class Inventory:
         self.utility.write_log(20, '[In] Explore FQDN using DNS server [{}].'.format(self.file_name))
 
         # Get DNS  addresses from each domain.
-        dns_info = {'A': '', 'CNAME': '', 'NS': '', 'MX': '', 'SOA': '', 'TXT': ''}
-        ip_adder = ''
+        dns_info = {'A': 'N/A', 'CNAME': 'N/A', 'NS': 'N/A', 'MX': 'N/A', 'SOA': 'N/A', 'TXT': 'N/A'}
+        ip_adder = 'N/A'
         for option in self.nslookup_options:
-            nslookup_result = self.execute_nslookup(domain, option).decode(self.char_code)
+            nslookup_result = self.execute_nslookup(domain, option)
             if nslookup_result != '':
+                nslookup_result = nslookup_result.decode(self.char_code)
                 if option == 'A':
                     ip_adder = re.findall(self.nslookup_regex_ip[self.os_index], nslookup_result)
                 dns_info[option] = nslookup_result
             else:
                 self.utility.print_message(WARNING, 'Executing nslookup is failure : option={}.'.format(option))
+                break
 
             time.sleep(self.nslookup_delay_time)
 
@@ -165,7 +165,7 @@ class Inventory:
         self.utility.write_log(20, '[In] Mutate domain [{}].'.format(self.file_name))
 
         # Mutate domain.
-        mutation_domain_list = [origin_domain]
+        mutation_domain_list = []
         ext = tldextract.extract(origin_domain)
         mutation_domain_list.append(ext.domain + '.com')
         mutation_domain_list.append(ext.domain + '.jp')
@@ -176,10 +176,10 @@ class Inventory:
         mutation_domain_list.append(ext.domain + '.or.jp')
 
         self.utility.write_log(20, '[Out] Mutate domain [{}].'.format(self.file_name))
-        return list(set(mutation_domain_list))
+        return list(set([s for s in mutation_domain_list if origin_domain != s]))
 
     # Extract whois information.
-    def extract_whois_info(self, dt, domain_list, origin_domain=None, mutation=False):
+    def extract_whois_info(self, dt, domain_list, origin_domain='-', mutation=False, import_list=False):
         self.utility.print_message(NOTE, 'Extract whois information.')
         self.utility.write_log(20, '[In] Extract whois information. [{}].'.format(self.file_name))
 
@@ -188,10 +188,11 @@ class Inventory:
         for domain in domain_list:
             # Domain Structure.
             domain_basic = {'IP Address': '', 'Date': '', 'Mutation': '', 'Origin Domain': '',
-                            'Whois': {}, 'DNS': {}, 'Sub-domain': {}}
-            domain_whois = {'Contact': [], 'Registrant Name': [], 'Registrant Organization': [],
-                            'Registrant Email': [], 'Admin Name': [], 'Admin Organization': [], 'Admin Email': [],
-                            'Tech Name': [], 'Tech Organization': [], 'Tech Email': [], 'Name Server': []}
+                            'Whois': {}, 'DNS': {}, 'Sub-domain': {}, 'Note': ''}
+            domain_whois = {'Contact': 'N/A', 'Registrant Name': 'N/A', 'Registrant Organization': 'N/A',
+                            'Registrant Email': 'N/A', 'Admin Name': 'N/A', 'Admin Organization': 'N/A',
+                            'Admin Email': 'N/A', 'Tech Name': 'N/A', 'Tech Organization': 'N/A', 'Tech Email': 'N/A',
+                            'Name Server': 'N/A'}
 
             # Set basic records.
             domain_basic['Date'] = self.utility.get_current_date()
@@ -199,33 +200,45 @@ class Inventory:
             domain_basic['Origin Domain'] = origin_domain
 
             # Get whois record.
-            status, contact, registrant_name, registrant_organization, registrant_email, admin_name, admin_organization, \
-            admin_email, tech_name, tech_organization, tech_email, name_server = dt.whois_lookup(domain)
+            if import_list is False:
+                status, contact, registrant_name, registrant_organization, registrant_email, admin_name, \
+                admin_organization, admin_email, tech_name, tech_organization, tech_email, \
+                name_server = dt.whois_lookup(domain)
 
-            # Set whois records.
-            if status is False:
-                domain_basic['Whois'] = domain_whois
+                # Set whois records.
+                if status is False:
+                    domain_basic['Whois'] = domain_whois
+                else:
+                    domain_whois['Contact'] = contact.extend(contact)
+                    domain_whois['Registrant Name'] = registrant_name.extend(registrant_name)
+                    domain_whois['Registrant Organization'] = registrant_organization.extend(registrant_organization)
+                    domain_whois['Registrant Email'] = registrant_email.extend(registrant_email)
+                    domain_whois['Admin Name'] = admin_name.extend(admin_name)
+                    domain_whois['Admin Organization'] = admin_organization.extend(admin_organization)
+                    domain_whois['Admin Email'] = admin_email.extend(admin_email)
+                    domain_whois['Tech Name'] = tech_name.extend(tech_name)
+                    domain_whois['Tech Organization'] = tech_organization.extend(tech_organization)
+                    domain_whois['Tech Email'] = tech_email.extend(tech_email)
+                    domain_whois['Name Server'] = name_server.extend(name_server)
+                    domain_basic['Whois'] = domain_whois
+
+                domain_info_dict[domain] = domain_basic
             else:
-                domain_whois['Contact'] = contact.extend(contact)
-                domain_whois['Registrant Name'] = registrant_name.extend(registrant_name)
-                domain_whois['Registrant Organization'] = registrant_organization.extend(registrant_organization)
-                domain_whois['Registrant Email'] = registrant_email.extend(registrant_email)
-                domain_whois['Admin Name'] = admin_name.extend(admin_name)
-                domain_whois['Admin Organization'] = admin_organization.extend(admin_organization)
-                domain_whois['Admin Email'] = admin_email.extend(admin_email)
-                domain_whois['Tech Name'] = tech_name.extend(tech_name)
-                domain_whois['Tech Organization'] = tech_organization.extend(tech_organization)
-                domain_whois['Tech Email'] = tech_email.extend(tech_email)
-                domain_whois['Name Server'] = name_server.extend(name_server)
                 domain_basic['Whois'] = domain_whois
-
-            domain_info_dict[domain] = domain_basic
+                domain_info_dict[domain] = domain_basic
 
         self.utility.write_log(20, '[Out] Extract whois information. [{}].'.format(self.file_name))
         return domain_info_dict
 
+    # Extract domain from import list.
+    def extract_domain_from_list(self, import_list_path):
+        domain_list = []
+        df = pd.read_csv(import_list_path, encoding='utf-8')
+        domain_list = df.loc[:, 'Domain'].values.tolist()
+        return domain_list
+
     # Explore domain.
-    def domain_explore(self, dt, search_word, search_type):
+    def domain_explore(self, dt=None, search_word=None, search_type=None, import_list=None):
         self.utility.print_message(NOTE, 'Explore domain.')
         msg = self.utility.make_log_msg(self.utility.log_in,
                                         self.utility.log_dis,
@@ -237,22 +250,37 @@ class Inventory:
 
         # Get domain list.
         domain_list = []
-        if search_type in ['Organization', 'Email']:
+        import_list_flag = False
+        if search_type in ['Organization', 'Email'] and dt is not None:
             domain_list = dt.reverse_whois(search_word)
-        else:
+        elif search_type == 'NS' and dt is not None:
             domain_list = dt.reverse_nslookup(search_word)
+        elif import_list is not None:
+            import_list_flag = True
+            domain_list = self.extract_domain_from_list(import_list)
+        else:
+            self.utility.print_message(FAIL, 'Search type is None.')
+            return {}
 
         # Get whois information for normal domain.
-        domain_info_dict = self.extract_whois_info(dt, list(set(domain_list)))
+        domain_info_dict = self.extract_whois_info(dt, list(set(domain_list)), import_list=import_list_flag)
 
         # Get whois information for mutated domain.
-        for domain in domain_info_dict.keys():
+        tmp_domain_info = copy.deepcopy(domain_info_dict)
+        for idx, domain in enumerate(tmp_domain_info.keys()):
+            self.utility.print_message(OK, '[{}/{}] Mutation of "{}"'.format(idx + 1, len(tmp_domain_info), domain))
             mutated_domain_list = self.mutated_domain(domain)
-            mutated_domain_info_dict = self.extract_whois_info(dt, mutated_domain_list, domain, True)
+            mutated_domain_info_dict = self.extract_whois_info(dt,
+                                                               mutated_domain_list,
+                                                               origin_domain=domain,
+                                                               mutation=True,
+                                                               import_list=import_list_flag)
             domain_info_dict.update(mutated_domain_info_dict)
+            self.utility.print_message(OK, 'Mutated : "{}" to "{}"'.format(domain, mutated_domain_list))
 
         # Get domain list from JPRS.
-        for domain in domain_info_dict.keys():
+        for idx, domain in enumerate(domain_info_dict.keys()):
+            self.utility.print_message(OK, '[{}/{}] JPRS Search of "{}"'.format(idx + 1, len(domain_info_dict), domain))
             if len(domain_info_dict[domain]['Whois']['Contact']) != 0:
                 organization_list, email_list = self.domain_explore_jprs(domain_info_dict[domain]['Whois']['Contact'])
 
@@ -265,9 +293,12 @@ class Inventory:
                     origin_email_list = domain_info_dict[domain]['Whois']['Registrant Email']
                     origin_email_list.extend(email_list)
                     domain_info_dict[domain]['Whois']['Registrant Email'] = list(set(origin_email_list))
+            else:
+                self.utility.print_message(OK, 'Contact is None')
 
         # Get DNS record information.
-        for domain in domain_info_dict.keys():
+        for idx, domain in enumerate(domain_info_dict.keys()):
+            self.utility.print_message(OK, '[{}/{}] DNS search of "{}"'.format(idx + 1, len(domain_info_dict), domain))
             ip_address, dns_info = self.dns_explore(domain)
             domain_info_dict[domain]['IP Address'] = ip_address
             domain_info_dict[domain]['DNS'] = dns_info
@@ -286,16 +317,17 @@ class Inventory:
         self.utility.print_message(NOTE, 'Extract DNS record of sub-domain.')
 
         # Get DNS records of sub-domain.
-        sub_domain_basic = {'IP Address': None, 'DNS': None, 'Access Status': None}
+        sub_domain_basic = {'IP Address': 'N/A', 'DNS': '', 'Access Status': 'Not Access.'}
         ip_address, dns_info = self.dns_explore(sub_domain)
+        sub_domain_basic['IP Address'] = ip_address
+        sub_domain_basic['DNS'] = dns_info
         if ip_address != '':
-            sub_domain_basic['IP Address'] = ip_address
-            sub_domain_basic['DNS'] = dns_info
-
             # Send request.
             target_url = 'http://' + sub_domain + ':80'
+            self.utility.print_message(OK, 'Send request to "{}".'.format(target_url))
             res, _, _, _, _ = self.utility.send_request('GET', target_url)
             if res is not None:
+                self.utility.print_message(OK, 'Return status : {}.'.format(res.status))
                 sub_domain_basic['Access Status'] = res.status
             else:
                 self.utility.print_message(FAIL, 'Could not access to {}.'.format(target_url))
@@ -314,22 +346,27 @@ class Inventory:
         self.utility.write_log(20, msg)
 
         # Get whois information for mutated domain.
-        for domain in domain_info_dict.keys():
+        for idx, domain in enumerate(domain_info_dict.keys()):
+            self.utility.print_message(OK, '[{}/{}] Sub-domain Explore of "{}"'.format(idx + 1, len(domain_info_dict), domain))
+
             # Add domain to sub-domain list.
             sub_domain_info_dict = {}
             sub_domain_info_dict[domain] = {'IP Address': domain_info_dict[domain]['IP Address'],
                                             'DNS': domain_info_dict[domain]['DNS'],
-                                            'Access Status': None}
+                                            'Access Status': 'N/A'}
 
             # Explore sub-domain using Google Custom Search.
-            sub_domain_list = google_hack.search_domain(domain, max_search_num=self.max_search_num)
-            sub_domain_list.append('www' + domain)
-            for sub_domain in list(set(sub_domain_list)):
+            sub_domain_list, query = google_hack.search_domain(domain, max_search_num=self.max_search_num)
+            sub_domain_list.append(domain)
+            sub_domain_list.append('www.' + domain)
+            for sub_idx, sub_domain in enumerate(list(set(sub_domain_list))):
+                self.utility.print_message(OK, 'Search "{}"'.format(sub_domain))
                 # Get DNS record and IP address of sub-domain.
                 sub_domain_info = self.get_sub_domain_dns_record(sub_domain)
                 sub_domain_info_dict[sub_domain] = sub_domain_info
 
             # Add sub-domain information to domain dict.
             domain_info_dict[domain]['Sub-domain'] = sub_domain_info_dict
+            domain_info_dict[domain]['Note'] = query
 
         return domain_info_dict
