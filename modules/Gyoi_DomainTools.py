@@ -63,7 +63,7 @@ class DomainTools:
                                                                                              search_word)
 
         # Send request.
-        res, _, _, res_body, _ = utility.send_request('GET', target_url)
+        res, _, _, res_body, _ = self.utility.send_request('GET', target_url)
         if res is None or res.status >= 400:
             self.utility.print_message(FAIL, 'Could not access to {}.'.format(target_url))
             return []
@@ -96,7 +96,7 @@ class DomainTools:
                                                                                      timestamp)
 
         # Send request.
-        res, _, _, res_body, _ = utility.send_request('GET', target_url)
+        res, _, _, res_body, _ = self.utility.send_request('GET', target_url)
         if res is None or res.status >= 400:
             self.utility.print_message(FAIL, 'Could not access to {}.'.format(target_url))
             return []
@@ -136,7 +136,7 @@ class DomainTools:
         target_url = 'https://{}{}'.format(self.api_host, self.uri_whois_lookup)
 
         # Send request.
-        res, _, _, res_body, _ = utility.send_request('GET', target_url)
+        res, _, _, res_body, _ = self.utility.send_request('GET', target_url)
         if res is None or res.status >= 400:
             self.utility.print_message(FAIL, 'Could not access to {}.'.format(target_url))
             return False, [], [], [], [], [], [], [], [], [], [], []
@@ -217,14 +217,3 @@ class DomainTools:
 
         return True, contact, registrant_name, registrant_organization, registrant_email, admin_name, \
                admin_organization, admin_email, tech_name, tech_organization, tech_email, name_server
-
-
-if __name__ == '__main__':
-    utility = Utilty()
-
-    dt = DomainTools(utility)
-    # domain_list = dt.reverse_whois('mitsuifodosan.co.jp')
-    # domain_list2 = dt.reverse_nslookup('ns3.mitsuifudosan.co.jp')
-    domain_list3 = dt.whois_lookup('domaintools.com')
-
-    print()
