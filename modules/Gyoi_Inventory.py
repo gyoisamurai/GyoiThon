@@ -4,6 +4,7 @@ import os
 import sys
 import codecs
 import time
+import json
 import copy
 import re
 import tldextract
@@ -36,6 +37,9 @@ class Inventory:
 
         try:
             self.signature_dir = os.path.join(self.root_path, config['Common']['signature_path'])
+            self.tmp_inventory_dir = os.path.join(self.root_path, config['Inventory']['tmp_inventory_dir'])
+            if os.path.exists(self.tmp_inventory_dir) is False:
+                os.mkdir(self.tmp_inventory_dir)
             self.black_list_path = os.path.join(self.signature_dir, config['Inventory']['black_list'])
             self.black_list = []
             if os.path.exists(self.black_list_path) is False:
@@ -178,6 +182,16 @@ class Inventory:
         self.utility.write_log(20, '[Out] Mutate domain [{}].'.format(self.file_name))
         return list(set([s for s in mutation_domain_list if origin_domain != s]))
 
+    # Check existing temporary Json file for domain.
+    def check_existing_tmp_json(self, domain):
+        self.utility.print_message(NOTE, 'Check existing temporary Json file for domain.')
+        self.utility.write_log(20, '[In] Check existing temporary Json file for domain. [{}].'.format(self.file_name))
+
+        self.utility.print_message(OK, 'Check existing temporary Json file for "{}".'.format(domain))
+
+        self.utility.write_log(20, '[In] Check existing temporary Json file for domain. [{}].'.format(self.file_name))
+        return os.path.exists(os.path.join(self.tmp_inventory_dir, domain))
+
     # Extract whois information.
     def extract_whois_info(self, dt, domain_list, origin_domain='-', mutation=False, import_list=False):
         self.utility.print_message(NOTE, 'Extract whois information.')
@@ -193,6 +207,11 @@ class Inventory:
                             'Registrant Email': 'N/A', 'Admin Name': 'N/A', 'Admin Organization': 'N/A',
                             'Admin Email': 'N/A', 'Tech Name': 'N/A', 'Tech Organization': 'N/A', 'Tech Email': 'N/A',
                             'Name Server': 'N/A'}
+
+            if self.check_existing_tmp_json(domain):
+                self.utility.print_message(WARNING, 'Existing temporary Json file for "{}".'.format(domain))
+                domain_info_dict[domain] = domain_basic
+                continue
 
             # Set basic records.
             domain_basic['Date'] = self.utility.get_current_date()
@@ -281,7 +300,11 @@ class Inventory:
         # Get domain list from JPRS.
         for idx, domain in enumerate(domain_info_dict.keys()):
             self.utility.print_message(OK, '[{}/{}] JPRS Search of "{}"'.format(idx + 1, len(domain_info_dict), domain))
-            if len(domain_info_dict[domain]['Whois']['Contact']) != 0:
+            if self.check_existing_tmp_json(domain):
+                self.utility.print_message(WARNING, 'Existing temporary Json file for "{}".'.format(domain))
+                continue
+
+            if type(domain_info_dict[domain]['Whois']['Contact']) == list:
                 organization_list, email_list = self.domain_explore_jprs(domain_info_dict[domain]['Whois']['Contact'])
 
                 # Merge Registrant Organization and Email.
@@ -299,6 +322,10 @@ class Inventory:
         # Get DNS record information.
         for idx, domain in enumerate(domain_info_dict.keys()):
             self.utility.print_message(OK, '[{}/{}] DNS search of "{}"'.format(idx + 1, len(domain_info_dict), domain))
+            if self.check_existing_tmp_json(domain):
+                self.utility.print_message(WARNING, 'Existing temporary Json file for "{}".'.format(domain))
+                continue
+
             ip_address, dns_info = self.dns_explore(domain)
             domain_info_dict[domain]['IP Address'] = ip_address
             domain_info_dict[domain]['DNS'] = dns_info
@@ -317,7 +344,7 @@ class Inventory:
         self.utility.print_message(NOTE, 'Extract DNS record of sub-domain.')
 
         # Get DNS records of sub-domain.
-        sub_domain_basic = {'IP Address': 'N/A', 'DNS': '', 'Access Status': 'Not Access.'}
+        sub_domain_basic = {'IP Address': 'N/A', 'DNS': '', 'Access Status': 'Not Access.', 'Location': 'N/A'}
         ip_address, dns_info = self.dns_explore(sub_domain)
         sub_domain_basic['IP Address'] = ip_address
         sub_domain_basic['DNS'] = dns_info
@@ -325,10 +352,19 @@ class Inventory:
             # Send request.
             target_url = 'http://' + sub_domain + ':80'
             self.utility.print_message(OK, 'Send request to "{}".'.format(target_url))
-            res, _, _, _, _ = self.utility.send_request('GET', target_url)
+            res, _, res_header, _, _ = self.utility.send_request('GET', target_url)
             if res is not None:
-                self.utility.print_message(OK, 'Return status : {}.'.format(res.status))
                 sub_domain_basic['Access Status'] = res.status
+                if 300 <= res.status < 400:
+                    location = ''
+                    for header in res_header.split('\r\n'):
+                        if header[:10].lower() == 'location: ':
+                            location = header.split(': ')[1]
+                            sub_domain_basic['Location'] = location
+                            break
+                    self.utility.print_message(OK, 'Return status : {}, Location : {}.'.format(res.status, location))
+                else:
+                    self.utility.print_message(OK, 'Return status : {}.'.format(res.status))
             else:
                 self.utility.print_message(FAIL, 'Could not access to {}.'.format(target_url))
 
@@ -348,6 +384,9 @@ class Inventory:
         # Get whois information for mutated domain.
         for idx, domain in enumerate(domain_info_dict.keys()):
             self.utility.print_message(OK, '[{}/{}] Sub-domain Explore of "{}"'.format(idx + 1, len(domain_info_dict), domain))
+            if self.check_existing_tmp_json(domain):
+                self.utility.print_message(WARNING, 'Existing temporary Json file for "{}".'.format(domain))
+                continue
 
             # Add domain to sub-domain list.
             sub_domain_info_dict = {}
@@ -369,4 +408,6 @@ class Inventory:
             domain_info_dict[domain]['Sub-domain'] = sub_domain_info_dict
             domain_info_dict[domain]['Note'] = query
 
-        return domain_info_dict
+            # Save domain information to temporary json file.
+            with codecs.open(os.path.join(self.tmp_inventory_dir, domain), 'w', 'utf-8') as fout:
+                json.dump(domain_info_dict[domain], fout, indent=4)

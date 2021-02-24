@@ -257,14 +257,13 @@ if __name__ == '__main__':
             # Get import path of domain list.
             # Search domain.
             domain_info_dict_tmp = inventory.domain_explore(import_list=domain_list_path)
-            # TODO: いったんjson形式で保存するか？
 
             # Search sub-domain.
-            domain_info_dict = inventory.sub_domain_explore(domain_info_dict_tmp, google_hack)
+            inventory.sub_domain_explore(domain_info_dict_tmp, google_hack)
 
             # Create report.
             report = CreateReport(utility)
-            report.create_inventory_report(domain_info_dict, search_word='', search_type='List')
+            report.create_inventory_report(inventory.tmp_inventory_dir, search_word='', search_type='List')
 
         elif opt_invent_org_list is not None and os.path.exists(org_list_path):
             inventory = Inventory(utility)

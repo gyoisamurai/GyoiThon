@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import shutil
+import codecs
 import copy
+import json
 import glob
 import configparser
 import pandas as pd
@@ -180,56 +183,64 @@ class CreateReport:
         self.utility.write_log(20, '[Out] Create Censys report [{}].'.format(self.file_name))
 
     # Create Inventory report.
-    def create_inventory_report(self, domain_info, search_word='', search_type=''):
+    def create_inventory_report(self, tmp_inventory_dir, search_word='', search_type=''):
         self.utility.print_message(NOTE, 'Create Inventory report.')
         self.utility.write_log(20, '[In] Create Inventory report [{}].'.format(self.file_name))
 
         date = self.utility.get_current_date('%Y%m%d%H%M%S%f')[:-3]
-        print_date = self.utility.transform_date_string(self.utility.transform_date_object(date[:-3], '%Y%m%d%H%M%S'))
         self.report_file_name_invent = self.report_path_invent.replace('*', search_word + '_' +
                                                                        search_type + '_' +
                                                                        date)
         pd.DataFrame([], columns=self.header_invent).to_csv(self.report_file_name_invent, mode='w', index=False)
 
+        # Gather reporting items.
+        json_file_list = glob.glob(os.path.join(tmp_inventory_dir, '*'))
+
         # Build base structure.
         report = []
         index = 1
-        for domain in domain_info.keys():
+        for json_file_path in json_file_list:
+            domain_info = {}
+            with codecs.open(json_file_path, 'r', 'utf-8') as fin:
+                domain_info = json.load(fin)
+
             # Build parent record.
+            domain = os.path.basename(json_file_path)
             parent_record = []
-            parent_record.insert(0, index)                                                    # Index.
-            parent_record.insert(1, domain_info[domain]['Date'])                              # Search Data.
-            parent_record.insert(2, search_word)                                              # Search Word.
-            parent_record.insert(3, search_type)                                              # Search Type.
-            parent_record.insert(4, domain)                                                   # Domain.
-            parent_record.insert(5, domain_info[domain]['Mutation'])                          # Mutation flag.
-            parent_record.insert(6, domain_info[domain]['Origin Domain'])                     # Origin Domain.
-            parent_record.insert(7, domain_info[domain]['Whois']['Contact'])                  # Administrative Contact.
-            parent_record.insert(8, domain_info[domain]['Whois']['Registrant Name'])          # Registrant Name.
-            parent_record.insert(9, domain_info[domain]['Whois']['Registrant Organization'])  # Registrant Organization.
-            parent_record.insert(10, domain_info[domain]['Whois']['Registrant Email'])        # Registrant Email.
-            parent_record.insert(11, domain_info[domain]['Whois']['Admin Name'])              # Admin Name.
-            parent_record.insert(12, domain_info[domain]['Whois']['Admin Organization'])      # Admin Organization.
-            parent_record.insert(13, domain_info[domain]['Whois']['Admin Email'])             # Admin Email.
-            parent_record.insert(14, domain_info[domain]['Whois']['Tech Name'])               # Tech Name.
-            parent_record.insert(15, domain_info[domain]['Whois']['Tech Organization'])       # Tech Organization.
-            parent_record.insert(16, domain_info[domain]['Whois']['Tech Email'])              # Tech Email.
-            parent_record.insert(17, domain_info[domain]['Whois']['Name Server'])             # Name Server.
-            parent_record.insert(18, 'N/A')                                                   # Sub-Domain.
-            parent_record.insert(19, domain_info[domain]['IP Address'])                       # IP Address.
-            parent_record.insert(20, 'N/A')                                                   # Access Status.
-            parent_record.insert(21, domain_info[domain]['DNS']['A'])                         # DNS (A record).
-            parent_record.insert(22, domain_info[domain]['DNS']['CNAME'])                     # DNS (CNAME record).
-            parent_record.insert(23, domain_info[domain]['DNS']['NS'])                        # DNS (NS record).
-            parent_record.insert(24, domain_info[domain]['DNS']['MX'])                        # DNS (MX record).
-            parent_record.insert(25, domain_info[domain]['DNS']['SOA'])                       # DNS (SOA record).
-            parent_record.insert(26, domain_info[domain]['DNS']['TXT'])                       # DNS (TXT record).
-            parent_record.insert(27, domain_info[domain]['Note'])                             # Note.
+            parent_record.insert(0, index)                                            # Index.
+            parent_record.insert(1, domain_info['Date'])                              # Search Data.
+            parent_record.insert(2, search_word)                                      # Search Word.
+            parent_record.insert(3, search_type)                                      # Search Type.
+            parent_record.insert(4, domain)                                           # Domain.
+            parent_record.insert(5, domain_info['Mutation'])                          # Mutation flag.
+            parent_record.insert(6, domain_info['Origin Domain'])                     # Origin Domain.
+            parent_record.insert(7, domain_info['Whois']['Contact'])                  # Administrative Contact.
+            parent_record.insert(8, domain_info['Whois']['Registrant Name'])          # Registrant Name.
+            parent_record.insert(9, domain_info['Whois']['Registrant Organization'])  # Registrant Organization.
+            parent_record.insert(10, domain_info['Whois']['Registrant Email'])        # Registrant Email.
+            parent_record.insert(11, domain_info['Whois']['Admin Name'])              # Admin Name.
+            parent_record.insert(12, domain_info['Whois']['Admin Organization'])      # Admin Organization.
+            parent_record.insert(13, domain_info['Whois']['Admin Email'])             # Admin Email.
+            parent_record.insert(14, domain_info['Whois']['Tech Name'])               # Tech Name.
+            parent_record.insert(15, domain_info['Whois']['Tech Organization'])       # Tech Organization.
+            parent_record.insert(16, domain_info['Whois']['Tech Email'])              # Tech Email.
+            parent_record.insert(17, domain_info['Whois']['Name Server'])             # Name Server.
+            parent_record.insert(18, 'N/A')                                           # Sub-Domain.
+            parent_record.insert(19, domain_info['IP Address'])                       # IP Address.
+            parent_record.insert(20, 'N/A')                                           # Access Status.
+            parent_record.insert(21, 'N/A')                                           # Location header.
+            parent_record.insert(22, domain_info['DNS']['A'])                         # DNS (A record).
+            parent_record.insert(23, domain_info['DNS']['CNAME'])                     # DNS (CNAME record).
+            parent_record.insert(24, domain_info['DNS']['NS'])                        # DNS (NS record).
+            parent_record.insert(25, domain_info['DNS']['MX'])                        # DNS (MX record).
+            parent_record.insert(26, domain_info['DNS']['SOA'])                       # DNS (SOA record).
+            parent_record.insert(27, domain_info['DNS']['TXT'])                       # DNS (TXT record).
+            parent_record.insert(28, domain_info['Note'])                             # Note.
             report.append(parent_record)
             index += 1
 
             # Build child record.
-            for sub_domain in domain_info[domain]['Sub-domain'].keys():
+            for sub_domain in domain_info['Sub-domain'].keys():
                 child_record = copy.deepcopy(parent_record)
                 child_record[0] = index  # Index.
                 child_record[7] = 'N/A'
@@ -244,16 +255,17 @@ class CreateReport:
                 child_record[16] = 'N/A'
                 child_record[17] = 'N/A'
                 child_record[18] = sub_domain
-                sub_domain_info = domain_info[domain]['Sub-domain']
+                sub_domain_info = domain_info['Sub-domain']
                 child_record[19] = sub_domain_info[sub_domain]['IP Address']     # IP Address.
                 child_record[20] = sub_domain_info[sub_domain]['Access Status']  # Access Status.
-                child_record[21] = sub_domain_info[sub_domain]['DNS']['A']       # DNS (A record).
-                child_record[22] = sub_domain_info[sub_domain]['DNS']['CNAME']   # DNS (CNAME record).
-                child_record[23] = sub_domain_info[sub_domain]['DNS']['NS']      # DNS (NS record).
-                child_record[24] = sub_domain_info[sub_domain]['DNS']['MX']      # DNS (MX record).
-                child_record[25] = sub_domain_info[sub_domain]['DNS']['SOA']     # DNS (SOA record).
-                child_record[26] = sub_domain_info[sub_domain]['DNS']['TXT']     # DNS (TXT record).
-                child_record[27] = ''                                            # Note.
+                child_record[21] = sub_domain_info[sub_domain]['Location']       # Location header.
+                child_record[22] = sub_domain_info[sub_domain]['DNS']['A']       # DNS (A record).
+                child_record[23] = sub_domain_info[sub_domain]['DNS']['CNAME']   # DNS (CNAME record).
+                child_record[24] = sub_domain_info[sub_domain]['DNS']['NS']      # DNS (NS record).
+                child_record[25] = sub_domain_info[sub_domain]['DNS']['MX']      # DNS (MX record).
+                child_record[26] = sub_domain_info[sub_domain]['DNS']['SOA']     # DNS (SOA record).
+                child_record[27] = sub_domain_info[sub_domain]['DNS']['TXT']     # DNS (TXT record).
+                child_record[28] = ''                                            # Note.
                 report.append(child_record)
                 index += 1
 
@@ -262,6 +274,11 @@ class CreateReport:
         self.utility.print_message(OK, msg)
         self.utility.write_log(20, msg)
         pd.DataFrame(report).to_csv(self.report_file_name_invent, mode='a', header=False, index=False)
+
+        # Remove temporary Json file.
+        shutil.rmtree(tmp_inventory_dir)
+        os.mkdir(tmp_inventory_dir)
+        self.utility.print_message(OK, 'Flush temporary Json files.')
 
         self.utility.write_log(20, '[Out] Create Inventory report [{}].'.format(self.file_name))
 
