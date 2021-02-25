@@ -227,15 +227,17 @@ class CreateReport:
             parent_record.insert(17, domain_info['Whois']['Name Server'])             # Name Server.
             parent_record.insert(18, 'N/A')                                           # Sub-Domain.
             parent_record.insert(19, domain_info['IP Address'])                       # IP Address.
-            parent_record.insert(20, 'N/A')                                           # Access Status.
-            parent_record.insert(21, 'N/A')                                           # Location header.
-            parent_record.insert(22, domain_info['DNS']['A'])                         # DNS (A record).
-            parent_record.insert(23, domain_info['DNS']['CNAME'])                     # DNS (CNAME record).
-            parent_record.insert(24, domain_info['DNS']['NS'])                        # DNS (NS record).
-            parent_record.insert(25, domain_info['DNS']['MX'])                        # DNS (MX record).
-            parent_record.insert(26, domain_info['DNS']['SOA'])                       # DNS (SOA record).
-            parent_record.insert(27, domain_info['DNS']['TXT'])                       # DNS (TXT record).
-            parent_record.insert(28, domain_info['Note'])                             # Note.
+            parent_record.insert(20, 'N/A')                                           # Access Status (http).
+            parent_record.insert(21, 'N/A')                                           # Location header (http).
+            parent_record.insert(22, 'N/A')                                           # Access Status (https).
+            parent_record.insert(23, 'N/A')                                           # Location header (https).
+            parent_record.insert(24, domain_info['DNS']['A'])                         # DNS (A record).
+            parent_record.insert(25, domain_info['DNS']['CNAME'])                     # DNS (CNAME record).
+            parent_record.insert(26, domain_info['DNS']['NS'])                        # DNS (NS record).
+            parent_record.insert(27, domain_info['DNS']['MX'])                        # DNS (MX record).
+            parent_record.insert(28, domain_info['DNS']['SOA'])                       # DNS (SOA record).
+            parent_record.insert(29, domain_info['DNS']['TXT'])                       # DNS (TXT record).
+            parent_record.insert(30, domain_info['Note'])                             # Note.
             report.append(parent_record)
             index += 1
 
@@ -256,16 +258,18 @@ class CreateReport:
                 child_record[17] = 'N/A'
                 child_record[18] = sub_domain
                 sub_domain_info = domain_info['Sub-domain']
-                child_record[19] = sub_domain_info[sub_domain]['IP Address']     # IP Address.
-                child_record[20] = sub_domain_info[sub_domain]['Access Status']  # Access Status.
-                child_record[21] = sub_domain_info[sub_domain]['Location']       # Location header.
-                child_record[22] = sub_domain_info[sub_domain]['DNS']['A']       # DNS (A record).
-                child_record[23] = sub_domain_info[sub_domain]['DNS']['CNAME']   # DNS (CNAME record).
-                child_record[24] = sub_domain_info[sub_domain]['DNS']['NS']      # DNS (NS record).
-                child_record[25] = sub_domain_info[sub_domain]['DNS']['MX']      # DNS (MX record).
-                child_record[26] = sub_domain_info[sub_domain]['DNS']['SOA']     # DNS (SOA record).
-                child_record[27] = sub_domain_info[sub_domain]['DNS']['TXT']     # DNS (TXT record).
-                child_record[28] = ''                                            # Note.
+                child_record[19] = sub_domain_info[sub_domain]['IP Address']             # IP Address.
+                child_record[20] = sub_domain_info[sub_domain]['Access Status (http)']   # Access Status.
+                child_record[21] = sub_domain_info[sub_domain]['Location (http)']        # Location header.
+                child_record[22] = sub_domain_info[sub_domain]['Access Status (https)']  # Access Status.
+                child_record[23] = sub_domain_info[sub_domain]['Location (https)']       # Location header.
+                child_record[24] = sub_domain_info[sub_domain]['DNS']['A']               # DNS (A record).
+                child_record[25] = sub_domain_info[sub_domain]['DNS']['CNAME']           # DNS (CNAME record).
+                child_record[26] = sub_domain_info[sub_domain]['DNS']['NS']              # DNS (NS record).
+                child_record[27] = sub_domain_info[sub_domain]['DNS']['MX']              # DNS (MX record).
+                child_record[28] = sub_domain_info[sub_domain]['DNS']['SOA']             # DNS (SOA record).
+                child_record[29] = sub_domain_info[sub_domain]['DNS']['TXT']             # DNS (TXT record).
+                child_record[30] = ''                                                    # Note.
                 report.append(child_record)
                 index += 1
 
@@ -276,9 +280,9 @@ class CreateReport:
         pd.DataFrame(report).to_csv(self.report_file_name_invent, mode='a', header=False, index=False)
 
         # Remove temporary Json file.
-        shutil.rmtree(tmp_inventory_dir)
-        os.mkdir(tmp_inventory_dir)
-        self.utility.print_message(OK, 'Flush temporary Json files.')
+        # shutil.rmtree(tmp_inventory_dir)
+        # os.mkdir(tmp_inventory_dir)
+        # self.utility.print_message(OK, 'Flush temporary Json files.')
 
         self.utility.write_log(20, '[Out] Create Inventory report [{}].'.format(self.file_name))
 

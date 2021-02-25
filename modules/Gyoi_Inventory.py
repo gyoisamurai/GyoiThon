@@ -344,29 +344,44 @@ class Inventory:
         self.utility.print_message(NOTE, 'Extract DNS record of sub-domain.')
 
         # Get DNS records of sub-domain.
-        sub_domain_basic = {'IP Address': 'N/A', 'DNS': '', 'Access Status': 'Not Access.', 'Location': 'N/A'}
+        sub_domain_basic = {'IP Address': 'N/A',
+                            'DNS': '',
+                            'Access Status (http)': 'Not Access.',
+                            'Location (http)': 'N/A',
+                            'Access Status (https)': 'Not Access.',
+                            'Location (https)': 'N/A'}
         ip_address, dns_info = self.dns_explore(sub_domain)
         sub_domain_basic['IP Address'] = ip_address
         sub_domain_basic['DNS'] = dns_info
         if ip_address != '':
             # Send request.
-            target_url = 'http://' + sub_domain + ':80'
-            self.utility.print_message(OK, 'Send request to "{}".'.format(target_url))
-            res, _, res_header, _, _ = self.utility.send_request('GET', target_url)
-            if res is not None:
-                sub_domain_basic['Access Status'] = res.status
-                if 300 <= res.status < 400:
-                    location = ''
-                    for header in res_header.split('\r\n'):
-                        if header[:10].lower() == 'location: ':
-                            location = header.split(': ')[1]
-                            sub_domain_basic['Location'] = location
-                            break
-                    self.utility.print_message(OK, 'Return status : {}, Location : {}.'.format(res.status, location))
+            for scheme, port in zip(['http', 'https'], ['80', '443']):
+                target_url = '{}://{}:{}'.format(scheme, sub_domain, port)
+                self.utility.print_message(OK, 'Send request to "{}".'.format(target_url))
+                res, _, res_header, _, _ = self.utility.send_request('GET', target_url)
+                if res is not None:
+                    # Set status code.
+                    if scheme == 'http':
+                        sub_domain_basic['Access Status (http)'] = res.status
+                    else:
+                        sub_domain_basic['Access Status (https)'] = res.status
+
+                    # Set location header value.
+                    if 300 <= res.status < 400:
+                        location = ''
+                        for header in res_header.split('\r\n'):
+                            if header[:10].lower() == 'location: ':
+                                location = header.split(': ')[1]
+                                if scheme == 'http':
+                                    sub_domain_basic['Location (http)'] = location
+                                else:
+                                    sub_domain_basic['Location (https)'] = location
+                                break
+                        self.utility.print_message(OK, 'Return status : {}, Location : {}.'.format(res.status, location))
+                    else:
+                        self.utility.print_message(OK, 'Return status : {}.'.format(res.status))
                 else:
-                    self.utility.print_message(OK, 'Return status : {}.'.format(res.status))
-            else:
-                self.utility.print_message(FAIL, 'Could not access to {}.'.format(target_url))
+                    self.utility.print_message(FAIL, 'Could not access to {}.'.format(target_url))
 
         return sub_domain_basic
 
