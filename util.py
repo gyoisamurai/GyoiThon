@@ -244,7 +244,7 @@ class Utilty:
         return parameter
 
     # Send http request.
-    def send_request(self, method, target_url, preload_content=True, query_param=None, body_param=None, enc='utf-8'):
+    def send_request(self, method, target_url, preload_content=True, query_param=None, body_param=None, enc='utf-8', cert_ignore=False):
         res_header = ''
         res_body = ''
         server_header = '-'
@@ -261,6 +261,12 @@ class Utilty:
         http = None
         ctx = ssl.create_default_context()
         ctx.set_ciphers('DEFAULT')
+
+        # Ignore verification of certificate.
+        if cert_ignore:
+            ctx.check_hostname = False
+            urllib3.disable_warnings()
+
         # ctx.set_ciphers('DEFAULT@SECLEVEL=1')
         if self.proxy != '':
             self.print_message(WARNING, 'Set proxy server: {}'.format(self.proxy))
@@ -275,10 +281,17 @@ class Utilty:
                                             headers=self.http_req_header,
                                             proxy_url=self.proxy)
         else:
-            http = urllib3.PoolManager(timeout=self.con_timeout,
-                                       headers=self.http_req_header,
-                                       ssl_version=ssl.PROTOCOL_TLSv1,
-                                       ssl_context=ctx)
+            if cert_ignore:
+                http = urllib3.PoolManager(timeout=self.con_timeout,
+                                           headers=self.http_req_header,
+                                           ssl_version=ssl.PROTOCOL_TLSv1,
+                                           ssl_context=ctx,
+                                           cert_reqs=ssl.CERT_NONE)
+            else:
+                http = urllib3.PoolManager(timeout=self.con_timeout,
+                                           headers=self.http_req_header,
+                                           ssl_version=ssl.PROTOCOL_TLSv1,
+                                           ssl_context=ctx)
 
         try:
             if method.lower() == 'get':

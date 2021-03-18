@@ -44,6 +44,7 @@ class CreateReport:
             self.header = str(config['Report']['header']).split('@')
             self.header_censys = str(config['Report']['header_censys']).split('@')
             self.header_invent = str(config['Report']['header_invent']).split('@')
+            self.header_ss = str(config['Report']['header_ss']).split('@')
             self.header_exploit = str(config['Report']['header_exploit']).split('@')
 
         except Exception as e:
@@ -280,11 +281,30 @@ class CreateReport:
         pd.DataFrame(report).to_csv(self.report_file_name_invent, mode='a', header=False, index=False)
 
         # Remove temporary Json file.
-        # shutil.rmtree(tmp_inventory_dir)
-        # os.mkdir(tmp_inventory_dir)
-        # self.utility.print_message(OK, 'Flush temporary Json files.')
+        shutil.rmtree(tmp_inventory_dir)
+        os.mkdir(tmp_inventory_dir)
+        self.utility.print_message(OK, 'Flush temporary Json files.')
 
         self.utility.write_log(20, '[Out] Create Inventory report [{}].'.format(self.file_name))
+
+        return self.report_file_name_invent
+
+    # Add Screen Shot's items to Inventory report.
+    def add_ss_items_to_inventory_report(self, report_path, ss_items, df_report):
+        self.utility.print_message(NOTE, 'Add screen shot to Inventory report.')
+        self.utility.write_log(20, '[In] Add screen shot to Inventory report [{}].'.format(self.file_name))
+
+        # Merge screen shot items and inventory report.
+        df_ss = pd.DataFrame(ss_items, columns=self.header_ss)
+        df_merge = pd.concat([df_report, df_ss], axis=1)
+
+        # Save report.
+        msg = 'Add Screen Shot Information to Inventory report : {}'.format(report_path)
+        self.utility.print_message(OK, msg)
+        self.utility.write_log(20, msg)
+        df_merge.to_csv(report_path, mode='w', index=False)
+
+        self.utility.write_log(20, '[Out] Add screen shot to Inventory report [{}].'.format(self.file_name))
 
     # Create exploit's report
     def create_all_inventory_report(self):

@@ -141,7 +141,8 @@ class Inventory:
             self.jprs_post['key'] = contact
             res, _, _, res_body, _ = self.utility.send_request('POST',
                                                                self.jprs_url + self.jprs_contact_path,
-                                                               body_param=self.jprs_post)
+                                                               body_param=self.jprs_post,
+                                                               cert_ignore=True)
             if res is None or res.status >= 400:
                 self.utility.print_message(FAIL, 'Could not access to {}.'.format(self.jprs_url+self.jprs_contact_path))
             else:
@@ -358,7 +359,7 @@ class Inventory:
             for scheme, port in zip(['http', 'https'], ['80', '443']):
                 target_url = '{}://{}:{}'.format(scheme, sub_domain, port)
                 self.utility.print_message(OK, 'Send request to "{}".'.format(target_url))
-                res, _, res_header, _, _ = self.utility.send_request('GET', target_url)
+                res, _, res_header, _, _ = self.utility.send_request('GET', target_url, cert_ignore=True)
                 if res is not None:
                     # Set status code.
                     if scheme == 'http':

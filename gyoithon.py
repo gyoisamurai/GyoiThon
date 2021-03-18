@@ -28,6 +28,7 @@ from modules.Gyoi_Censys import Censys
 from modules.Gyoi_Creator import Creator
 from modules.Gyoi_Inventory import Inventory
 from modules.Gyoi_DomainTools import DomainTools
+from modules.Gyoi_ComputerVision import ComputerVision
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -152,7 +153,7 @@ __doc__ = """{f}
 usage:
     {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
     {f} [-d --category=<category> --vendor=<vendor> --package=<package>]
-    {f} [-i --org_list --domain_list]
+    {f} [-i --org_list --domain_list --screen_shot]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -192,6 +193,7 @@ if __name__ == '__main__':
     opt_invent = args['-i']
     opt_invent_org_list = args['--org_list']
     opt_invent_domain_list = args['--domain_list']
+    opt_invent_screen_shot = args['--screen_shot']
     opt_no_update_vulndb = args['--no-update-vulndb']
 
     # Read config.ini.
@@ -247,13 +249,18 @@ if __name__ == '__main__':
 
     # Explore relevant FQDN with the target FQDN.
     if opt_invent:
+        # Create path.
         org_list_path = os.path.join(full_path, 'organization_list.csv')
         domain_list_path = os.path.join(full_path, 'domain_list.csv')
-        if opt_invent_domain_list is not None and os.path.exists(domain_list_path):
-            inventory = Inventory(utility)
-            google_hack = GoogleCustomSearch(utility)
-            report = CreateReport(utility)
 
+        # Create instances.
+        inventory = Inventory(utility)
+        google_hack = GoogleCustomSearch(utility)
+        cv = ComputerVision(utility)
+        report = CreateReport(utility)
+
+        # Explore domains and subdomains from domain list.
+        if opt_invent_domain_list is not None and os.path.exists(domain_list_path):
             # Get import path of domain list.
             # Search domain.
             domain_info_dict_tmp = inventory.domain_explore(import_list=domain_list_path)
@@ -263,13 +270,19 @@ if __name__ == '__main__':
 
             # Create report.
             report = CreateReport(utility)
-            report.create_inventory_report(inventory.tmp_inventory_dir, search_word='', search_type='List')
+            report_path = report.create_inventory_report(inventory.tmp_inventory_dir,
+                                                         search_word='',
+                                                         search_type='List')
 
+            # Get Screen Shot and Add report.
+            if opt_invent_screen_shot:
+                screen_shot_list, df_report = cv.get_web_screen_shot(report_path)
+                report.add_ss_items_to_inventory_report(report_path, screen_shot_list, df_report)
+
+        # Explore domains and subdomains from search result of DomainTools.
         elif opt_invent_org_list is not None and os.path.exists(org_list_path):
-            inventory = Inventory(utility)
-            google_hack = GoogleCustomSearch(utility)
+            # Create DomainTools instance.
             dt = DomainTools(utility)
-            report = CreateReport(utility)
 
             with codecs.open(org_list_path, 'r', 'utf-8') as fin:
                 targets = fin.readlines()
