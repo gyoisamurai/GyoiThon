@@ -24,28 +24,35 @@ Japanese page is [here](https://github.com/gyoisamurai/GyoiThon/wiki).
  [Let's join GyoiThon Slack!!](https://docs.google.com/forms/d/e/1FAIpQLSeuT-HNF-geek1IM3qBWViTVJbLUr3GZR2Hzuow30734X70gw/viewform)  
 
 ## New function!!
-The new GyoiThon \(version 0.0.3\) can **automatically generate signature/train data** for detecting web products operated on the target server. You can get signatures/train data just by executing the following command.  
+The new GyoiThon \(version 0.0.4\) can **list up your subdomain facing on the internet**. And if the subdomain is published as a Web service, then GyoiThon executes a health check that a non-destructive vulnerability assessment.
 
- * ex) Generating **Joomla!** signatures.  
- ```
- root@kali:~/GyoiThon# python3 gyoithon.py -d --category=CMS --vendor=joomla! --package=Joomla!@3.9.4@_origin.tar.zip
- ```
+| Note |
+|:-----|
+| New function uses a **Google custom search API**. So if you use a new function, then you have to prepare a API key of Google Custom search. |
 
- Generated Joomla! signatures.  
+ * ex) Listing up your subdomain.  
+First, you have to prepare the `domain_list.csv` is following:  
  ```
- CMS@joomla!@Joomla!@3.9.4@(/js/application.js)
- CMS@joomla!@Joomla!@3.9.4@(/js/classes.js)/
- CMS@joomla!@Joomla!@3.9.4@(/jui/css/bootstrap-extended.css)
- CMS@joomla!@Joomla!@3.9.4@(/jui/css/bootstrap-responsive.css)
- CMS@joomla!@Joomla!@3.9.4@(/jui/css/bootstrap-responsive.min.css)
- ...snip...
+ "Domain"
+ mbsd.jp
  ```
+And you execute following command.  
+ ```
+ root@kali:~/GyoiThon# python3 gyoithon.py -i --domain_list
+ ```
+As a result, you get a list of sundomains associated with the specified domain.    
+|Index|Domain|Sub-Domain|IP Address|Access Status (http)|Location (http)|Access Status (https)|Location (https)|
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|1|mbsd.jp|mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|301|https://www.mbsd.jp/|
+|2|mbsd.jp|www.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|
+|3|mbsd.jp|www2.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|
 
- * Slide  
- [BlackHat ASIA 2019](https://github.com/gyoisamurai/GyoiThon/blob/master/handout/BHASIA2019_slide.pdf)  
-
- * Demo movie  
- [Demo](https://www.youtube.com/watch?v=X8tW4S7c6s0)  
+* ex) Listing up your subdomain and executing health check.  
+GyoiThon executes a list up your subdomain and if the subdomain is published as a Web service (with port 80 or 443 open), then GyoiThon execute a health check that a non-destructive vulnerability assessment.
+```
+root@kali:~/GyoiThon# python3 gyoithon.py -i --domain_list --through_health_check --safety
+```
+As a result, you get a list of subdomains and assessment report.  
 
 If you need more information, please refer to [Usage](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#generating_sig).  
 
