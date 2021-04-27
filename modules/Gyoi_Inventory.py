@@ -427,3 +427,60 @@ class Inventory:
             # Save domain information to temporary json file.
             with codecs.open(os.path.join(self.tmp_inventory_dir, domain), 'w', 'utf-8') as fout:
                 json.dump(domain_info_dict[domain], fout, indent=4)
+
+    # Extract target host of health check.
+    def extract_host_info(self, report_path, report_header, safety, domain_list_path):
+        self.utility.print_message(NOTE, 'Extract target host for health check.')
+        msg = self.utility.make_log_msg(self.utility.log_in,
+                                        self.utility.log_dis,
+                                        self.file_name,
+                                        action=self.action_name,
+                                        note='Extract target host for health check.',
+                                        dest=self.utility.target_host)
+        self.utility.write_log(20, msg)
+
+        # Read inventory's report.
+        df_invent = pd.read_csv(report_path, dtype=str, names=report_header)
+        df_invent = df_invent.fillna('N/A')
+
+        # Select target host.
+        df_selected_http = df_invent[(df_invent['Sub-Domain'] != 'N/A') &
+                                     (df_invent['Access Status (http)'] != 'Not Access.') &
+                                     (df_invent['Access Status (http)'] != 'N/A')]
+        df_selected_https = df_invent[(df_invent['Sub-Domain'] != 'N/A') &
+                                      (df_invent['Access Status (https)'] != 'Not Access.') &
+                                      (df_invent['Access Status (https)'] != 'N/A')]
+
+        protocol_list = []
+        fqdn_list = []
+        port_list = []
+        path_list = []
+        target_domain_list = self.extract_domain_from_list(domain_list_path)
+        for idx, subdomain in enumerate(df_selected_http['Sub-Domain'].drop_duplicates()):
+            if idx == 0:
+                continue
+
+            # Exclude out of target domain.
+            if safety:
+                ext = tldextract.extract(subdomain)
+                if ext.domain + '.' + ext.suffix not in target_domain_list:
+                    continue
+            protocol_list.append('http')
+            fqdn_list.append(subdomain)
+            port_list.append('80')
+            path_list.append('/')
+        for idx, subdomain in enumerate(df_selected_https['Sub-Domain'].drop_duplicates()):
+            if idx == 0:
+                continue
+
+            # Exclude out of target domain.
+            if safety:
+                ext = tldextract.extract(subdomain)
+                if ext.domain + '.' + ext.suffix not in target_domain_list:
+                    continue
+            protocol_list.append('https')
+            fqdn_list.append(subdomain)
+            port_list.append('443')
+            path_list.append('/')
+
+        return protocol_list, fqdn_list, port_list, path_list

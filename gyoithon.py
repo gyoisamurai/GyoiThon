@@ -153,7 +153,7 @@ __doc__ = """{f}
 usage:
     {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
     {f} [-d --category=<category> --vendor=<vendor> --package=<package>]
-    {f} [-i --org_list --domain_list --screen_shot]
+    {f} [-i --org_list --domain_list --screen_shot --through_health_check --safety --no-update-vulndb]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -194,6 +194,8 @@ if __name__ == '__main__':
     opt_invent_org_list = args['--org_list']
     opt_invent_domain_list = args['--domain_list']
     opt_invent_screen_shot = args['--screen_shot']
+    opt_invent_through_health_check = args['--through_health_check']
+    opt_invent_safety = args['--safety']
     opt_no_update_vulndb = args['--no-update-vulndb']
 
     # Read config.ini.
@@ -239,6 +241,12 @@ if __name__ == '__main__':
     # Show banner.
     show_banner(utility)
 
+    # Define target information's container for health check.
+    protocol_list = []
+    fqdn_list = []
+    port_list = []
+    path_list = []
+
     # Create signature and train data.
     if opt_develop:
         creator = Creator(utility)
@@ -248,6 +256,9 @@ if __name__ == '__main__':
         sys.exit(0)
 
     # Explore relevant FQDN with the target FQDN.
+    report_path = None
+    invent_report_header = None
+    inventory = None
     if opt_invent:
         # Create path.
         org_list_path = os.path.join(full_path, 'organization_list.csv')
@@ -258,6 +269,11 @@ if __name__ == '__main__':
         google_hack = GoogleCustomSearch(utility)
         cv = ComputerVision(utility)
         report = CreateReport(utility)
+
+        # Define report header for continuous health check.
+        invent_report_header = report.header_invent
+        if opt_invent_screen_shot:
+            invent_report_header.extend(report.header_ss)
 
         # Explore domains and subdomains from domain list.
         if opt_invent_domain_list is not None and os.path.exists(domain_list_path):
@@ -305,14 +321,30 @@ if __name__ == '__main__':
                                                                     search_type=search_type)
 
                     # Search sub-domain.
-                    domain_info_dict = inventory.sub_domain_explore(domain_info_dict_tmp, google_hack)
+                    inventory.sub_domain_explore(domain_info_dict_tmp, google_hack)
 
                     # Create report.
                     report = CreateReport(utility)
-                    report.create_inventory_report(domain_info_dict, search_word, search_type)
+                    report_path = report.create_inventory_report(inventory.tmp_inventory_dir,
+                                                                 search_word=search_word,
+                                                                 search_type=search_type)
+
+                    # Get Screen Shot and Add report.
+                    if opt_invent_screen_shot:
+                        screen_shot_list, df_report = cv.get_web_screen_shot(report_path)
+                        report.add_ss_items_to_inventory_report(report_path, screen_shot_list, df_report)
         else:
             utility.print_message(FAIL, 'Required lists are not found : {}.')
-        exit(0)
+
+        if opt_invent_through_health_check is False:
+            exit(0)
+        else:
+            utility.print_message(NOTE, 'GyoiThon continues to the health check.')
+            domain_list_path = os.path.join(full_path, 'domain_list.csv')
+            protocol_list, fqdn_list, port_list, path_list = inventory.extract_host_info(report_path,
+                                                                                         invent_report_header,
+                                                                                         opt_invent_safety,
+                                                                                         domain_list_path)
 
     # Create instances.
     cloud_checker = CloudChecker(utility)
@@ -329,7 +361,8 @@ if __name__ == '__main__':
     censys = Censys(utility)
 
     # Get target information from "host.txt".
-    protocol_list, fqdn_list, port_list, path_list = get_target_info(full_path, utility)
+    if opt_invent_through_health_check is False:
+        protocol_list, fqdn_list, port_list, path_list = get_target_info(full_path, utility)
 
     # Start investigation.
     for idx in range(len(fqdn_list)):

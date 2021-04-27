@@ -13,7 +13,7 @@ import ipaddress
 import configparser
 import ssl
 from urllib3 import util
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from datetime import datetime
 from logging import getLogger, FileHandler, Formatter
 

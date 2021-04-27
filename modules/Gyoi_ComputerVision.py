@@ -80,7 +80,7 @@ class ComputerVision:
         self.utility.write_log(20, msg)
 
         # Get inventory report.
-        df = pd.read_csv(report_path, delimiter=',')
+        df = pd.read_csv(report_path, delimiter='\t')
         save_dir = os.path.splitext(report_path)[0] + '-screen_shot'
         if os.path.exists(save_dir) is False:
             os.mkdir(save_dir)

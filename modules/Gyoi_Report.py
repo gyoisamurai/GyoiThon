@@ -281,9 +281,9 @@ class CreateReport:
         pd.DataFrame(report).to_csv(self.report_file_name_invent, mode='a', header=False, index=False)
 
         # Remove temporary Json file.
-        shutil.rmtree(tmp_inventory_dir)
-        os.mkdir(tmp_inventory_dir)
-        self.utility.print_message(OK, 'Flush temporary Json files.')
+        #shutil.rmtree(tmp_inventory_dir)
+        #os.mkdir(tmp_inventory_dir)
+        #self.utility.print_message(OK, 'Flush temporary Json files.')
 
         self.utility.write_log(20, '[Out] Create Inventory report [{}].'.format(self.file_name))
 
