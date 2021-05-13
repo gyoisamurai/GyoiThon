@@ -90,7 +90,7 @@ def show_banner(utility):
 # Show credit.
 def show_credit(utility):
     credit = u"""
-       =[ GyoiThon v0.0.3-beta                               ]=
+       =[ GyoiThon v0.0.4-beta                               ]=
 + -- --=[ Author  : Gyoiler (@gyoithon)                      ]=--
 + -- --=[ Website : https://github.com/gyoisamurai/GyoiThon/ ]=--
     """
@@ -151,9 +151,9 @@ def divide_data_size(data, clipping_size, clipping_buff):
 # Define command option.
 __doc__ = """{f}
 usage:
-    {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb]
+    {f} [-s] [-m] [-g] [-e] [-c] [-p] [-l --log_path=<path>] [--no-update-vulndb] [--gyoiboard]
     {f} [-d --category=<category> --vendor=<vendor> --package=<package>]
-    {f} [-i --org_list --domain_list --screen_shot --through_health_check --safety --no-update-vulndb]
+    {f} [-i --org_list --domain_list --screen_shot --through_health_check --safety --gyoiboard --no-update-vulndb]
     {f} -h | --help
 options:
     -s   Optional : Examine cloud service.
@@ -197,6 +197,7 @@ if __name__ == '__main__':
     opt_invent_through_health_check = args['--through_health_check']
     opt_invent_safety = args['--safety']
     opt_no_update_vulndb = args['--no-update-vulndb']
+    opt_gyoiboard = args['--gyoiboard']
 
     # Read config.ini.
     config = configparser.ConfigParser()
@@ -294,6 +295,9 @@ if __name__ == '__main__':
             if opt_invent_screen_shot:
                 screen_shot_list, df_report = cv.get_web_screen_shot(report_path)
                 report.add_ss_items_to_inventory_report(report_path, screen_shot_list, df_report)
+
+            if opt_gyoiboard:
+                inventory.push_result_to_gyoiboard(inventory.tmp_inventory_dir)
 
         # Explore domains and subdomains from search result of DomainTools.
         elif opt_invent_org_list is not None and os.path.exists(org_list_path):

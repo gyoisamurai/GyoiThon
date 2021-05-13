@@ -7,6 +7,7 @@ import time
 import json
 import copy
 import re
+import glob
 import tldextract
 import subprocess
 import configparser
@@ -194,7 +195,7 @@ class Inventory:
         return os.path.exists(os.path.join(self.tmp_inventory_dir, domain))
 
     # Extract whois information.
-    def extract_whois_info(self, dt, domain_list, origin_domain='-', mutation=False, import_list=False):
+    def extract_whois_info(self, dt, domain_list, origin_domain='-', mutation=False, import_list=False, organization_id='N/A', domain_id='N/A'):
         self.utility.print_message(NOTE, 'Extract whois information.')
         self.utility.write_log(20, '[In] Extract whois information. [{}].'.format(self.file_name))
 
@@ -202,7 +203,17 @@ class Inventory:
         domain_info_dict = {}
         for domain in domain_list:
             # Domain Structure.
-            domain_basic = {'IP Address': '', 'Date': '', 'Mutation': '', 'Origin Domain': '',
+            if type(domain) == list:
+                if len(domain) == 3:
+                    organization_id = domain[0]
+                    domain_id = domain[1]
+                    domain = domain[2]
+                else:
+                    self.utility.print_message(WARNING, 'Invalid domain list. Length is "{}".'.format(len(domain)))
+                    continue
+
+            domain_basic = {'Organization ID': organization_id, 'Domain ID': domain_id,
+                            'IP Address': '', 'Date': '', 'Mutation': '', 'Origin Domain': '',
                             'Whois': {}, 'DNS': {}, 'Sub-domain': {}, 'Note': ''}
             domain_whois = {'Contact': 'N/A', 'Registrant Name': 'N/A', 'Registrant Organization': 'N/A',
                             'Registrant Email': 'N/A', 'Admin Name': 'N/A', 'Admin Organization': 'N/A',
@@ -254,7 +265,14 @@ class Inventory:
     def extract_domain_from_list(self, import_list_path):
         domain_list = []
         df = pd.read_csv(import_list_path, encoding='utf-8')
-        domain_list = df.loc[:, 'Domain'].values.tolist()
+        if len(df.columns) == 1:
+            domain_list = df.loc[:, 'Domain Name'].values.tolist()
+            domain_list = sorted(set(domain_list), key=domain_list.index)
+        elif len(df.columns) == 3:
+            domain_list = df.values.tolist()
+            domain_list = sorted(list(map(list, set(map(tuple, domain_list)))), key=lambda i: domain_list.index(i))
+        else:
+            self.utility.print_message(WARNING, 'Invalid domain list: "{}".'.format(import_list_path))
         return domain_list
 
     # Explore domain.
@@ -283,7 +301,7 @@ class Inventory:
             return {}
 
         # Get whois information for normal domain.
-        domain_info_dict = self.extract_whois_info(dt, list(set(domain_list)), import_list=import_list_flag)
+        domain_info_dict = self.extract_whois_info(dt, domain_list, import_list=import_list_flag)
 
         # Get whois information for mutated domain.
         tmp_domain_info = copy.deepcopy(domain_info_dict)
@@ -294,7 +312,9 @@ class Inventory:
                                                                mutated_domain_list,
                                                                origin_domain=domain,
                                                                mutation=True,
-                                                               import_list=import_list_flag)
+                                                               import_list=import_list_flag,
+                                                               organization_id=tmp_domain_info[domain]['Organization ID'],
+                                                               domain_id=tmp_domain_info[domain]['Domain ID'])
             domain_info_dict.update(mutated_domain_info_dict)
             self.utility.print_message(OK, 'Mutated : "{}" to "{}"'.format(domain, mutated_domain_list))
 
@@ -455,11 +475,19 @@ class Inventory:
         fqdn_list = []
         port_list = []
         path_list = []
-        target_domain_list = self.extract_domain_from_list(domain_list_path)
+        target_domain_list = []
+        for target_domain in self.extract_domain_from_list(domain_list_path):
+            if type(target_domain) == list:
+                if len(target_domain) == 3:
+                    target_domain_list.append(target_domain[2])
+                else:
+                    self.utility.print_message(WARNING, 'Invalid domain list. Length is "{}".'.format(len(target_domain)))
+                    break
+
+        # Select target's subdomain (http).
         for idx, subdomain in enumerate(df_selected_http['Sub-Domain'].drop_duplicates()):
             if idx == 0:
                 continue
-
             # Exclude out of target domain.
             if safety:
                 ext = tldextract.extract(subdomain)
@@ -469,6 +497,8 @@ class Inventory:
             fqdn_list.append(subdomain)
             port_list.append('80')
             path_list.append('/')
+
+        # Select target's subdomain (https).
         for idx, subdomain in enumerate(df_selected_https['Sub-Domain'].drop_duplicates()):
             if idx == 0:
                 continue
@@ -484,3 +514,16 @@ class Inventory:
             path_list.append('/')
 
         return protocol_list, fqdn_list, port_list, path_list
+
+    # Update inventory to gyoiboard.
+    def push_result_to_gyoiboard(self, tmp_inventory_dir):
+        # Gather reporting items.
+        json_file_list = glob.glob(os.path.join(tmp_inventory_dir, '*'))
+
+        # Build base structure.
+        report = []
+        index = 1
+        for json_file_path in json_file_list:
+            domain_info = {}
+            with codecs.open(json_file_path, 'r', 'utf-8') as fin:
+                domain_info = json.load(fin)

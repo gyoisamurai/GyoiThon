@@ -41,11 +41,11 @@ And you execute following command.
  root@kali:~/GyoiThon# python3 gyoithon.py -i --domain_list
  ```
 As a result, you get a list of sundomains associated with the specified domain.    
-|Index|Domain|Sub-Domain|IP Address|Access Status (http)|Location (http)|Access Status (https)|Location (https)|
-|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|1|mbsd.jp|mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|301|https://www.mbsd.jp/|
-|2|mbsd.jp|www.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|
-|3|mbsd.jp|www2.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|
+|Index|Domain|Sub-Domain|IP Address|Access Status (http)|Location (http)|Access Status (https)|Location (https)|Whois records|
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|1|mbsd.jp|mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|301|https://www.mbsd.jp/|***|
+|2|mbsd.jp|www.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|-|
+|3|mbsd.jp|www2.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|-|
 
 * ex) Listing up your subdomain and executing health check.  
 GyoiThon executes a list up your subdomain and if the subdomain is published as a Web service (with port 80 or 443 open), then GyoiThon execute a health check that a non-destructive vulnerability assessment.
@@ -53,8 +53,11 @@ GyoiThon executes a list up your subdomain and if the subdomain is published as 
 root@kali:~/GyoiThon# python3 gyoithon.py -i --domain_list --through_health_check --safety
 ```
 As a result, you get a list of subdomains and assessment report.  
-
-If you need more information, please refer to [Usage](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#generating_sig).  
+|Index|Domain|Sub-Domain|IP Address|Access Status (http)|Location (http)|Access Status (https)|Location (https)|Whois records|Assessment results|
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|1|mbsd.jp|mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|301|https://www.mbsd.jp/|***|***|
+|2|mbsd.jp|www.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|-|***|
+|3|mbsd.jp|www2.mbsd.jp|['40.115.251.148']|301|https://www.mbsd.jp/|200|-|-|***|
 
 ## Overview
 GyoiThon is **Intelligence Gathering tool** for Web Server.  
