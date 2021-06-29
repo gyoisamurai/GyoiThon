@@ -483,6 +483,8 @@ class Inventory:
                 else:
                     self.utility.print_message(WARNING, 'Invalid domain list. Length is "{}".'.format(len(target_domain)))
                     break
+            elif type(target_domain) == str:
+                target_domain_list.append(target_domain)
 
         # Select target's subdomain (http).
         for idx, subdomain in enumerate(df_selected_http['Sub-Domain'].drop_duplicates()):
