@@ -33,7 +33,7 @@ The new GyoiThon \(version 0.0.4\) can **list up your subdomain facing on the in
  * ex) Listing up your subdomain.  
 First, you have to prepare the `domain_list.csv` is following:  
  ```
- "Domain"
+ "Domain Name"
  mbsd.jp
  ```
 And you execute following command.  
