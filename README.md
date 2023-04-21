@@ -30,7 +30,7 @@ The new GyoiThon \(version 0.0.4\) can **list up your subdomain facing on the in
 |:-----|
 | New function uses a **Google custom search API**. So if you use a new function, then you have to prepare a API key of Google Custom search. |
 
- * ex) Listing up your subdomain.  
+ * example) Listing up your subdomain.  
 First, you have to prepare the `domain_list.csv` is following:  
  ```
  "Domain Name"
