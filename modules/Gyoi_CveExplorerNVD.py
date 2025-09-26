@@ -82,67 +82,70 @@ class CveExplorerNVD:
     def extract_vuln_info(self, cve_items, cve_year, last_modified_date):
         self.utility.write_log(20, '[In] Extract vulnerability information [{}]'.format(self.file_name))
         all_cve_list = []
+        
 
         # Get last modified date.
         last_modified_date_value = last_modified_date
 
-        for cve_item in cve_items['CVE_Items']:
+        for cve_item in cve_items['vulnerabilities']:
             # Get problem type (ex. CWE-**).
             per_cve = cve_item['cve']
             problem_type_value = ''
-            problems = per_cve['problemtype']['problemtype_data']
+            problems = per_cve.get('weaknesses', [])
             for description in problems:
-                for problem in description['description']:
-                    problem_type_value = problem['value']
+                for problem in description.get('description', []):
+                    problem_type_value = problem.get('value', '')
 
             # Get description of vulnerability.
             description_value = ''
-            for description in per_cve['description']['description_data']:
-                description_value = description['value']
+            for description in per_cve.get('descriptions', []):
+                if description.get('lang') == 'en':
+                    description_value = description.get('value', '')
+
 
             # Get CVSS score.
             cvss_score_v2_value = ''
             cvss_score_v3_value = ''
-            impact = cve_item['impact']
+            impact = cve_item.get('cve', {}).get('metrics', {})
 
             # CVSS v3 score.
-            if 'baseMetricV3' in impact:
-                cvss_score_v3_value = float(impact['baseMetricV3']['cvssV3']['baseScore'])
+            if 'cvssMetricV30' in impact and impact['cvssMetricV30']:
+                cvss_score_v3_value = float(impact['cvssMetricV30'][0].get('cvssData', {}).get('baseScore', 0))
+            elif 'cvssMetricV31' in impact and impact['cvssMetricV31']:
+                cvss_score_v3_value = float(impact['cvssMetricV31'][0].get('cvssData', {}).get('baseScore', 0))
             else:
                 cvss_score_v3_value = 0
 
             # CVSS v2 score.
-            if 'baseMetricV2' in impact:
-                cvss_score_v2_value = format(impact['baseMetricV2']['cvssV2']['baseScore'])
+            if 'cvssMetricV2' in impact and impact['cvssMetricV2']:
+                cvss_score_v2_value = float(impact['cvssMetricV2'][0].get('cvssData', {}).get('baseScore', 0))
             else:
                 cvss_score_v2_value = 0
 
             # Get data type and CVE id.
-            data_type_value = per_cve['data_type']
-            cve_id_value = per_cve['CVE_data_meta']['ID']
+            data_type_value = 'CVE'
+            cve_id_value = per_cve.get('id', '')
 
             # Get configuration of CPE 2.3.
             some_cpe = []
-            for nodes in cve_item['configurations']['nodes']:
-                if 'children' in nodes:
-                    for child_node in nodes['children']:
-                        if 'cpe_match' in child_node:
-                            for cpe in child_node['cpe_match']:
+            for nodes in per_cve.get('configurations', []):
+                for node in nodes.get('nodes', []):
+                    if 'children' in node:
+                        for child_node in node['children']:
+                            for cpe in child_node.get('cpeMatch', []):
                                 some_cpe.append(cpe)
-                else:
-                    if 'cpe_match' in nodes:
-                        for cpe in nodes['cpe_match']:
-                            some_cpe.append(cpe)
+                    for cpe in node.get('cpeMatch', []):
+                        some_cpe.append(cpe)
+                        
             for per_cpe in some_cpe:
-                cpe23_list = per_cpe['cpe23Uri'].split(':')
-                category_value = cpe23_list[2]
-                vendor_name_value = cpe23_list[3]
-                product_name_value = cpe23_list[4]
-                version_value = cpe23_list[5]
-                update_value = cpe23_list[6]
-                edition_value = cpe23_list[7]
-
-                # Add each item to list.
+                cpe23_list = per_cpe.get('criteria', '').split(':')
+                category_value = cpe23_list[2] if len(cpe23_list) > 2 else ''
+                vendor_name_value = cpe23_list[3] if len(cpe23_list) > 3 else ''
+                product_name_value = cpe23_list[4] if len(cpe23_list) > 4 else ''
+                version_value = cpe23_list[5] if len(cpe23_list) > 5 else ''
+                update_value = cpe23_list[6] if len(cpe23_list) > 6 else ''
+                edition_value = cpe23_list[7] if len(cpe23_list) > 7 else ''
+    
                 self.utility.print_message(OK, 'Extract CVE information : '
                                                '{}, Vendor={}, '
                                                'Product={}, Version={}'.format(cve_id_value,
@@ -164,6 +167,7 @@ class CveExplorerNVD:
                 per_cve_list.append(str(edition_value).lower())
                 per_cve_list.append(description_value.replace('\r', ' ').replace('\n', ' '))
                 all_cve_list.append(per_cve_list)
+                
 
         # Create csv file.
         db_path = self.nvd_year_path.replace('*', cve_year)
@@ -239,6 +243,8 @@ class CveExplorerNVD:
                 target_url = self.nvd_meta_url.replace('*', cve_year)
                 self.utility.print_message(OK, 'Get {} meta information from {}'.format(cve_year, target_url))
                 self.utility.write_log(20, 'Accessing : {}'.format(target_url))
+                
+                
                 res_meta, _, _, _, encoding = self.utility.send_request('GET', target_url)
                 obj_match = re.match(self.nvd_chk_date_regex, res_meta.data.decode(encoding))
                 last_modified_date = obj_match.group(obj_match.lastindex)
