@@ -135,7 +135,8 @@ class MergeReport:
         # Check unnecessary contents.
         record.insert(15, '\n'.join(self.check_unnecessary_content(df_local)))
 
-        record.insert(16, '-')  # TODO:ディレクトリ一覧の表示
+        # Check directory listing.
+        record.insert(16, '\n'.join(self.check_directory_listing(df_local)))
 
         # Unnecessary comment and error message.
         un_comment, error_msg = self.check_comment_error(df_local)
@@ -190,6 +191,20 @@ class MergeReport:
             return True
         else:
             return False
+
+    # Check directory listing.
+    def check_directory_listing(self, df_local):
+        dir_listing = []
+        for idx, log_path in enumerate(df_local['log']):
+            if os.path.exists(log_path):
+                try:
+                    with codecs.open(log_path, 'r', encoding='utf-8', errors='replace') as fin:
+                        log_file = fin.read()
+                        if re.search(r'Index of', log_file, flags=re.IGNORECASE) is not None:
+                            dir_listing.append(df_local['url'].iloc[idx])
+                except Exception as e:
+                    self.utility.print_message(WARNING, 'Could not read log file [{}]: {}'.format(log_path, e))
+        return sorted(list(set(dir_listing)))
 
     # Check Basic authentication.
     def check_basic_auth(self, df_local):

@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # coding:utf-8
-import time
 import codecs
 import scrapy
 from scrapy.http import Request
@@ -34,7 +33,7 @@ class SimpleSpider(scrapy.Spider):
         self.custom_settings = {
             'CONCURRENT_REQUESTS': self.concurrent,
             'CONCURRENT_REQUESTS_PER_DOMAIN': self.concurrent,
-            'DEPTH_LIMIT ': self.depth_limit,
+            'DEPTH_LIMIT': self.depth_limit,
             'DOWNLOAD_DELAY': self.delay_time,
             'ROBOTSTXT_OBEY': True,
             'USER_AGENT': self.user_agent,
@@ -59,8 +58,6 @@ class SimpleSpider(scrapy.Spider):
         self.fout.write(response.body.decode(self.encoding))
         for href in response.css('a::attr(href)'):
             full_url = response.urljoin(href.extract())
-            time.sleep(self.delay_time)
-
             # Set proxy server.
             if self.proxy_server != '':
                 proxy = {'proxy': self.proxy_server}

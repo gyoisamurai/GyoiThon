@@ -109,6 +109,33 @@ root@kali:~/GyoiThon# apt install python3-tk
 You have to edit your `config.ini`.  
 More information is Usage.  
 
+### Termux (Android)
+1. Install Termux from F-Droid or Google Play Store.
+2. Clone repository and run setup script.
+```bash
+pkg install git
+git clone https://github.com/gyoisamurai/GyoiThon.git
+cd GyoiThon
+chmod +x setup_termux.sh
+./setup_termux.sh
+```
+
+### NixOS
+1. Ensure you have Nix installed with flakes enabled.
+2. Enter the development shell.
+```bash
+nix develop
+```
+
+## <a name='Dashboard'>Dashboard</a>
+GyoiThon now includes an interactive dashboard powered by Streamlit.
+This allows you to configure `host.txt` and `config.ini`, run scans, and view reports from a web interface.
+
+To start the dashboard:
+```bash
+streamlit run dashboard.py
+```
+
 ## <a name='Usage'>Usage</a>
 By using [default mode](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#default_mode) without option and [combination of several options](https://github.com/gyoisamurai/GyoiThon/blob/master/README.md#complex_mode), GyoiThon can gather various information of target web server.  
 

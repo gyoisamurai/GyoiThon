@@ -7,7 +7,7 @@ import random
 import re
 import urllib
 import urllib3
-import cchardet
+import chardet
 import socket
 import ipaddress
 import configparser
@@ -228,13 +228,9 @@ class Utilty:
 
     # Extract subdomain.
     def extract_subdomain(self, target_fqdn, domain):
-        subdomain = ''
-        point = target_fqdn.find(domain)
-        if point > 0:
-            subdomain = target_fqdn[:point]
-        elif point == 0:
-            subdomain = domain
-        return subdomain
+        if target_fqdn.endswith('.' + domain):
+            return target_fqdn[:-len(domain)]
+        return ''
 
     # Decode parameter (name and value).
     def decode_parameter(self, params, enc):
@@ -353,7 +349,7 @@ class Utilty:
             encoding = obj_match.group(1)
             self.print_message(WARNING, 'Set encoding: {}'.format(encoding))
         else:
-            guess = cchardet.detect(data)
+            guess = chardet.detect(data)
             if guess['encoding'] is not None:
                 encoding = guess['encoding']
                 self.print_message(WARNING, 'Set encoding: {}'.format(encoding))
